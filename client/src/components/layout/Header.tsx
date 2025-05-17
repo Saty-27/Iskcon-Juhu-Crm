@@ -44,40 +44,29 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/">
-              <a className="font-poppins font-medium text-primary hover:text-secondary transition-colors">
-                Home
-              </a>
+            <Link href="/" className="font-poppins font-medium text-primary hover:text-secondary transition-colors">
+              Home
             </Link>
-            <Link href="/donate">
-              <a className="font-poppins font-medium text-dark hover:text-secondary transition-colors">
-                Donate
-              </a>
+            <Link href="/donate" className="font-poppins font-medium text-dark hover:text-secondary transition-colors">
+              Donate
             </Link>
-            <Link href="/events">
-              <a className="font-poppins font-medium text-dark hover:text-secondary transition-colors">
-                Events
-              </a>
+            <Link href="/events" className="font-poppins font-medium text-dark hover:text-secondary transition-colors">
+              Events
             </Link>
-            <Link href="/gallery">
-              <a className="font-poppins font-medium text-dark hover:text-secondary transition-colors">
-                Gallery
-              </a>
+            <Link href="/gallery" className="font-poppins font-medium text-dark hover:text-secondary transition-colors">
+              Gallery
             </Link>
-            <Link href="/videos">
-              <a className="font-poppins font-medium text-dark hover:text-secondary transition-colors">
-                Videos
-              </a>
+            <Link href="/videos" className="font-poppins font-medium text-dark hover:text-secondary transition-colors">
+              Videos
             </Link>
-            <Link href="/contact">
-              <a className="font-poppins font-medium text-dark hover:text-secondary transition-colors">
-                Contact
-              </a>
+            <Link href="/contact" className="font-poppins font-medium text-dark hover:text-secondary transition-colors">
+              Contact
             </Link>
-            <Link href={isAuthenticated ? '/profile' : '/login'}>
-              <a className="font-poppins text-white bg-primary hover:bg-opacity-90 px-5 py-2 rounded-full transition-colors">
-                {isAuthenticated ? 'My Profile' : 'Login'}
-              </a>
+            <Link 
+              href={isAuthenticated ? '/profile' : '/login'} 
+              className="font-poppins text-white bg-primary hover:bg-opacity-90 px-5 py-2 rounded-full transition-colors"
+            >
+              {isAuthenticated ? 'My Profile' : 'Login'}
             </Link>
           </nav>
 
@@ -97,61 +86,54 @@ const Header = () => {
       >
         <div className="container mx-auto px-4 py-3">
           <nav className="flex flex-col space-y-4 py-2">
-            <Link href="/">
-              <a 
-                className="font-poppins font-medium text-primary hover:text-secondary transition-colors"
-                onClick={closeMobileMenu}
-              >
-                Home
-              </a>
+            <Link 
+              href="/"
+              className="font-poppins font-medium text-primary hover:text-secondary transition-colors"
+              onClick={closeMobileMenu}
+            >
+              Home
             </Link>
-            <Link href="/donate">
-              <a 
-                className="font-poppins font-medium text-dark hover:text-secondary transition-colors"
-                onClick={closeMobileMenu}
-              >
-                Donate
-              </a>
+            <Link 
+              href="/donate"
+              className="font-poppins font-medium text-dark hover:text-secondary transition-colors"
+              onClick={closeMobileMenu}
+            >
+              Donate
             </Link>
-            <Link href="/events">
-              <a 
-                className="font-poppins font-medium text-dark hover:text-secondary transition-colors"
-                onClick={closeMobileMenu}
-              >
-                Events
-              </a>
+            <Link 
+              href="/events"
+              className="font-poppins font-medium text-dark hover:text-secondary transition-colors"
+              onClick={closeMobileMenu}
+            >
+              Events
             </Link>
-            <Link href="/gallery">
-              <a 
-                className="font-poppins font-medium text-dark hover:text-secondary transition-colors"
-                onClick={closeMobileMenu}
-              >
-                Gallery
-              </a>
+            <Link 
+              href="/gallery"
+              className="font-poppins font-medium text-dark hover:text-secondary transition-colors"
+              onClick={closeMobileMenu}
+            >
+              Gallery
             </Link>
-            <Link href="/videos">
-              <a 
-                className="font-poppins font-medium text-dark hover:text-secondary transition-colors"
-                onClick={closeMobileMenu}
-              >
-                Videos
-              </a>
+            <Link 
+              href="/videos"
+              className="font-poppins font-medium text-dark hover:text-secondary transition-colors"
+              onClick={closeMobileMenu}
+            >
+              Videos
             </Link>
-            <Link href="/contact">
-              <a 
-                className="font-poppins font-medium text-dark hover:text-secondary transition-colors"
-                onClick={closeMobileMenu}
-              >
-                Contact
-              </a>
+            <Link 
+              href="/contact"
+              className="font-poppins font-medium text-dark hover:text-secondary transition-colors"
+              onClick={closeMobileMenu}
+            >
+              Contact
             </Link>
-            <Link href={isAuthenticated ? '/profile' : '/login'}>
-              <a 
-                className="font-poppins text-white bg-primary hover:bg-opacity-90 px-5 py-2 rounded-full text-center transition-colors"
-                onClick={closeMobileMenu}
-              >
-                {isAuthenticated ? 'My Profile' : 'Login'}
-              </a>
+            <Link 
+              href={isAuthenticated ? '/profile' : '/login'}
+              className="font-poppins text-white bg-primary hover:bg-opacity-90 px-5 py-2 rounded-full text-center transition-colors"
+              onClick={closeMobileMenu}
+            >
+              {isAuthenticated ? 'My Profile' : 'Login'}
             </Link>
           </nav>
         </div>
