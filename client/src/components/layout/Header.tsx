@@ -62,12 +62,24 @@ const Header = () => {
             <Link href="/contact" className="font-poppins font-medium text-dark hover:text-secondary transition-colors">
               Contact
             </Link>
-            <Link 
-              href={isAuthenticated ? '/profile' : '/login'} 
-              className="font-poppins text-white bg-primary hover:bg-opacity-90 px-5 py-2 rounded-full transition-colors"
-            >
-              {isAuthenticated ? 'My Profile' : 'Login'}
-            </Link>
+            {isAuthenticated && user ? (
+              <div className="flex items-center space-x-2">
+                <span className="font-poppins text-dark font-medium">{user.name}</span>
+                <Link 
+                  href="/profile" 
+                  className="font-poppins text-white bg-primary hover:bg-opacity-90 px-5 py-2 rounded-full transition-colors"
+                >
+                  My Profile
+                </Link>
+              </div>
+            ) : (
+              <Link 
+                href="/login" 
+                className="font-poppins text-white bg-primary hover:bg-opacity-90 px-5 py-2 rounded-full transition-colors"
+              >
+                Login
+              </Link>
+            )}
           </nav>
 
           {/* Mobile Menu Button */}
@@ -128,13 +140,26 @@ const Header = () => {
             >
               Contact
             </Link>
-            <Link 
-              href={isAuthenticated ? '/profile' : '/login'}
-              className="font-poppins text-white bg-primary hover:bg-opacity-90 px-5 py-2 rounded-full text-center transition-colors"
-              onClick={closeMobileMenu}
-            >
-              {isAuthenticated ? 'My Profile' : 'Login'}
-            </Link>
+            {isAuthenticated && user ? (
+              <div className="flex flex-col space-y-2">
+                <span className="font-poppins text-dark font-medium">Welcome, {user.name}</span>
+                <Link 
+                  href="/profile"
+                  className="font-poppins text-white bg-primary hover:bg-opacity-90 px-5 py-2 rounded-full text-center transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  My Profile
+                </Link>
+              </div>
+            ) : (
+              <Link 
+                href="/login"
+                className="font-poppins text-white bg-primary hover:bg-opacity-90 px-5 py-2 rounded-full text-center transition-colors"
+                onClick={closeMobileMenu}
+              >
+                Login
+              </Link>
+            )}
           </nav>
         </div>
       </div>
