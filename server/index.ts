@@ -3,6 +3,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { createDefaultAdmin } from "./createDefaultAdmin";
 import { storage } from "./storage";
+import connectDB from './mongodb'; // Import MongoDB connection
 
 const app = express();
 app.use(express.json());
@@ -39,6 +40,10 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Connect to MongoDB first
+  await connectDB();
+  console.log('MongoDB connected successfully');
+  
   // Create a default admin user if one doesn't exist
   await createDefaultAdmin();
   

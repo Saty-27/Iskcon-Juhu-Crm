@@ -762,4 +762,8 @@ export class MemStorage implements IStorage {
 
 import { DatabaseStorage } from "./dbStorage";
 
-export const storage = new DatabaseStorage();
+// Import MongoDB storage implementation
+import { mongoStorage } from './mongoStorage';
+
+// Use MongoDB storage implementation
+export const storage = mongoStorage;
