@@ -1,0 +1,260 @@
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+const contactFormSchema = z.object({
+  name: z.string().min(2, { message: 'Name must be at least 2 characters' }),
+  email: z.string().email({ message: 'Please enter a valid email address' }),
+  phone: z.string().optional(),
+  subject: z.string(),
+  message: z.string().min(10, { message: 'Message must be at least 10 characters' }),
+});
+
+type ContactFormValues = z.infer<typeof contactFormSchema>;
+
+const ContactSection = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+  
+  const form = useForm<ContactFormValues>({
+    resolver: zodResolver(contactFormSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      phone: '',
+      subject: 'general',
+      message: '',
+    },
+  });
+  
+  const onSubmit = async (data: ContactFormValues) => {
+    setIsSubmitting(true);
+    
+    try {
+      await apiRequest('POST', '/api/contact', data);
+      
+      toast({
+        title: "Message Sent",
+        description: "Thank you! We'll get back to you soon.",
+        variant: "success",
+      });
+      
+      form.reset();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "There was an error sending your message. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  
+  return (
+    <section className="py-16 bg-neutral relative">
+      <div className="container mx-auto px-4">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <div>
+            <h2 className="font-poppins font-bold text-3xl md:text-4xl text-primary mb-4">
+              Get in Touch
+            </h2>
+            <p className="font-opensans text-lg text-dark mb-6">
+              We'd love to hear from you. Reach out for inquiries, spiritual guidance, 
+              or to participate in our services.
+            </p>
+            
+            <div className="space-y-6">
+              <div className="flex items-start">
+                <div className="text-2xl text-primary mr-4">
+                  <i className="ri-map-pin-2-fill"></i>
+                </div>
+                <div>
+                  <h4 className="font-poppins font-semibold text-lg text-primary mb-1">Address</h4>
+                  <p className="font-opensans text-dark">
+                    Hare Krishna Land, Juhu, Mumbai, Maharashtra 400049, India
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start">
+                <div className="text-2xl text-primary mr-4">
+                  <i className="ri-phone-fill"></i>
+                </div>
+                <div>
+                  <h4 className="font-poppins font-semibold text-lg text-primary mb-1">Phone</h4>
+                  <p className="font-opensans text-dark">+91 22 2620 0072</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start">
+                <div className="text-2xl text-primary mr-4">
+                  <i className="ri-mail-fill"></i>
+                </div>
+                <div>
+                  <h4 className="font-poppins font-semibold text-lg text-primary mb-1">Email</h4>
+                  <p className="font-opensans text-dark">info@iskconjuhu.in</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start">
+                <div className="text-2xl text-primary mr-4">
+                  <i className="ri-time-fill"></i>
+                </div>
+                <div>
+                  <h4 className="font-poppins font-semibold text-lg text-primary mb-1">Temple Hours</h4>
+                  <p className="font-opensans text-dark">Daily: 4:30 AM - 9:00 PM<br/>Special timings during festivals</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-8">
+              <h4 className="font-poppins font-semibold text-lg text-primary mb-3">Connect With Us</h4>
+              <div className="flex space-x-4">
+                <a href="https://facebook.com/iskconjuhu" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center hover:bg-secondary transition-colors">
+                  <i className="ri-facebook-fill"></i>
+                </a>
+                <a href="https://instagram.com/iskconjuhu" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center hover:bg-secondary transition-colors">
+                  <i className="ri-instagram-fill"></i>
+                </a>
+                <a href="https://youtube.com/iskconjuhu" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center hover:bg-secondary transition-colors">
+                  <i className="ri-youtube-fill"></i>
+                </a>
+                <a href="https://twitter.com/iskconjuhu" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center hover:bg-secondary transition-colors">
+                  <i className="ri-twitter-fill"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white p-6 md:p-8 rounded-xl shadow-md">
+            <h3 className="font-poppins font-semibold text-xl text-primary mb-6">Send us a Message</h3>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-dark font-medium">Your Name</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="John Doe" 
+                          {...field} 
+                          className="focus:ring-primary"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-dark font-medium">Email Address</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="john@example.com" 
+                          type="email"
+                          {...field} 
+                          className="focus:ring-primary"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-dark font-medium">Phone Number</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="+91 98765 43210" 
+                          {...field} 
+                          className="focus:ring-primary"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="subject"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-dark font-medium">Subject</FormLabel>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a subject" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="general">General Inquiry</SelectItem>
+                          <SelectItem value="donation">Donation Related</SelectItem>
+                          <SelectItem value="event">Event Information</SelectItem>
+                          <SelectItem value="volunteer">Volunteering</SelectItem>
+                          <SelectItem value="spiritual">Spiritual Guidance</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="message"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-dark font-medium">Your Message</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Your message here..." 
+                          {...field}
+                          rows={4}
+                          className="focus:ring-primary"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <Button 
+                  type="submit" 
+                  className="w-full bg-primary text-white font-poppins font-medium py-3 rounded-lg hover:bg-opacity-90 transition-colors"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Sending..." : "Send Message"}
+                </Button>
+              </form>
+            </Form>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default ContactSection;

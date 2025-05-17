@@ -1,0 +1,126 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Open+Sans:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
+@import url('https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Base colors */
+  --primary: 288 69% 29%; /* #702963 - ISKCON purple */
+  --primary-foreground: 0 0% 100%;
+  
+  --secondary: 33 100% 60%; /* #FF9933 - ISKCON orange */
+  --secondary-foreground: 0 0% 100%;
+  
+  --accent: 134 100% 26%; /* #138808 - ISKCON green */
+  --accent-foreground: 0 0% 100%;
+  
+  /* System colors */
+  --background: 48 60% 96%; /* #F8F5E6 - Neutral background */
+  --foreground: 0 0% 20%; /* #333333 - Dark text */
+  
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 20%;
+  
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 20%;
+  
+  --border: 0 0% 89.8%;
+  --input: 0 0% 89.8%;
+  
+  --muted: 48 10% 90%;
+  --muted-foreground: 0 0% 45.1%;
+  
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  
+  --success: 142 76% 45%; /* #22C55E - Success green */
+  --success-foreground: 0 0% 100%;
+  
+  --warning: 38 92% 50%; /* #F59E0B - Warning yellow */
+  --warning-foreground: 0 0% 100%;
+  
+  --ring: var(--primary);
+  --radius: 0.5rem;
+  
+  /* Chart colors */
+  --chart-1: var(--primary);
+  --chart-2: var(--secondary);
+  --chart-3: var(--accent);
+  --chart-4: var(--success);
+  --chart-5: var(--warning);
+  
+  /* Sidebar colors */
+  --sidebar-background: var(--primary);
+  --sidebar-foreground: 0 0% 100%;
+  --sidebar-primary: var(--secondary);
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 0 0% 100%;
+  --sidebar-accent-foreground: var(--primary);
+  --sidebar-border: 288 30% 40%;
+  --sidebar-ring: var(--secondary);
+}
+
+.dark {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 300 80% 45%; /* Lighter purple for dark mode */
+  --primary-foreground: 0 0% 98%;
+  --secondary: 33 100% 65%; /* Lighter orange for dark mode */
+  --secondary-foreground: 240 5.9% 10%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --accent: 134 80% 40%; /* Lighter green for dark mode */
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --ring: 240 4.9% 83.9%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-opensans;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-poppins font-semibold;
+  }
+  
+  .font-playfair {
+    font-family: 'Playfair Display', serif;
+  }
+  
+  .font-poppins {
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .font-opensans {
+    font-family: 'Open Sans', sans-serif;
+  }
+}
+
+/* Slider animations */
+.slide {
+  display: none;
+  animation: fade 1.5s ease-in-out;
+}
+
+.slide.active {
+  display: block;
+}
+
+@keyframes fade {
+  from {opacity: 0.7}
+  to {opacity: 1}
+}
