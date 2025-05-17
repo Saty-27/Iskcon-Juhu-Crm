@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { createDefaultAdmin } from "./createDefaultAdmin";
+import { storage } from "./storage";
 
 const app = express();
 app.use(express.json());
@@ -40,6 +41,21 @@ app.use((req, res, next) => {
 (async () => {
   // Create a default admin user if one doesn't exist
   await createDefaultAdmin();
+  
+  // Create a new admin user with known credentials
+  try {
+    const newAdmin = await storage.createUser({
+      username: "iskconadmin",
+      password: "iskcon123",
+      email: "admin2@iskconjuhu.org",
+      name: "ISKCON Admin",
+      role: "admin"
+    });
+    console.log("New admin created with username: iskconadmin and password: iskcon123");
+  } catch (error) {
+    // If user already exists, this will fail which is fine
+    console.log("Note: New admin account already exists or couldn't be created");
+  }
   
   const server = await registerRoutes(app);
 
