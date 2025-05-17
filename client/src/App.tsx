@@ -19,6 +19,11 @@ import AdminBanners from "@/pages/admin/Banners";
 import AdminEvents from "@/pages/admin/Events";
 import AdminGallery from "@/pages/admin/Gallery";
 import AdminVideos from "@/pages/admin/Videos";
+import AdminDonations from "@/pages/admin/Donations";
+import AdminDonationCategories from "@/pages/admin/DonationCategories";
+import AdminQuotes from "@/pages/admin/Quotes";
+import AdminUsers from "@/pages/admin/Users";
+import AdminMessages from "@/pages/admin/Messages";
 
 function Router() {
   return (
@@ -42,6 +47,9 @@ function Router() {
       <Route path="/admin/events" component={AdminEvents} />
       <Route path="/admin/gallery" component={AdminGallery} />
       <Route path="/admin/videos" component={AdminVideos} />
+      <Route path="/admin/donations" component={AdminDonations} />
+      <Route path="/admin/donation-categories" component={AdminDonationCategories} />
+      <Route path="/admin/quotes" component={AdminQuotes} />
       
       {/* Fallback to 404 */}
       <Route component={NotFound} />
