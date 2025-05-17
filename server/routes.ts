@@ -659,6 +659,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Current user endpoint
+  app.get("/api/auth/me", async (req, res) => {
+    try {
+      if (!req.session || !req.session.userId) {
+        return res.status(200).json(null);
+      }
+      
+      const user = await storage.getUser(req.session.userId);
+      
+      if (!user) {
+        return res.status(200).json(null);
+      }
+      
+      // Remove password from response
+      const { password, ...userWithoutPassword } = user;
+      
+      res.json(userWithoutPassword);
+    } catch (error) {
+      console.error("Error fetching current user:", error);
+      res.status(500).json({ message: "Error fetching current user" });
+    }
+  });
+  
   // User authentication API endpoints
   app.post("/api/auth/register", async (req, res) => {
     try {
