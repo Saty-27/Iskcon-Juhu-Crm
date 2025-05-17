@@ -50,6 +50,8 @@ function Router() {
       <Route path="/admin/donations" component={AdminDonations} />
       <Route path="/admin/donation-categories" component={AdminDonationCategories} />
       <Route path="/admin/quotes" component={AdminQuotes} />
+      <Route path="/admin/users" component={AdminUsers} />
+      <Route path="/admin/messages" component={AdminMessages} />
       
       {/* Fallback to 404 */}
       <Route component={NotFound} />
