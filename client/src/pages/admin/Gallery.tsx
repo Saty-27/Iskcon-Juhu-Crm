@@ -1,22 +1,22 @@
 import { Helmet } from 'react-helmet';
 import Layout from '@/components/admin/Layout';
 
-const BannersManagement = () => {
+const GalleryManagement = () => {
   return (
     <Layout>
       <Helmet>
-        <title>Banners Management - ISKCON Juhu Admin</title>
+        <title>Gallery Management - ISKCON Juhu Admin</title>
       </Helmet>
       
       <div className="p-6">
-        <h1 className="text-3xl font-bold text-primary mb-8">Banners Management</h1>
+        <h1 className="text-3xl font-bold text-primary mb-8">Gallery Management</h1>
         
         <div className="bg-white p-6 rounded-lg shadow">
-          <p>Banners management interface will be implemented here.</p>
+          <p>Gallery management interface will be implemented here.</p>
         </div>
       </div>
     </Layout>
   );
 };
 
-export default BannersManagement;
+export default GalleryManagement;

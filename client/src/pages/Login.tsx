@@ -1,17 +1,16 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link, useLocation } from 'wouter';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import useAuth from '@/hooks/useAuth';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { queryClient } from '@/lib/queryClient';
 
 const loginFormSchema = z.object({
   username: z.string().min(1, { message: 'Username is required' }),
@@ -21,9 +20,9 @@ const loginFormSchema = z.object({
 type LoginFormValues = z.infer<typeof loginFormSchema>;
 
 const Login = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
+  const { login, isAuthenticated, user, isPendingLogin } = useAuth();
   
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginFormSchema),
@@ -32,33 +31,34 @@ const Login = () => {
       password: '',
     },
   });
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      // Redirect based on user role
+      if (user && user.role === 'admin') {
+        setLocation('/admin');
+      } else {
+        setLocation('/profile');
+      }
+    }
+  }, [isAuthenticated, user, setLocation]);
   
   const onSubmit = async (data: LoginFormValues) => {
-    setIsSubmitting(true);
-    
     try {
-      const response = await apiRequest('POST', '/api/auth/login', data);
+      await login(data);
       
-      // User successfully logged in
       toast({
         title: "Login Successful",
         description: "Welcome back!",
-        variant: "success",
       });
-      
-      // Invalidate user profile query to refetch user data
-      queryClient.invalidateQueries({ queryKey: ['/api/user/profile'] });
-      
-      // Redirect to profile or home page
-      setLocation('/profile');
     } catch (error) {
+      console.error('Login error:', error);
       toast({
         title: "Login Failed",
         description: "Invalid username or password. Please try again.",
         variant: "destructive",
       });
-    } finally {
-      setIsSubmitting(false);
     }
   };
   
@@ -124,9 +124,9 @@ const Login = () => {
                   <Button 
                     type="submit" 
                     className="w-full bg-primary text-white font-poppins font-medium py-2 rounded-lg hover:bg-opacity-90 transition-colors"
-                    disabled={isSubmitting}
+                    disabled={isPendingLogin}
                   >
-                    {isSubmitting ? "Logging in..." : "Login"}
+                    {isPendingLogin ? "Logging in..." : "Login"}
                   </Button>
                 </form>
               </Form>
