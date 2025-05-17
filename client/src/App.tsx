@@ -24,6 +24,8 @@ import AdminDonationCategories from "@/pages/admin/DonationCategories";
 import AdminQuotes from "@/pages/admin/Quotes";
 import AdminUsers from "@/pages/admin/Users";
 import AdminMessages from "@/pages/admin/Messages";
+import AdminTestimonials from "@/pages/admin/Testimonials";
+import AdminSocialLinks from "@/pages/admin/SocialLinks";
 
 function Router() {
   return (
@@ -52,6 +54,8 @@ function Router() {
       <Route path="/admin/quotes" component={AdminQuotes} />
       <Route path="/admin/users" component={AdminUsers} />
       <Route path="/admin/messages" component={AdminMessages} />
+      <Route path="/admin/testimonials" component={AdminTestimonials} />
+      <Route path="/admin/social-links" component={AdminSocialLinks} />
       
       {/* Fallback to 404 */}
       <Route component={NotFound} />
