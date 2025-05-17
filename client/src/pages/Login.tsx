@@ -35,11 +35,20 @@ const Login = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      // Redirect based on user role
-      if (user && user.role === 'admin') {
-        setLocation('/admin');
+      // Check for redirect parameter in URL
+      const params = new URLSearchParams(window.location.search);
+      const redirectPath = params.get('redirect');
+      
+      if (redirectPath) {
+        // If there's a redirect parameter, use it
+        setLocation(redirectPath);
       } else {
-        setLocation('/profile');
+        // Otherwise redirect based on user role
+        if (user && user.role === 'admin') {
+          setLocation('/admin');
+        } else {
+          setLocation('/profile');
+        }
       }
     }
   }, [isAuthenticated, user, setLocation]);

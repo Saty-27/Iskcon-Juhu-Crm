@@ -216,7 +216,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/donation-categories/:id", isAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const data = insertDonationCategorySchema.partial().parse(req.body);
+      const requestData = insertDonationCategorySchema.partial().parse(req.body);
+      
+      // Handle suggestedAmounts separately to ensure correct type
+      let data = { ...requestData };
+      if (requestData.suggestedAmounts && !Array.isArray(requestData.suggestedAmounts)) {
+        data = {
+          ...requestData,
+          suggestedAmounts: Array.isArray(requestData.suggestedAmounts) 
+            ? requestData.suggestedAmounts 
+            : null
+        };
+      }
+      
       const category = await storage.updateDonationCategory(id, data);
       if (!category) {
         return res.status(404).json({ message: "Donation category not found" });
@@ -282,7 +294,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/events/:id", isAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const data = insertEventSchema.partial().parse(req.body);
+      const requestData = insertEventSchema.partial().parse(req.body);
+      
+      // Handle suggestedAmounts separately to ensure correct type
+      let data = { ...requestData };
+      if (requestData.suggestedAmounts && !Array.isArray(requestData.suggestedAmounts)) {
+        data = {
+          ...requestData,
+          suggestedAmounts: Array.isArray(requestData.suggestedAmounts) 
+            ? requestData.suggestedAmounts 
+            : null
+        };
+      }
+      
       const event = await storage.updateEvent(id, data);
       if (!event) {
         return res.status(404).json({ message: "Event not found" });
