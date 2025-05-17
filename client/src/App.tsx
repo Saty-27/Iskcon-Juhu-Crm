@@ -15,6 +15,10 @@ import Profile from "@/pages/Profile";
 
 // Admin pages
 import AdminDashboard from "@/pages/admin/Dashboard";
+import AdminBanners from "@/pages/admin/Banners";
+import AdminEvents from "@/pages/admin/Events";
+import AdminGallery from "@/pages/admin/Gallery";
+import AdminVideos from "@/pages/admin/Videos";
 
 function Router() {
   return (
@@ -34,6 +38,10 @@ function Router() {
       
       {/* Admin routes */}
       <Route path="/admin" component={AdminDashboard} />
+      <Route path="/admin/banners" component={AdminBanners} />
+      <Route path="/admin/events" component={AdminEvents} />
+      <Route path="/admin/gallery" component={AdminGallery} />
+      <Route path="/admin/videos" component={AdminVideos} />
       
       {/* Fallback to 404 */}
       <Route component={NotFound} />

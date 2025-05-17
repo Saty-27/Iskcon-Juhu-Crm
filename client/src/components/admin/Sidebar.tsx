@@ -11,13 +11,11 @@ import {
   Mail, 
   MessageSquare,
   Share,
-  LogOut
+  Home
 } from 'lucide-react';
-import useAuth from '@/hooks/useAuth';
 
 const Sidebar = () => {
   const [location] = useLocation();
-  const { logout } = useAuth();
   
   const isActive = (path: string) => {
     return location === path;
@@ -108,13 +106,13 @@ const Sidebar = () => {
         </ul>
         
         <div className="border-t border-primary-dark mt-4 pt-4">
-          <button
-            onClick={logout}
+          <Link 
+            href="/"
             className="flex items-center p-2 rounded-lg text-white hover:bg-white/10 w-full"
           >
-            <LogOut className="mr-3 h-5 w-5" />
-            <span>Logout</span>
-          </button>
+            <Home className="mr-3 h-5 w-5" />
+            <span>Back to Website</span>
+          </Link>
         </div>
       </nav>
     </aside>
