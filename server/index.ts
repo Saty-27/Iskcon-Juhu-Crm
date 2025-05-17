@@ -3,7 +3,6 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { createDefaultAdmin } from "./createDefaultAdmin";
 import { storage } from "./storage";
-import connectDB from './mongodb'; // Import MongoDB connection
 
 const app = express();
 app.use(express.json());
