@@ -12,6 +12,7 @@ import Contact from "@/pages/Contact";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import Profile from "@/pages/Profile";
+import AdminRoute from "@/components/auth/AdminRoute";
 
 // Admin pages
 import AdminDashboard from "@/pages/admin/Dashboard";
@@ -43,19 +44,91 @@ function Router() {
       <Route path="/register" component={Register} />
       <Route path="/profile" component={Profile} />
       
-      {/* Admin routes */}
-      <Route path="/admin" component={AdminDashboard} />
-      <Route path="/admin/banners" component={AdminBanners} />
-      <Route path="/admin/events" component={AdminEvents} />
-      <Route path="/admin/gallery" component={AdminGallery} />
-      <Route path="/admin/videos" component={AdminVideos} />
-      <Route path="/admin/donations" component={AdminDonations} />
-      <Route path="/admin/donation-categories" component={AdminDonationCategories} />
-      <Route path="/admin/quotes" component={AdminQuotes} />
-      <Route path="/admin/users" component={AdminUsers} />
-      <Route path="/admin/messages" component={AdminMessages} />
-      <Route path="/admin/testimonials" component={AdminTestimonials} />
-      <Route path="/admin/social-links" component={AdminSocialLinks} />
+      {/* Admin routes - protected with AdminRoute */}
+      <Route path="/admin">
+        {() => (
+          <AdminRoute>
+            <AdminDashboard />
+          </AdminRoute>
+        )}
+      </Route>
+      <Route path="/admin/banners">
+        {() => (
+          <AdminRoute>
+            <AdminBanners />
+          </AdminRoute>
+        )}
+      </Route>
+      <Route path="/admin/events">
+        {() => (
+          <AdminRoute>
+            <AdminEvents />
+          </AdminRoute>
+        )}
+      </Route>
+      <Route path="/admin/gallery">
+        {() => (
+          <AdminRoute>
+            <AdminGallery />
+          </AdminRoute>
+        )}
+      </Route>
+      <Route path="/admin/videos">
+        {() => (
+          <AdminRoute>
+            <AdminVideos />
+          </AdminRoute>
+        )}
+      </Route>
+      <Route path="/admin/donations">
+        {() => (
+          <AdminRoute>
+            <AdminDonations />
+          </AdminRoute>
+        )}
+      </Route>
+      <Route path="/admin/donation-categories">
+        {() => (
+          <AdminRoute>
+            <AdminDonationCategories />
+          </AdminRoute>
+        )}
+      </Route>
+      <Route path="/admin/quotes">
+        {() => (
+          <AdminRoute>
+            <AdminQuotes />
+          </AdminRoute>
+        )}
+      </Route>
+      <Route path="/admin/users">
+        {() => (
+          <AdminRoute>
+            <AdminUsers />
+          </AdminRoute>
+        )}
+      </Route>
+      <Route path="/admin/messages">
+        {() => (
+          <AdminRoute>
+            <AdminMessages />
+          </AdminRoute>
+        )}
+      </Route>
+      <Route path="/admin/testimonials">
+        {() => (
+          <AdminRoute>
+            <AdminTestimonials />
+          </AdminRoute>
+        )}
+      </Route>
+      <Route path="/admin/social-links">
+        {() => (
+          <AdminRoute>
+            <AdminSocialLinks />
+          </AdminRoute>
+        )}
+      </Route>
       
       {/* Fallback to 404 */}
       <Route component={NotFound} />

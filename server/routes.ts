@@ -34,10 +34,23 @@ const isAuthenticated = (req: express.Request, res: express.Response, next: expr
   }
 };
 
-// Middleware for admin routes - now allows all access (no auth required)
+// Middleware to verify if user is an admin
 const isAdmin = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  // No authentication check - all requests allowed
-  next();
+  if (!req.session || !req.session.userId) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  try {
+    const user = await storage.getUser(req.session.userId);
+    if (!user || user.role !== "admin") {
+      return res.status(403).json({ message: "Forbidden - Admin access required" });
+    }
+    
+    next();
+  } catch (error) {
+    console.error("Error in admin authorization:", error);
+    return res.status(500).json({ message: "Error checking admin authorization" });
+  }
 };
 
 // Extend express Request type to include session
