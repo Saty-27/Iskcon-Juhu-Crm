@@ -15,15 +15,8 @@ import { X } from 'lucide-react';
 
 const donationFormSchema = z.object({
   amount: z.number().refine(
-    (val, ctx) => {
-      // Allow 1 Rupee if small donation option is selected
-      if (ctx.path && ctx.obj && (ctx as any).allowSmallAmount) {
-        return val >= 1;
-      }
-      // Otherwise require at least ₹100
-      return val >= 100;
-    },
-    { message: 'Amount must be at least ₹100 (or ₹1 for Shri donation)' }
+    (val) => val >= 1,
+    { message: 'Amount must be at least ₹1' }
   ),
   name: z.string().min(2, { message: 'Name must be at least 2 characters' }),
   email: z.string().email({ message: 'Please enter a valid email address' }),
@@ -61,9 +54,6 @@ const DonationModal = ({ isOpen, category, event, amount, onClose }: DonationMod
       phone: user?.phone || '',
       panCard: '',
       message: '',
-    },
-    context: {
-      allowSmallAmount: false // for 1 Rupee donations
     }
   });
   
@@ -160,7 +150,6 @@ const DonationModal = ({ isOpen, category, event, amount, onClose }: DonationMod
                   onClick={() => {
                     setIsShriDonation(true);
                     handleAmountSelect(1);
-                    form.setContext({ allowSmallAmount: true });
                   }}
                   className={`w-full border rounded-lg py-3 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary ${
                     isShriDonation
@@ -184,7 +173,6 @@ const DonationModal = ({ isOpen, category, event, amount, onClose }: DonationMod
                     onClick={() => {
                       setIsShriDonation(false);
                       handleAmountSelect(amt);
-                      form.setContext({ allowSmallAmount: false });
                     }}
                     className={`border rounded-lg py-2 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary ${
                       selectedAmount === amt && !isShriDonation
