@@ -33,8 +33,17 @@ const PaymentGateway = () => {
     if (storedData) {
       try {
         const parsedData = JSON.parse(storedData);
+        
+        // Ensure amount is stored as a number
+        if (parsedData && parsedData.amount) {
+          parsedData.amount = typeof parsedData.amount === 'number' 
+            ? parsedData.amount 
+            : parseFloat(String(parsedData.amount));
+        }
+        
         setPaymentData(parsedData);
       } catch (err) {
+        console.error('Error parsing payment data:', err);
         setError('Invalid payment data. Please try again.');
       }
     } else {
