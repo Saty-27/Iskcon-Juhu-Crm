@@ -95,27 +95,19 @@ const DonationModal = ({ isOpen, category, event, amount, onClose }: DonationMod
           variant: "default",
         });
         
-        // Create and display PayU info (for demonstration/testing)
-        // In a production environment, you would redirect to the PayU gateway
-        toast({
-          title: "Payment Request Created",
-          description: "Your donation has been recorded. In a live environment, you would be redirected to PayU.",
-          variant: "default",
-        });
+        // Store payment data in localStorage for the payment simulator
+        localStorage.setItem('payuData', JSON.stringify({
+          txnid: result.paymentData.txnid,
+          amount: result.paymentData.amount,
+          firstname: result.paymentData.firstname,
+          email: result.paymentData.email,
+          phone: result.paymentData.phone,
+          productinfo: result.paymentData.productinfo,
+          key: result.paymentData.key
+        }));
         
-        // For testing purposes, we'll redirect to the thank-you page directly
-        const params = new URLSearchParams();
-        params.append('txnid', result.paymentData.txnid);
-        params.append('amount', String(result.paymentData.amount));
-        params.append('firstname', String(result.paymentData.firstname));
-        params.append('email', String(result.paymentData.email));
-        params.append('phone', String(result.paymentData.phone));
-        params.append('status', 'success');
-        
-        // Simulate successful payment - in production this would be handled by PayU
-        setTimeout(() => {
-          window.location.href = `/donate/thank-you?${params.toString()}`;
-        }, 1500);
+        // Redirect to payment simulation page
+        window.location.href = '/donate/payment-gateway';
       } else {
         throw new Error(result.message || 'Payment initialization failed');
       }

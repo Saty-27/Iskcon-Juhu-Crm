@@ -7,6 +7,7 @@ import Home from "@/pages/Home";
 import Events from "@/pages/Events";
 import Donate from "@/pages/Donate";
 import DonateThankYou from "@/pages/donate/ThankYou";
+import PaymentGateway from "@/pages/donate/PaymentGateway";
 import Gallery from "@/pages/Gallery";
 import Videos from "@/pages/Videos";
 import Contact from "@/pages/Contact";
@@ -38,6 +39,7 @@ function Router() {
       <Route path="/events" component={Events} />
       <Route path="/donate" component={Donate} />
       <Route path="/donate/thank-you" component={DonateThankYou} />
+      <Route path="/donate/payment-gateway" component={PaymentGateway} />
       <Route path="/gallery" component={Gallery} />
       <Route path="/videos" component={Videos} />
       <Route path="/contact" component={Contact} />
