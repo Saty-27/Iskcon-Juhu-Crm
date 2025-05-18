@@ -203,7 +203,7 @@ const DonationModal = ({ isOpen, category, event, amount, onClose }: DonationMod
                             setSelectedAmount(null);
                           }}
                           value={field.value === 0 ? '' : field.value}
-                          min={100}
+                          min={1}
                         />
                       </FormControl>
                     </div>
