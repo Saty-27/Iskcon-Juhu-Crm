@@ -13,6 +13,8 @@ interface TransactionData {
   paymentMethod?: string;
   bankRefNum?: string;
   status?: string;
+  purpose?: string;
+  categoryId?: string;
 }
 
 const ThankYou = () => {
@@ -27,9 +29,11 @@ const ThankYou = () => {
     const email = params.get('email') || '';
     const firstname = params.get('firstname') || '';
     const phone = params.get('phone') || '';
-    const paymentMethod = params.get('PG_TYPE') || '';
+    const paymentMethod = params.get('PG_TYPE') || params.get('paymentMethod') || '';
     const bankRefNum = params.get('bank_ref_num') || '';
     const status = params.get('status') || 'success';
+    const purpose = params.get('purpose') || '';
+    const categoryId = params.get('categoryId') || '';
     
     setTxnData({ 
       txnid, 
@@ -39,7 +43,9 @@ const ThankYou = () => {
       phone, 
       paymentMethod, 
       bankRefNum,
-      status
+      status,
+      purpose,
+      categoryId
     });
     
     // If no transaction ID, redirect to donation page
@@ -127,10 +133,18 @@ const ThankYou = () => {
             Hare Krishna, {txnData.firstname || 'Devotee'}!
           </h1>
           
-          <p className="font-opensans text-gray-700 mb-8 max-w-lg mx-auto">
-            Thank you for your kind donation towards Krishna's Prasadam distribution.
+          <p className="font-opensans text-gray-700 mb-4 max-w-lg mx-auto">
+            Thank you for your kind donation
+            {txnData.purpose ? (
+              <span> towards <span className="font-semibold text-[#d35400]">{txnData.purpose}</span></span>
+            ) : ""}
+            .
             <br />We are blessed to have your support.
           </p>
+          
+          <div className="text-green-600 bg-green-50 px-4 py-2 rounded-full mb-8 font-medium inline-block">
+            A confirmation receipt will be sent to your WhatsApp number shortly.
+          </div>
           
           <div className="bg-[#fdf4e7] border-l-4 border-[#e67e22] rounded-lg p-6 mb-8 text-left">
             <div className="grid gap-2">
