@@ -3,10 +3,12 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { createDefaultAdmin } from "./createDefaultAdmin";
 import { storage } from "./storage";
+import paymentRoutes from "./routes/payment";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use('/api/payments', paymentRoutes);
 
 app.use((req, res, next) => {
   const start = Date.now();
