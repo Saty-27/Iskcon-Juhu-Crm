@@ -107,15 +107,65 @@ router.post('/success', async (req, res) => {
   try {
     const paymentResponse = req.body;
     
+    // Import invoice service functions
+    const { generateInvoiceNumber, sendWhatsAppReceipt } = await import('../services/invoiceService');
+    
     // Update donation status to completed
     if (paymentResponse && paymentResponse.txnid) {
       const donation = await storage.getDonationByPaymentId(paymentResponse.txnid);
       
       if (donation) {
+        // Generate a unique invoice number
+        const invoiceNumber = generateInvoiceNumber();
+        
+        // Update donation status
         await storage.updateDonation(donation.id, {
           status: 'completed',
-          paymentId: paymentResponse.mihpayid || paymentResponse.txnid
+          paymentId: paymentResponse.mihpayid || paymentResponse.txnid,
+          invoiceNumber
         });
+        
+        // Get purpose from category or event
+        let purpose = "ISKCON Juhu Donation";
+        if (donation.categoryId) {
+          const category = await storage.getDonationCategory(donation.categoryId);
+          if (category) {
+            purpose = category.name;
+          }
+        } else if (donation.eventId) {
+          const event = await storage.getEvent(donation.eventId);
+          if (event) {
+            purpose = event.title;
+          }
+        }
+        
+        // Send WhatsApp receipt for successful payment
+        if (donation.phone && !donation.receiptSent) {
+          try {
+            const receiptData = {
+              txnid: donation.paymentId || paymentResponse.txnid,
+              amount: donation.amount,
+              name: donation.name,
+              email: donation.email,
+              phone: donation.phone,
+              date: donation.createdAt,
+              paymentMethod: 'Online Payment',
+              purpose,
+              invoiceNumber
+            };
+            
+            await sendWhatsAppReceipt(donation.phone, receiptData);
+            
+            // Mark receipt as sent
+            await storage.updateDonation(donation.id, {
+              receiptSent: true
+            });
+            
+            console.log(`Payment receipt sent to ${donation.phone}`);
+          } catch (receiptError) {
+            console.error('Error sending payment receipt:', receiptError);
+          }
+        }
       }
     }
     
@@ -270,6 +320,10 @@ router.post('/verify-upi', async (req, res) => {
     // Import UPI service functions
     const { verifyUpiTransaction } = await import('../services/upiService');
     
+    // Import notification and receipt services
+    const { sendFailedPaymentNotification } = await import('../services/notificationService');
+    const { generateInvoiceNumber, sendWhatsAppReceipt } = await import('../services/invoiceService');
+    
     // Get the donation record
     const donation = await storage.getDonationByPaymentId(txnid);
     
@@ -280,14 +334,60 @@ router.post('/verify-upi', async (req, res) => {
       });
     }
     
+    // Get purpose from category or event
+    let purpose = "ISKCON Juhu Donation";
+    if (donation.categoryId) {
+      const category = await storage.getDonationCategory(donation.categoryId);
+      if (category) {
+        purpose = category.name;
+      }
+    } else if (donation.eventId) {
+      const event = await storage.getEvent(donation.eventId);
+      if (event) {
+        purpose = event.title;
+      }
+    }
+    
     // Verify UPI transaction status
     const verificationResult = await verifyUpiTransaction(txnid);
     
     if (verificationResult.success) {
+      // Generate a unique invoice number
+      const invoiceNumber = generateInvoiceNumber();
+      
       // Update donation status to completed
       await storage.updateDonation(donation.id, {
-        status: 'completed'
+        status: 'completed_upi',
+        invoiceNumber
       });
+      
+      // Send WhatsApp receipt for successful payment if not already sent
+      if (donation.phone && !donation.receiptSent) {
+        try {
+          const receiptData = {
+            txnid: donation.paymentId || txnid,
+            amount: donation.amount,
+            name: donation.name,
+            email: donation.email,
+            phone: donation.phone,
+            date: donation.createdAt,
+            paymentMethod: 'UPI',
+            purpose,
+            invoiceNumber
+          };
+          
+          await sendWhatsAppReceipt(donation.phone, receiptData);
+          
+          // Mark receipt as sent
+          await storage.updateDonation(donation.id, {
+            receiptSent: true
+          });
+          
+          console.log(`UPI payment receipt sent to ${donation.phone}`);
+        } catch (receiptError) {
+          console.error('Error sending UPI payment receipt:', receiptError);
+        }
+      }
       
       return res.json({
         success: true,
@@ -302,9 +402,31 @@ router.post('/verify-upi', async (req, res) => {
       });
     } else {
       // Update donation status based on verification result
+      const newStatus = verificationResult.status === 'pending' ? 'pending' : 'failed_upi';
       await storage.updateDonation(donation.id, {
-        status: verificationResult.status === 'pending' ? 'pending' : 'failed'
+        status: newStatus
       });
+      
+      // Send WhatsApp notification about failed payment if it's marked as failed
+      if (newStatus === 'failed_upi' && donation.phone && !donation.notificationSent) {
+        try {
+          await sendFailedPaymentNotification(
+            donation.phone,
+            donation.name,
+            donation.amount,
+            purpose
+          );
+          
+          // Mark notification as sent
+          await storage.updateDonation(donation.id, {
+            notificationSent: true
+          });
+          
+          console.log(`UPI failed payment notification sent to ${donation.phone}`);
+        } catch (notifyError) {
+          console.error('Error sending UPI payment failure notification:', notifyError);
+        }
+      }
       
       return res.json({
         success: false,
