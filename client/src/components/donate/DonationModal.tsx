@@ -80,7 +80,7 @@ const DonationModal = ({ isOpen, category, event, amount, onClose }: DonationMod
       };
       
       // Initialize payment with PayU
-      const response = await apiRequest('POST', '/api/payments/initialize', donationData);
+      const response = await apiRequest('POST', '/api/payments/initiate', donationData);
       
       if (!response.ok) {
         throw new Error(`Server error: ${response.status}`);

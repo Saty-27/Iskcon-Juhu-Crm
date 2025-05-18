@@ -172,7 +172,7 @@ const PaymentGateway = () => {
               
               <div className="flex justify-between text-primary font-semibold">
                 <span>Amount:</span>
-                <span>₹{paymentData.amount.toFixed(2)}</span>
+                <span>₹{typeof paymentData.amount === 'number' ? paymentData.amount.toFixed(2) : parseFloat(String(paymentData.amount)).toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -339,7 +339,7 @@ const PaymentGateway = () => {
                                       />
                                     </div>
                                     <div style="margin-bottom: 5px; font-weight: 500;">Pay to ISKCON Juhu</div>
-                                    <div style="margin-bottom: 10px; font-size: 20px; font-weight: bold; color: #5a189a;">₹${paymentData?.amount.toFixed(2)}</div>
+                                    <div style="margin-bottom: 10px; font-size: 20px; font-weight: bold; color: #5a189a;">₹${typeof paymentData?.amount === 'number' ? paymentData.amount.toFixed(2) : paymentData?.amount}</div>
                                     <div style="margin-bottom: 10px; color: #666; font-size: 14px;">UPI ID: iskcon@hdfcbank</div>
                                     <div style="margin-bottom: 15px; color: #888; font-size: 12px;">Scan with any UPI app: Google Pay, PhonePe, Paytm, etc.</div>
                                     <div style="display: flex; width: 100%; gap: 10px;">
@@ -408,8 +408,11 @@ const PaymentGateway = () => {
                                   // Add event listeners
                                   document.getElementById('payment-success-btn')?.addEventListener('click', async () => {
                                     // Show loading indicator
-                                    document.getElementById('payment-success-btn').innerHTML = 'Verifying...';
-                                    document.getElementById('payment-failed-btn').disabled = true;
+                                    const successBtn = document.getElementById('payment-success-btn');
+                                    const failedBtn = document.getElementById('payment-failed-btn');
+                                    
+                                    if (successBtn) successBtn.innerHTML = 'Verifying...';
+                                    if (failedBtn) failedBtn.setAttribute('disabled', 'true');
                                     
                                     try {
                                       // Verify payment status with server
@@ -676,7 +679,7 @@ const PaymentGateway = () => {
                   onClick={handleSuccess}
                   disabled={!selectedPaymentMethod}
                 >
-                  Pay ₹{paymentData.amount.toFixed(2)}
+                  Pay ₹{typeof paymentData.amount === 'number' ? paymentData.amount.toFixed(2) : parseFloat(String(paymentData.amount)).toFixed(2)}
                 </Button>
               </div>
             </>
