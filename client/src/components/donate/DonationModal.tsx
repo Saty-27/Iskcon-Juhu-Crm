@@ -14,7 +14,17 @@ import useAuth from '@/hooks/useAuth';
 import { X } from 'lucide-react';
 
 const donationFormSchema = z.object({
-  amount: z.number().min(100, { message: 'Amount must be at least ₹100' }),
+  amount: z.number().refine(
+    (val, ctx) => {
+      // Allow 1 Rupee if small donation option is selected
+      if (ctx.path && ctx.obj && (ctx as any).allowSmallAmount) {
+        return val >= 1;
+      }
+      // Otherwise require at least ₹100
+      return val >= 100;
+    },
+    { message: 'Amount must be at least ₹100 (or ₹1 for Shri donation)' }
+  ),
   name: z.string().min(2, { message: 'Name must be at least 2 characters' }),
   email: z.string().email({ message: 'Please enter a valid email address' }),
   phone: z.string().min(10, { message: 'Please enter a valid phone number' }),
@@ -35,6 +45,7 @@ interface DonationModalProps {
 const DonationModal = ({ isOpen, category, event, amount, onClose }: DonationModalProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
+  const [isShriDonation, setIsShriDonation] = useState<boolean>(false);
   const { toast } = useToast();
   const { isAuthenticated, user } = useAuth();
   
@@ -51,6 +62,9 @@ const DonationModal = ({ isOpen, category, event, amount, onClose }: DonationMod
       panCard: '',
       message: '',
     },
+    context: {
+      allowSmallAmount: false // for 1 Rupee donations
+    }
   });
   
   // Set the amount when selected from parent component
@@ -138,14 +152,42 @@ const DonationModal = ({ isOpen, category, event, amount, onClose }: DonationMod
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <FormLabel className="block font-poppins font-medium text-dark mb-2">Select Amount</FormLabel>
+              
+              {/* 1 Rupee Donation Button */}
+              <div className="mb-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsShriDonation(true);
+                    handleAmountSelect(1);
+                    form.setContext({ allowSmallAmount: true });
+                  }}
+                  className={`w-full border rounded-lg py-3 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary ${
+                    isShriDonation
+                      ? 'bg-primary text-white border-primary'
+                      : 'border-gray-300'
+                  }`}
+                >
+                  <div className="flex flex-col items-center">
+                    <span className="text-lg font-semibold">₹1 Shri Donation</span>
+                    <span className="text-xs mt-1">Token of devotion to Lord Krishna</span>
+                  </div>
+                </button>
+              </div>
+              
+              {/* Regular Donation Amounts */}
               <div className="grid grid-cols-2 gap-2 mb-2">
                 {suggestedAmounts.map((amt) => (
                   <button
                     key={amt}
                     type="button"
-                    onClick={() => handleAmountSelect(amt)}
+                    onClick={() => {
+                      setIsShriDonation(false);
+                      handleAmountSelect(amt);
+                      form.setContext({ allowSmallAmount: false });
+                    }}
                     className={`border rounded-lg py-2 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary ${
-                      selectedAmount === amt
+                      selectedAmount === amt && !isShriDonation
                         ? 'bg-primary text-white border-primary'
                         : 'border-gray-300'
                     }`}
