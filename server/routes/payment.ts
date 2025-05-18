@@ -85,7 +85,7 @@ router.post('/initiate', async (req, res) => {
       // Include UPI data if UPI is selected
       ...(paymentMethod === 'upi' && {
         upiData: {
-          payeeVpa: 'iskcon@hdfcbank', // Replace with your actual UPI VPA
+          payeeVpa: 'test@upi', // Test UPI VPA for development
           payeeName: 'ISKCON Juhu',
           amount: Number(amount),
           transactionId: txnid,
@@ -203,7 +203,7 @@ router.post('/upi-intent', async (req, res) => {
       upiIntent,
       qrCodeData,
       txnid,
-      payeeVpa: 'iskcon@hdfcbank',
+      payeeVpa: 'test@upi',
       payeeName: 'ISKCON Juhu'
     });
   } catch (error) {

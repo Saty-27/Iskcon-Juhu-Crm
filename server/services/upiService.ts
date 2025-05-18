@@ -21,7 +21,7 @@ export function generateUpiIntent(params: UpiIntentParams): string {
   
   // Encode all parameters for URL safety
   const encodedParams = new URLSearchParams({
-    pa: 'iskcon@hdfcbank', // UPI ID of ISKCON (example)
+    pa: 'test@upi', // Test UPI ID for development
     pn: 'ISKCON Juhu',     // Name of the payee
     tr: txnid,             // Transaction ID
     am: amount.toString(), // Amount
@@ -43,7 +43,7 @@ export async function generateUpiQrData(params: UpiIntentParams): Promise<string
   
   // Generate UPI intent URL for QR code
   const encodedParams = new URLSearchParams({
-    pa: 'iskcon@hdfcbank',
+    pa: 'test@upi',
     pn: 'ISKCON Juhu',
     tr: txnid,
     am: amount.toString(),
