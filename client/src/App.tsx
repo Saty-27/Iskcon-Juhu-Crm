@@ -6,6 +6,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Events from "@/pages/Events";
 import Donate from "@/pages/Donate";
+import DonateThankYou from "@/pages/donate/ThankYou";
 import Gallery from "@/pages/Gallery";
 import Videos from "@/pages/Videos";
 import Contact from "@/pages/Contact";
@@ -22,6 +23,7 @@ import AdminGallery from "@/pages/admin/Gallery";
 import AdminVideos from "@/pages/admin/Videos";
 import AdminDonations from "@/pages/admin/Donations";
 import AdminDonationCategories from "@/pages/admin/DonationCategories";
+import AdminDonationStats from "@/pages/admin/DonationStats";
 import AdminQuotes from "@/pages/admin/Quotes";
 import AdminUsers from "@/pages/admin/Users";
 import AdminMessages from "@/pages/admin/Messages";
@@ -35,6 +37,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/events" component={Events} />
       <Route path="/donate" component={Donate} />
+      <Route path="/donate/thank-you" component={DonateThankYou} />
       <Route path="/gallery" component={Gallery} />
       <Route path="/videos" component={Videos} />
       <Route path="/contact" component={Contact} />
@@ -91,6 +94,13 @@ function Router() {
         {() => (
           <AdminRoute>
             <AdminDonationCategories />
+          </AdminRoute>
+        )}
+      </Route>
+      <Route path="/admin/donation-stats">
+        {() => (
+          <AdminRoute>
+            <AdminDonationStats />
           </AdminRoute>
         )}
       </Route>

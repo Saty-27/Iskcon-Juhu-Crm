@@ -96,11 +96,19 @@ const AdminDashboard = () => {
                   `₹${donations.reduce((sum, donation) => sum + (donation.amount || 0), 0).toLocaleString('en-IN')}` : 
                   '₹0'}
               </div>
-              <p className="text-xs text-muted-foreground">
-                {Array.isArray(donations) && donations.length > 0 ? 
-                  `${donations.length} donations received` : 
-                  'No donations yet'}
-              </p>
+              <div className="flex justify-between items-center">
+                <p className="text-xs text-muted-foreground">
+                  {Array.isArray(donations) && donations.length > 0 ? 
+                    `${donations.length} donations received` : 
+                    'No donations yet'}
+                </p>
+                <a 
+                  href="/admin/donation-stats"
+                  className="text-xs text-primary hover:underline"
+                >
+                  View Statistics →
+                </a>
+              </div>
             </CardContent>
           </Card>
           
