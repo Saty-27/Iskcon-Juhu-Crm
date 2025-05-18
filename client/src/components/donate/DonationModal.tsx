@@ -81,13 +81,18 @@ const DonationModal = ({ isOpen, category, event, amount, onClose }: DonationMod
       
       // Initialize payment with PayU
       const response = await apiRequest('POST', '/api/payments/initialize', donationData);
+      
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+      
       const result = await response.json();
       
       if (result.success && result.paymentData) {
         toast({
           title: "Redirecting to Payment Gateway",
           description: "Please wait while we redirect you to the secure payment page.",
-          variant: "success",
+          variant: "default",
         });
         
         // Create and submit a form to PayU
@@ -98,21 +103,33 @@ const DonationModal = ({ isOpen, category, event, amount, onClose }: DonationMod
         
         // Add all payment data as hidden fields
         Object.entries(result.paymentData).forEach(([key, value]) => {
-          const input = document.createElement('input');
-          input.type = 'hidden';
-          input.name = key;
-          input.value = value as string;
-          form.appendChild(input);
+          if (value !== undefined && value !== null) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = String(value);
+            form.appendChild(input);
+          }
         });
         
         // Append form to body and submit
         document.body.appendChild(form);
-        form.submit();
+        setTimeout(() => {
+          try {
+            form.submit();
+          } catch (submitError) {
+            console.error('Form submission error:', submitError);
+            toast({
+              title: "Payment Error",
+              description: "There was an error redirecting to the payment gateway. Please try again.",
+              variant: "destructive",
+            });
+            setIsSubmitting(false);
+          }
+        }, 100);
       } else {
-        throw new Error('Payment initialization failed');
+        throw new Error(result.message || 'Payment initialization failed');
       }
-      
-      onClose();
     } catch (error) {
       console.error('Payment error:', error);
       toast({
