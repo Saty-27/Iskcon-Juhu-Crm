@@ -39,9 +39,7 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Connect to MongoDB first
-  await connectDB();
-  console.log('MongoDB connected successfully');
+  // Database connection is handled by PostgreSQL automatically
   
   // Create a default admin user if one doesn't exist
   await createDefaultAdmin();
