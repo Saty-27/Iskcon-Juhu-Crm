@@ -268,8 +268,74 @@ const PaymentGateway = () => {
                       <span className="text-xs text-primary">What is UPI ID?</span>
                     </div>
                     <div className="flex gap-2">
-                      <Input type="text" placeholder="yourname@upi" className="flex-1" />
-                      <Button type="button" className="whitespace-nowrap">Verify & Pay</Button>
+                      <Input 
+                        type="text" 
+                        placeholder="yourname@upi" 
+                        className="flex-1"
+                        id="upi-id-input"
+                        defaultValue="sg639502@oksbi" 
+                      />
+                      <Button 
+                        type="button" 
+                        className="whitespace-nowrap bg-purple-700 hover:bg-purple-800"
+                        onClick={() => {
+                          setIsProcessing(true);
+                          // Simulate UPI app opening
+                          setTimeout(() => {
+                            const modalElement = document.createElement('div');
+                            modalElement.id = 'upi-app-simulation';
+                            modalElement.style.position = 'fixed';
+                            modalElement.style.top = '0';
+                            modalElement.style.left = '0';
+                            modalElement.style.right = '0';
+                            modalElement.style.bottom = '0';
+                            modalElement.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+                            modalElement.style.display = 'flex';
+                            modalElement.style.alignItems = 'center';
+                            modalElement.style.justifyContent = 'center';
+                            modalElement.style.zIndex = '9999';
+                            
+                            const content = document.createElement('div');
+                            content.style.width = '300px';
+                            content.style.maxWidth = '90%';
+                            content.style.backgroundColor = 'white';
+                            content.style.borderRadius = '12px';
+                            content.style.padding = '20px';
+                            
+                            content.innerHTML = `
+                              <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                <div style="margin-bottom: 15px; font-size: 18px; font-weight: bold;">UPI Payment Request</div>
+                                <div style="width: 100px; height: 100px; background-color: #f0f0f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                                  <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 24 24' fill='none' stroke='%235a189a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'></polygon></svg>" alt="ISKCON" />
+                                </div>
+                                <div style="margin-bottom: 5px; font-weight: 500;">Pay to ISKCON Juhu</div>
+                                <div style="margin-bottom: 15px; font-size: 24px; font-weight: bold; color: #5a189a;">₹${paymentData?.amount.toFixed(2)}</div>
+                                <div style="margin-bottom: 20px; color: #666; font-size: 14px;">UPI ID: iskcon@hdfcbank</div>
+                                <div style="display: flex; width: 100%; gap: 10px;">
+                                  <button id="decline-upi-btn" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 6px; background-color: #f5f5f5; cursor: pointer;">Decline</button>
+                                  <button id="approve-upi-btn" style="flex: 1; padding: 8px; border: none; border-radius: 6px; background-color: #5a189a; color: white; cursor: pointer;">Approve</button>
+                                </div>
+                              </div>
+                            `;
+                            
+                            modalElement.appendChild(content);
+                            document.body.appendChild(modalElement);
+                            
+                            // Add event listeners
+                            document.getElementById('approve-upi-btn')?.addEventListener('click', () => {
+                              document.body.removeChild(modalElement);
+                              handleSuccess();
+                            });
+                            
+                            document.getElementById('decline-upi-btn')?.addEventListener('click', () => {
+                              document.body.removeChild(modalElement);
+                              setIsProcessing(false);
+                            });
+                          }, 1000);
+                        }}
+                      >
+                        Verify & Pay
+                      </Button>
                     </div>
                     <p className="text-xs text-muted-foreground mt-2">Example: mobilenumber@upi, username@bank</p>
                   </div>
