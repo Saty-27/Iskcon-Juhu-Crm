@@ -204,8 +204,9 @@ router.get('/:filename', async (req, res) => {
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     
-    const fileStream = fs.createReadStream(filePath);
-    fileStream.pipe(res);
+    // Read file into buffer and send
+    const fileBuffer = await fs.readFile(filePath);
+    res.send(fileBuffer);
     
     // Clean up the file after a delay
     setTimeout(async () => {

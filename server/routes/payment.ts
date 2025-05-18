@@ -140,6 +140,9 @@ router.post('/failure', async (req, res) => {
   try {
     const paymentResponse = req.body;
     
+    // Import notification service
+    const { sendFailedPaymentNotification } = await import('../services/notificationService');
+    
     // Update donation status to failed
     if (paymentResponse && paymentResponse.txnid) {
       const donation = await storage.getDonationByPaymentId(paymentResponse.txnid);
@@ -148,6 +151,41 @@ router.post('/failure', async (req, res) => {
         await storage.updateDonation(donation.id, {
           status: 'failed'
         });
+        
+        // Get purpose from category or event
+        let purpose = "ISKCON Juhu Donation";
+        if (donation.categoryId) {
+          const category = await storage.getDonationCategory(donation.categoryId);
+          if (category) {
+            purpose = category.name;
+          }
+        } else if (donation.eventId) {
+          const event = await storage.getEvent(donation.eventId);
+          if (event) {
+            purpose = event.title;
+          }
+        }
+        
+        // Send WhatsApp notification about failed payment
+        if (donation.phone && !donation.notificationSent) {
+          try {
+            await sendFailedPaymentNotification(
+              donation.phone,
+              donation.name,
+              donation.amount,
+              purpose
+            );
+            
+            // Mark notification as sent
+            await storage.updateDonation(donation.id, {
+              notificationSent: true
+            });
+            
+            console.log(`Failed payment notification sent to ${donation.phone}`);
+          } catch (notifyError) {
+            console.error('Error sending payment failure notification:', notifyError);
+          }
+        }
       }
     }
     
