@@ -278,60 +278,151 @@ const PaymentGateway = () => {
                       <Button 
                         type="button" 
                         className="whitespace-nowrap bg-purple-700 hover:bg-purple-800"
-                        onClick={() => {
+                        onClick={async () => {
+                          const upiId = (document.getElementById('upi-id-input') as HTMLInputElement)?.value;
+                          
+                          if (!upiId) {
+                            alert('Please enter a valid UPI ID');
+                            return;
+                          }
+                          
                           setIsProcessing(true);
-                          // Simulate UPI app opening
-                          setTimeout(() => {
-                            const modalElement = document.createElement('div');
-                            modalElement.id = 'upi-app-simulation';
-                            modalElement.style.position = 'fixed';
-                            modalElement.style.top = '0';
-                            modalElement.style.left = '0';
-                            modalElement.style.right = '0';
-                            modalElement.style.bottom = '0';
-                            modalElement.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-                            modalElement.style.display = 'flex';
-                            modalElement.style.alignItems = 'center';
-                            modalElement.style.justifyContent = 'center';
-                            modalElement.style.zIndex = '9999';
-                            
-                            const content = document.createElement('div');
-                            content.style.width = '300px';
-                            content.style.maxWidth = '90%';
-                            content.style.backgroundColor = 'white';
-                            content.style.borderRadius = '12px';
-                            content.style.padding = '20px';
-                            
-                            content.innerHTML = `
-                              <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-                                <div style="margin-bottom: 15px; font-size: 18px; font-weight: bold;">UPI Payment Request</div>
-                                <div style="width: 100px; height: 100px; background-color: #f0f0f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
-                                  <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 24 24' fill='none' stroke='%235a189a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'></polygon></svg>" alt="ISKCON" />
-                                </div>
-                                <div style="margin-bottom: 5px; font-weight: 500;">Pay to ISKCON Juhu</div>
-                                <div style="margin-bottom: 15px; font-size: 24px; font-weight: bold; color: #5a189a;">₹${paymentData?.amount.toFixed(2)}</div>
-                                <div style="margin-bottom: 20px; color: #666; font-size: 14px;">UPI ID: iskcon@hdfcbank</div>
-                                <div style="display: flex; width: 100%; gap: 10px;">
-                                  <button id="decline-upi-btn" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 6px; background-color: #f5f5f5; cursor: pointer;">Decline</button>
-                                  <button id="approve-upi-btn" style="flex: 1; padding: 8px; border: none; border-radius: 6px; background-color: #5a189a; color: white; cursor: pointer;">Approve</button>
-                                </div>
-                              </div>
-                            `;
-                            
-                            modalElement.appendChild(content);
-                            document.body.appendChild(modalElement);
-                            
-                            // Add event listeners
-                            document.getElementById('approve-upi-btn')?.addEventListener('click', () => {
-                              document.body.removeChild(modalElement);
-                              handleSuccess();
+                          
+                          try {
+                            // Create UPI payment intent with the backend
+                            const response = await fetch('/api/payments/upi-intent', {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                              },
+                              body: JSON.stringify({
+                                upiId,
+                                txnid: paymentData?.txnid,
+                                amount: paymentData?.amount
+                              }),
                             });
                             
-                            document.getElementById('decline-upi-btn')?.addEventListener('click', () => {
-                              document.body.removeChild(modalElement);
-                              setIsProcessing(false);
-                            });
-                          }, 1000);
+                            const result = await response.json();
+                            
+                            if (result.success && result.upiIntent) {
+                              // On desktop, show QR code for UPI payment
+                              if (!/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                                // Show QR code modal for UPI intent
+                                const modalElement = document.createElement('div');
+                                modalElement.id = 'upi-qr-modal';
+                                modalElement.style.position = 'fixed';
+                                modalElement.style.top = '0';
+                                modalElement.style.left = '0';
+                                modalElement.style.right = '0';
+                                modalElement.style.bottom = '0';
+                                modalElement.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+                                modalElement.style.display = 'flex';
+                                modalElement.style.alignItems = 'center';
+                                modalElement.style.justifyContent = 'center';
+                                modalElement.style.zIndex = '9999';
+                                
+                                const content = document.createElement('div');
+                                content.style.width = '350px';
+                                content.style.maxWidth = '90%';
+                                content.style.backgroundColor = 'white';
+                                content.style.borderRadius = '12px';
+                                content.style.padding = '20px';
+                                
+                                content.innerHTML = `
+                                  <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                    <div style="margin-bottom: 15px; font-size: 18px; font-weight: bold;">Scan QR Code to Pay</div>
+                                    <div style="border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 15px; background-color: #f9f9f9;">
+                                      <div id="qrcode-placeholder" style="width: 200px; height: 200px; display: flex; align-items: center; justify-content: center; background-color: #f0f0f0;">
+                                        QR Code Placeholder
+                                      </div>
+                                    </div>
+                                    <div style="margin-bottom: 5px; font-weight: 500;">Pay to ISKCON Juhu</div>
+                                    <div style="margin-bottom: 10px; font-size: 20px; font-weight: bold; color: #5a189a;">₹${paymentData?.amount.toFixed(2)}</div>
+                                    <div style="margin-bottom: 10px; color: #666; font-size: 14px;">UPI ID: iskcon@hdfcbank</div>
+                                    <div style="margin-bottom: 15px; color: #888; font-size: 12px;">Scan with any UPI app: Google Pay, PhonePe, Paytm, etc.</div>
+                                    <div style="display: flex; width: 100%; gap: 10px;">
+                                      <button id="cancel-qr-btn" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 6px; background-color: #f5f5f5; cursor: pointer;">Cancel</button>
+                                      <button id="payment-completed-btn" style="flex: 1; padding: 8px; border: none; border-radius: 6px; background-color: #5a189a; color: white; cursor: pointer;">Payment Completed</button>
+                                    </div>
+                                  </div>
+                                `;
+                                
+                                modalElement.appendChild(content);
+                                document.body.appendChild(modalElement);
+                                
+                                // Add event listeners
+                                document.getElementById('payment-completed-btn')?.addEventListener('click', () => {
+                                  document.body.removeChild(modalElement);
+                                  handleSuccess();
+                                });
+                                
+                                document.getElementById('cancel-qr-btn')?.addEventListener('click', () => {
+                                  document.body.removeChild(modalElement);
+                                  setIsProcessing(false);
+                                });
+                              } else {
+                                // On mobile, try to open UPI app directly
+                                window.location.href = result.upiIntent;
+                                
+                                // Set a timer to check if payment completed
+                                setTimeout(() => {
+                                  // Show payment verification dialog 
+                                  const verifyModalElement = document.createElement('div');
+                                  verifyModalElement.id = 'upi-verify-modal';
+                                  verifyModalElement.style.position = 'fixed';
+                                  verifyModalElement.style.top = '0';
+                                  verifyModalElement.style.left = '0';
+                                  verifyModalElement.style.right = '0';
+                                  verifyModalElement.style.bottom = '0';
+                                  verifyModalElement.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+                                  verifyModalElement.style.display = 'flex';
+                                  verifyModalElement.style.alignItems = 'center';
+                                  verifyModalElement.style.justifyContent = 'center';
+                                  verifyModalElement.style.zIndex = '9999';
+                                  
+                                  const verifyContent = document.createElement('div');
+                                  verifyContent.style.width = '300px';
+                                  verifyContent.style.maxWidth = '90%';
+                                  verifyContent.style.backgroundColor = 'white';
+                                  verifyContent.style.borderRadius = '12px';
+                                  verifyContent.style.padding = '20px';
+                                  
+                                  verifyContent.innerHTML = `
+                                    <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                      <div style="margin-bottom: 15px; font-size: 18px; font-weight: bold;">Payment Verification</div>
+                                      <div style="margin-bottom: 20px; color: #666; font-size: 14px;">
+                                        Did you complete the payment in your UPI app?
+                                      </div>
+                                      <div style="display: flex; width: 100%; gap: 10px;">
+                                        <button id="payment-failed-btn" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 6px; background-color: #f5f5f5; cursor: pointer;">No, Failed</button>
+                                        <button id="payment-success-btn" style="flex: 1; padding: 8px; border: none; border-radius: 6px; background-color: #5a189a; color: white; cursor: pointer;">Yes, Completed</button>
+                                      </div>
+                                    </div>
+                                  `;
+                                  
+                                  verifyModalElement.appendChild(verifyContent);
+                                  document.body.appendChild(verifyModalElement);
+                                  
+                                  // Add event listeners
+                                  document.getElementById('payment-success-btn')?.addEventListener('click', () => {
+                                    document.body.removeChild(verifyModalElement);
+                                    handleSuccess();
+                                  });
+                                  
+                                  document.getElementById('payment-failed-btn')?.addEventListener('click', () => {
+                                    document.body.removeChild(verifyModalElement);
+                                    setIsProcessing(false);
+                                  });
+                                }, 5000);
+                              }
+                            } else {
+                              throw new Error(result.message || 'Failed to create UPI payment intent');
+                            }
+                          } catch (error) {
+                            console.error('UPI payment error:', error);
+                            setIsProcessing(false);
+                            alert('Failed to initialize UPI payment. Please try again.');
+                          }
                         }}
                       >
                         Verify & Pay

@@ -1,157 +1,200 @@
-import { Router, Request, Response } from 'express';
-import crypto from 'crypto-js';
-import { nanoid } from 'nanoid';
+import express from 'express';
+import { payuConfig, generateHash, getPaymentFormData } from '../services/payuService';
 import { storage } from '../storage';
+import { nanoid } from 'nanoid';
 
-const router = Router();
+const router = express.Router();
 
-// Initialize donation payment with PayU
-router.post('/initialize', async (req: Request, res: Response) => {
+// Initialize PayU payment
+router.post('/initiate', async (req, res) => {
   try {
-    const { 
-      name, 
-      email, 
-      phone, 
-      amount, 
-      message, 
+    const {
+      amount,
+      name,
+      email,
+      phone,
+      message,
       categoryId, 
       eventId,
       panCard,
-      userId
+      paymentMethod = 'netbanking' // Default payment method
     } = req.body;
-
-    if (!name || !email || !phone || !amount) {
+    
+    if (!amount || !name || !email || !phone) {
       return res.status(400).json({ 
         success: false,
-        message: 'Missing required fields' 
+        message: 'Missing required payment fields' 
       });
     }
-
-    // Generate unique transaction ID
-    const txnid = `TXN_${Date.now()}`;
     
-    // Create donation record with pending status
-    const donation = await storage.createDonation({
+    // Generate transaction ID
+    const txnid = `ISKCON_${nanoid(8)}`;
+    
+    // Determine success and failure URLs
+    const baseUrl = `${req.protocol}://${req.hostname}`;
+    
+    // In production, these would be full URLs that PayU would redirect to after payment
+    const surl = `${baseUrl}/api/payments/success`; 
+    const furl = `${baseUrl}/api/payments/failure`;
+    
+    // Product info description
+    const categoryName = categoryId ? 'Temple Donation' : 'General Donation';
+    const productinfo = `Donation for ISKCON Juhu - ${categoryName}`;
+    
+    // Prepare payment request for PayU
+    const paymentRequest = {
+      txnid,
+      amount: Number(amount),
+      productinfo,
+      firstname: name,
+      email,
+      phone,
+      surl,
+      furl,
+      // Include UPI specific fields if UPI payment method is selected
+      ...(paymentMethod === 'upi' && {
+        udf1: 'upi', // Use UDF fields to pass payment method info
+        pg: 'UPI'    // Payment gateway - UPI
+      })
+    };
+    
+    // Get PayU form data with hash
+    const { formUrl, formData } = getPaymentFormData(paymentRequest);
+    
+    // Store donation in database
+    await storage.createDonation({
       email,
       name,
       phone,
       amount: Number(amount),
       message: message || null,
-      panCard: panCard || null,
       status: 'pending',
-      userId: userId || req.session?.userId || null,
       categoryId: categoryId ? Number(categoryId) : null,
       eventId: eventId ? Number(eventId) : null,
-      paymentId: txnid,
-      createdAt: new Date()
+      panCard: panCard || null,
+      userId: req.user?.id || null,
+      paymentId: txnid
     });
-
-    // Generate PayU hash
-    const key = process.env.PAYU_MERCHANT_KEY;
-    const salt = process.env.PAYU_MERCHANT_SALT;
     
-    if (!key || !salt) {
-      return res.status(500).json({ 
-        success: false,
-        message: 'Payment gateway configuration error' 
-      });
-    }
-    
-    const productinfo = 'Donation for ISKCON Juhu';
-      
-    const hashString = `${key}|${txnid}|${amount}|${productinfo}|${name}|${email}|||||||||||${salt}`;
-    const hash = crypto.SHA512(hashString).toString();
-    
-    // PayU payment data
-    const paymentData = {
-      key,
-      txnid,
-      amount,
-      productinfo,
-      firstname: name,
-      email,
-      phone,
-      surl: `${req.protocol}://${req.get('host')}/donate/thank-you`,
-      furl: `${req.protocol}://${req.get('host')}/donate?status=failed`,
-      hash,
-      udf1: donation.id.toString() // Store donation ID for reference
-    };
-    
-    res.status(200).json({
+    // Return payment data and URL for the frontend to create and submit form
+    res.json({
       success: true,
-      paymentData,
-      payuUrl: process.env.NODE_ENV === 'production' 
-        ? 'https://secure.payu.in/_payment' 
-        : 'https://sandboxsecure.payu.in/_payment'
+      txnid,
+      payuUrl: formUrl,
+      paymentData: formData,
+      // Include UPI data if UPI is selected
+      ...(paymentMethod === 'upi' && {
+        upiData: {
+          payeeVpa: 'iskcon@hdfcbank', // Replace with your actual UPI VPA
+          payeeName: 'ISKCON Juhu',
+          amount: Number(amount),
+          transactionId: txnid,
+          transactionNote: productinfo
+        }
+      })
     });
-  } catch (error: any) {
-    console.error('Payment initialization error:', error);
-    res.status(500).json({ 
+  } catch (error) {
+    console.error('PayU payment initialization error:', error);
+    res.status(500).json({
       success: false,
-      message: 'Failed to initialize payment', 
-      error: error.message 
+      message: 'Payment initialization failed'
     });
   }
 });
 
-// Handle successful payment callback
-router.post('/success', async (req: Request, res: Response) => {
+// Handle PayU success callback
+router.post('/success', async (req, res) => {
   try {
-    const { txnid, status, amount, udf1, firstname, email, phone } = req.body;
-    const donationId = Number(udf1);
+    const paymentResponse = req.body;
     
-    // Update donation status
-    if (donationId) {
-      await storage.updateDonation(donationId, {
-        status: status.toLowerCase(),
-        paymentId: txnid
-      });
+    // Update donation status to completed
+    if (paymentResponse && paymentResponse.txnid) {
+      const donation = await storage.getDonationByPaymentId(paymentResponse.txnid);
+      
+      if (donation) {
+        await storage.updateDonation(donation.id, {
+          status: 'completed',
+          paymentId: paymentResponse.mihpayid || paymentResponse.txnid
+        });
+      }
     }
     
-    // Build query params for thank you page
-    const params = new URLSearchParams();
-    params.append('txnid', txnid);
-    params.append('amount', amount);
-    params.append('status', 'success');
+    // Redirect to thank you page with parameters
+    const params = new URLSearchParams({
+      txnid: paymentResponse.txnid || '',
+      amount: paymentResponse.amount || '',
+      firstname: paymentResponse.firstname || '',
+      email: paymentResponse.email || '',
+      status: 'success'
+    });
     
-    if (firstname) params.append('firstname', firstname);
-    if (email) params.append('email', email);
-    if (phone) params.append('phone', phone);
-    
-    // Redirect to thank you page
-    return res.redirect(`/donate/thank-you?${params.toString()}`);
-  } catch (error: any) {
-    console.error('Payment success callback error:', error);
-    return res.redirect('/donate?status=error');
+    res.redirect(`/donate/thank-you?${params.toString()}`);
+  } catch (error) {
+    console.error('PayU success callback error:', error);
+    res.redirect('/donate/payment-failed');
   }
 });
 
-// Handle failed payment callback
-router.post('/failure', async (req: Request, res: Response) => {
+// Handle PayU failure callback
+router.post('/failure', async (req, res) => {
   try {
-    const { txnid, status, error_Message, udf1 } = req.body;
-    const donationId = Number(udf1);
+    const paymentResponse = req.body;
     
-    // Update donation status
-    if (donationId) {
-      await storage.updateDonation(donationId, {
-        status: status?.toLowerCase() || 'failed',
-        paymentId: txnid
+    // Update donation status to failed
+    if (paymentResponse && paymentResponse.txnid) {
+      const donation = await storage.getDonationByPaymentId(paymentResponse.txnid);
+      
+      if (donation) {
+        await storage.updateDonation(donation.id, {
+          status: 'failed'
+        });
+      }
+    }
+    
+    // Redirect to failure page with parameters
+    const params = new URLSearchParams({
+      txnid: paymentResponse.txnid || '',
+      amount: paymentResponse.amount || '',
+      firstname: paymentResponse.firstname || '',
+      email: paymentResponse.email || '',
+      status: 'failure',
+      error: paymentResponse.error_Message || 'Payment failed'
+    });
+    
+    res.redirect(`/donate/payment-failed?${params.toString()}`);
+  } catch (error) {
+    console.error('PayU failure callback error:', error);
+    res.redirect('/donate/payment-failed');
+  }
+});
+
+// API endpoint to initiate UPI payment directly
+router.post('/upi-intent', async (req, res) => {
+  try {
+    const { upiId, txnid, amount } = req.body;
+    
+    if (!upiId || !txnid || !amount) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required UPI fields'
       });
     }
     
-    // Build query params for failure page
-    const params = new URLSearchParams();
-    params.append('status', 'failed');
+    // Create UPI payment intent URL
+    // Format: upi://pay?pa=PAYEE_VPA&pn=PAYEE_NAME&am=AMOUNT&tr=TRANSACTION_ID&tn=TRANSACTION_NOTE
+    const upiIntent = `upi://pay?pa=iskcon@hdfcbank&pn=ISKCON+Juhu&am=${amount}&tr=${txnid}&tn=Donation+to+ISKCON+Juhu`;
     
-    if (txnid) params.append('txnid', txnid);
-    if (error_Message) params.append('message', error_Message);
-    
-    // Redirect to failure page
-    return res.redirect(`/donate?${params.toString()}`);
-  } catch (error: any) {
-    console.error('Payment failure callback error:', error);
-    return res.redirect('/donate?status=error');
+    res.json({
+      success: true,
+      upiIntent,
+      txnid
+    });
+  } catch (error) {
+    console.error('UPI intent error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create UPI payment intent'
+    });
   }
 });
 
