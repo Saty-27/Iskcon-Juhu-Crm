@@ -163,6 +163,9 @@ export const donations = pgTable("donations", {
   paymentId: text("payment_id"),
   status: text("status").default("pending").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  invoiceNumber: text("invoice_number"),
+  receiptSent: boolean("receipt_sent").default(false),
+  notificationSent: boolean("notification_sent").default(false),
 });
 
 export const insertDonationSchema = createInsertSchema(donations).omit({

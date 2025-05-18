@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import paymentRoutes from "./routes/payment";
+import receiptRoutes from "./routes/receipt";
 import { 
   insertUserSchema, 
   insertBannerSchema, 
