@@ -1,20 +1,20 @@
-import { 
-  users, type User, type InsertUser,
-  banners, type Banner, type InsertBanner,
-  quotes, type Quote, type InsertQuote,
-  donationCategories, type DonationCategory, type InsertDonationCategory,
-  events, type Event, type InsertEvent,
-  gallery, type Gallery, type InsertGallery,
-  videos, type Video, type InsertVideo,
-  testimonials, type Testimonial, type InsertTestimonial,
-  contactMessages, type ContactMessage, type InsertContactMessage,
-  socialLinks, type SocialLink, type InsertSocialLink,
-  donations, type Donation, type InsertDonation,
-  subscriptions, type Subscription, type InsertSubscription
-} from "@shared/schema";
-import { IStorage } from "./storage";
-import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { db } from './db';
+import { eq } from 'drizzle-orm';
+import {
+  users, User, InsertUser,
+  banners, Banner, InsertBanner,
+  quotes, Quote, InsertQuote,
+  donationCategories, DonationCategory, InsertDonationCategory,
+  events, Event, InsertEvent,
+  gallery, Gallery, InsertGallery,
+  videos, Video, InsertVideo,
+  testimonials, Testimonial, InsertTestimonial,
+  contactMessages, ContactMessage, InsertContactMessage,
+  socialLinks, SocialLink, InsertSocialLink,
+  donations, Donation, InsertDonation,
+  subscriptions, Subscription, InsertSubscription
+} from '@shared/schema';
+import { IStorage } from './storage';
 
 export class DatabaseStorage implements IStorage {
   // User management
@@ -27,7 +27,7 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db.select().from(users).where(eq(users.username, username));
     return user || undefined;
   }
-  
+
   async getUserByEmail(email: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.email, email));
     return user || undefined;
@@ -36,15 +36,15 @@ export class DatabaseStorage implements IStorage {
   async createUser(user: InsertUser): Promise<User> {
     const [newUser] = await db
       .insert(users)
-      .values({...user, isActive: true})
+      .values(user)
       .returning();
     return newUser;
   }
-  
+
   async getUsers(): Promise<User[]> {
     return await db.select().from(users);
   }
-  
+
   async updateUser(id: number, userData: Partial<User>): Promise<User | undefined> {
     const [updatedUser] = await db
       .update(users)
@@ -53,7 +53,7 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return updatedUser || undefined;
   }
-  
+
   async deleteUser(id: number): Promise<boolean> {
     const result = await db
       .delete(users)
@@ -218,25 +218,25 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getGalleryItem(id: number): Promise<Gallery | undefined> {
-    const [item] = await db.select().from(gallery).where(eq(gallery.id, id));
-    return item || undefined;
+    const [galleryItem] = await db.select().from(gallery).where(eq(gallery.id, id));
+    return galleryItem || undefined;
   }
   
   async createGalleryItem(galleryItem: InsertGallery): Promise<Gallery> {
-    const [newItem] = await db
+    const [newGalleryItem] = await db
       .insert(gallery)
       .values(galleryItem)
       .returning();
-    return newItem;
+    return newGalleryItem;
   }
   
   async updateGalleryItem(id: number, galleryData: Partial<Gallery>): Promise<Gallery | undefined> {
-    const [updatedItem] = await db
+    const [updatedGalleryItem] = await db
       .update(gallery)
       .set(galleryData)
       .where(eq(gallery.id, id))
       .returning();
-    return updatedItem || undefined;
+    return updatedGalleryItem || undefined;
   }
   
   async deleteGalleryItem(id: number): Promise<boolean> {
@@ -330,11 +330,7 @@ export class DatabaseStorage implements IStorage {
   async createContactMessage(message: InsertContactMessage): Promise<ContactMessage> {
     const [newMessage] = await db
       .insert(contactMessages)
-      .values({
-        ...message,
-        isRead: false,
-        createdAt: new Date()
-      })
+      .values(message)
       .returning();
     return newMessage;
   }
@@ -401,20 +397,25 @@ export class DatabaseStorage implements IStorage {
     return donation || undefined;
   }
   
+  async getDonationByPaymentId(paymentId: string): Promise<Donation | undefined> {
+    const [donation] = await db.select().from(donations).where(eq(donations.paymentId, paymentId));
+    return donation || undefined;
+  }
+
   async getUserDonations(userId: number): Promise<Donation[]> {
-    return await db.select().from(donations).where(eq(donations.userId, userId));
+    return db
+      .select()
+      .from(donations)
+      .where(eq(donations.userId, userId))
+      .execute();
   }
   
   async createDonation(donation: InsertDonation): Promise<Donation> {
-    const [newDonation] = await db
+    const [result] = await db
       .insert(donations)
-      .values({
-        ...donation,
-        createdAt: new Date(),
-        status: donation.status || 'pending'
-      })
+      .values(donation)
       .returning();
-    return newDonation;
+    return result;
   }
   
   async updateDonation(id: number, donationData: Partial<Donation>): Promise<Donation | undefined> {
@@ -452,10 +453,7 @@ export class DatabaseStorage implements IStorage {
   async createSubscription(subscription: InsertSubscription): Promise<Subscription> {
     const [newSubscription] = await db
       .insert(subscriptions)
-      .values({
-        ...subscription,
-        createdAt: new Date()
-      })
+      .values(subscription)
       .returning();
     return newSubscription;
   }
@@ -477,3 +475,5 @@ export class DatabaseStorage implements IStorage {
     return result.length > 0;
   }
 }
+
+export const dbStorage = new DatabaseStorage();

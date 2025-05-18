@@ -89,6 +89,7 @@ export interface IStorage {
   // Donation management
   getDonations(): Promise<Donation[]>;
   getDonation(id: number): Promise<Donation | undefined>;
+  getDonationByPaymentId(paymentId: string): Promise<Donation | undefined>;
   getUserDonations(userId: number): Promise<Donation[]>;
   createDonation(donation: InsertDonation): Promise<Donation>;
   updateDonation(id: number, donationData: Partial<Donation>): Promise<Donation | undefined>;

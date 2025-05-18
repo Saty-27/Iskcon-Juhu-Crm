@@ -180,20 +180,103 @@ router.post('/upi-intent', async (req, res) => {
       });
     }
     
+    // Import UPI service functions
+    const { generateUpiIntent, generateUpiQrData } = await import('../services/upiService');
+    
     // Create UPI payment intent URL
-    // Format: upi://pay?pa=PAYEE_VPA&pn=PAYEE_NAME&am=AMOUNT&tr=TRANSACTION_ID&tn=TRANSACTION_NOTE
-    const upiIntent = `upi://pay?pa=iskcon@hdfcbank&pn=ISKCON+Juhu&am=${amount}&tr=${txnid}&tn=Donation+to+ISKCON+Juhu`;
+    const upiParams = { upiId, txnid, amount };
+    const upiIntent = generateUpiIntent(upiParams);
+    const qrCodeData = generateUpiQrData(upiParams);
+    
+    // Get the donation to update with UPI payment details
+    const donation = await storage.getDonationByPaymentId(txnid);
+    
+    if (donation) {
+      // Update donation with additional details
+      await storage.updateDonation(donation.id, {
+        status: 'pending_upi' // Special status for UPI payments in progress
+      });
+    }
     
     res.json({
       success: true,
       upiIntent,
-      txnid
+      qrCodeData,
+      txnid,
+      payeeVpa: 'iskcon@hdfcbank',
+      payeeName: 'ISKCON Juhu'
     });
   } catch (error) {
     console.error('UPI intent error:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to create UPI payment intent'
+    });
+  }
+});
+
+// API endpoint to verify UPI payment status
+router.post('/verify-upi', async (req, res) => {
+  try {
+    const { txnid } = req.body;
+    
+    if (!txnid) {
+      return res.status(400).json({
+        success: false,
+        message: 'Transaction ID is required'
+      });
+    }
+    
+    // Import UPI service functions
+    const { verifyUpiTransaction } = await import('../services/upiService');
+    
+    // Get the donation record
+    const donation = await storage.getDonationByPaymentId(txnid);
+    
+    if (!donation) {
+      return res.status(404).json({
+        success: false,
+        message: 'Donation record not found'
+      });
+    }
+    
+    // Verify UPI transaction status
+    const verificationResult = await verifyUpiTransaction(txnid);
+    
+    if (verificationResult.success) {
+      // Update donation status to completed
+      await storage.updateDonation(donation.id, {
+        status: 'completed'
+      });
+      
+      return res.json({
+        success: true,
+        status: 'success',
+        message: 'Payment verified successfully',
+        donation: {
+          id: donation.id,
+          amount: donation.amount,
+          name: donation.name,
+          email: donation.email
+        }
+      });
+    } else {
+      // Update donation status based on verification result
+      await storage.updateDonation(donation.id, {
+        status: verificationResult.status === 'pending' ? 'pending' : 'failed'
+      });
+      
+      return res.json({
+        success: false,
+        status: verificationResult.status,
+        message: verificationResult.message
+      });
+    }
+  } catch (error) {
+    console.error('UPI verification error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to verify UPI payment'
     });
   }
 });
