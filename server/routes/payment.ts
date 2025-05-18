@@ -85,7 +85,7 @@ router.post('/initiate', async (req, res) => {
       // Include UPI data if UPI is selected
       ...(paymentMethod === 'upi' && {
         upiData: {
-          payeeVpa: 'test@upi', // Test UPI VPA for development
+          payeeVpa: 'iskconjuhu@sbi', // ISKCON Juhu UPI ID
           payeeName: 'ISKCON Juhu',
           amount: Number(amount),
           transactionId: txnid,
@@ -171,9 +171,11 @@ router.post('/failure', async (req, res) => {
 // API endpoint to initiate UPI payment directly
 router.post('/upi-intent', async (req, res) => {
   try {
-    const { upiId, txnid, amount } = req.body;
+    // Always use the official ISKCON UPI ID
+    const upiId = 'iskconjuhu@sbi';
+    const { txnid, amount } = req.body;
     
-    if (!upiId || !txnid || !amount) {
+    if (!txnid || !amount) {
       return res.status(400).json({
         success: false,
         message: 'Missing required UPI fields'
@@ -203,7 +205,7 @@ router.post('/upi-intent', async (req, res) => {
       upiIntent,
       qrCodeData,
       txnid,
-      payeeVpa: 'test@upi',
+      payeeVpa: upiId,
       payeeName: 'ISKCON Juhu'
     });
   } catch (error) {

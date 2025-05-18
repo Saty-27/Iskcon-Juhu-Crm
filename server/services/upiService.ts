@@ -21,7 +21,7 @@ export function generateUpiIntent(params: UpiIntentParams): string {
   
   // Encode all parameters for URL safety
   const encodedParams = new URLSearchParams({
-    pa: 'test@upi', // Test UPI ID for development
+    pa: upiId || 'iskconjuhu@sbi', // Use provided UPI ID or default to ISKCON Juhu UPI
     pn: 'ISKCON Juhu',     // Name of the payee
     tr: txnid,             // Transaction ID
     am: amount.toString(), // Amount
@@ -39,11 +39,11 @@ export function generateUpiIntent(params: UpiIntentParams): string {
  * @returns Promise resolving to QR code data URL
  */
 export async function generateUpiQrData(params: UpiIntentParams): Promise<string> {
-  const { txnid, amount } = params;
+  const { txnid, amount, upiId } = params;
   
   // Generate UPI intent URL for QR code
   const encodedParams = new URLSearchParams({
-    pa: 'test@upi',
+    pa: upiId || 'iskconjuhu@sbi', // Use provided UPI ID or default to ISKCON Juhu UPI
     pn: 'ISKCON Juhu',
     tr: txnid,
     am: amount.toString(),
