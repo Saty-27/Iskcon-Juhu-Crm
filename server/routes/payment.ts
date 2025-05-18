@@ -186,7 +186,7 @@ router.post('/upi-intent', async (req, res) => {
     // Create UPI payment intent URL
     const upiParams = { upiId, txnid, amount };
     const upiIntent = generateUpiIntent(upiParams);
-    const qrCodeData = generateUpiQrData(upiParams);
+    const qrCodeData = await generateUpiQrData(upiParams);
     
     // Get the donation to update with UPI payment details
     const donation = await storage.getDonationByPaymentId(txnid);

@@ -332,9 +332,11 @@ const PaymentGateway = () => {
                                   <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
                                     <div style="margin-bottom: 15px; font-size: 18px; font-weight: bold;">Scan QR Code to Pay</div>
                                     <div style="border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 15px; background-color: #f9f9f9;">
-                                      <div id="qrcode-placeholder" style="width: 200px; height: 200px; display: flex; align-items: center; justify-content: center; background-color: #f0f0f0;">
-                                        QR Code Placeholder
-                                      </div>
+                                      <img 
+                                        src="${result.qrCodeData}"
+                                        alt="UPI QR Code"
+                                        style="width: 200px; height: 200px;"
+                                      />
                                     </div>
                                     <div style="margin-bottom: 5px; font-weight: 500;">Pay to ISKCON Juhu</div>
                                     <div style="margin-bottom: 10px; font-size: 20px; font-weight: bold; color: #5a189a;">₹${paymentData?.amount.toFixed(2)}</div>
@@ -404,9 +406,39 @@ const PaymentGateway = () => {
                                   document.body.appendChild(verifyModalElement);
                                   
                                   // Add event listeners
-                                  document.getElementById('payment-success-btn')?.addEventListener('click', () => {
-                                    document.body.removeChild(verifyModalElement);
-                                    handleSuccess();
+                                  document.getElementById('payment-success-btn')?.addEventListener('click', async () => {
+                                    // Show loading indicator
+                                    document.getElementById('payment-success-btn').innerHTML = 'Verifying...';
+                                    document.getElementById('payment-failed-btn').disabled = true;
+                                    
+                                    try {
+                                      // Verify payment status with server
+                                      const verifyResponse = await fetch('/api/payments/verify-upi', {
+                                        method: 'POST',
+                                        headers: {
+                                          'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({
+                                          txnid: paymentData?.txnid
+                                        }),
+                                      });
+                                      
+                                      const verifyResult = await verifyResponse.json();
+                                      
+                                      if (verifyResult.success) {
+                                        document.body.removeChild(verifyModalElement);
+                                        handleSuccess();
+                                      } else {
+                                        alert('Payment verification failed: ' + verifyResult.message);
+                                        document.body.removeChild(verifyModalElement);
+                                        setIsProcessing(false);
+                                      }
+                                    } catch (error) {
+                                      console.error('Payment verification error:', error);
+                                      alert('Failed to verify payment. Please contact support with your transaction ID.');
+                                      document.body.removeChild(verifyModalElement);
+                                      setIsProcessing(false);
+                                    }
                                   });
                                   
                                   document.getElementById('payment-failed-btn')?.addEventListener('click', () => {

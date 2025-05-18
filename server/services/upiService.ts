@@ -36,16 +36,14 @@ export function generateUpiIntent(params: UpiIntentParams): string {
 /**
  * Generate a UPI QR code data for displaying on desktop
  * @param params UPI intent parameters
- * @returns UPI QR code data
+ * @returns Promise resolving to QR code data URL
  */
-export function generateUpiQrData(params: UpiIntentParams): string {
+export async function generateUpiQrData(params: UpiIntentParams): Promise<string> {
   const { txnid, amount } = params;
   
-  // For actual implementation, you would generate a QR code with a UPI intent
-  // This would typically need a proper QR code generation library or API
-  // For now, we're just returning the UPI intent data
+  // Generate UPI intent URL for QR code
   const encodedParams = new URLSearchParams({
-    pa: 'iskcon@hdfcbank', 
+    pa: 'iskcon@hdfcbank',
     pn: 'ISKCON Juhu',
     tr: txnid,
     am: amount.toString(),
@@ -53,7 +51,27 @@ export function generateUpiQrData(params: UpiIntentParams): string {
     tn: `Donation to ISKCON Juhu (${txnid})`,
   }).toString();
   
-  return `upi://pay?${encodedParams}`;
+  const upiIntentUrl = `upi://pay?${encodedParams}`;
+  
+  try {
+    // Import QR code library
+    const QRCode = await import('qrcode');
+    
+    // Generate QR code as data URL
+    const qrCodeDataUrl = await QRCode.toDataURL(upiIntentUrl, {
+      width: 200,
+      margin: 2,
+      color: {
+        dark: '#5a189a', // QR code color - ISKCON purple
+        light: '#ffffff' // Background color
+      }
+    });
+    
+    return qrCodeDataUrl;
+  } catch (error) {
+    console.error('QR code generation error:', error);
+    throw new Error('Failed to generate QR code for UPI payment');
+  }
 }
 
 /**
