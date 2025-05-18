@@ -71,38 +71,55 @@ const DonationModal = ({ isOpen, category, event, amount, onClose }: DonationMod
     setIsSubmitting(true);
     
     try {
-      // Prepare donation data
+      // Prepare donation data for PayU
       const donationData = {
         ...data,
         userId: user?.id,
         categoryId: category?.id,
         eventId: event?.id,
-        status: 'pending',
       };
       
-      // Submit to API
-      const response = await apiRequest('POST', '/api/donations', donationData);
+      // Initialize payment with PayU
+      const response = await apiRequest('POST', '/api/payments/initialize', donationData);
       const result = await response.json();
       
-      toast({
-        title: "Donation Initiated",
-        description: "You will be redirected to the payment gateway.",
-        variant: "success",
-      });
-      
-      // Redirect to payment gateway
-      if (result.paymentUrl) {
-        window.location.href = result.paymentUrl;
+      if (result.success && result.paymentData) {
+        toast({
+          title: "Redirecting to Payment Gateway",
+          description: "Please wait while we redirect you to the secure payment page.",
+          variant: "success",
+        });
+        
+        // Create and submit a form to PayU
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = result.payuUrl;
+        form.style.display = 'none';
+        
+        // Add all payment data as hidden fields
+        Object.entries(result.paymentData).forEach(([key, value]) => {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = key;
+          input.value = value as string;
+          form.appendChild(input);
+        });
+        
+        // Append form to body and submit
+        document.body.appendChild(form);
+        form.submit();
+      } else {
+        throw new Error('Payment initialization failed');
       }
       
       onClose();
     } catch (error) {
+      console.error('Payment error:', error);
       toast({
-        title: "Error",
-        description: "There was an error processing your donation. Please try again.",
+        title: "Payment Error",
+        description: "There was an error processing your payment. Please try again.",
         variant: "destructive",
       });
-    } finally {
       setIsSubmitting(false);
     }
   };
