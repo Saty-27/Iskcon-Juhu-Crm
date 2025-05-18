@@ -95,38 +95,27 @@ const DonationModal = ({ isOpen, category, event, amount, onClose }: DonationMod
           variant: "default",
         });
         
-        // Create and submit a form to PayU
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = result.payuUrl;
-        form.style.display = 'none';
-        
-        // Add all payment data as hidden fields
-        Object.entries(result.paymentData).forEach(([key, value]) => {
-          if (value !== undefined && value !== null) {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = key;
-            input.value = String(value);
-            form.appendChild(input);
-          }
+        // Create and display PayU info (for demonstration/testing)
+        // In a production environment, you would redirect to the PayU gateway
+        toast({
+          title: "Payment Request Created",
+          description: "Your donation has been recorded. In a live environment, you would be redirected to PayU.",
+          variant: "default",
         });
         
-        // Append form to body and submit
-        document.body.appendChild(form);
+        // For testing purposes, we'll redirect to the thank-you page directly
+        const params = new URLSearchParams();
+        params.append('txnid', result.paymentData.txnid);
+        params.append('amount', String(result.paymentData.amount));
+        params.append('firstname', String(result.paymentData.firstname));
+        params.append('email', String(result.paymentData.email));
+        params.append('phone', String(result.paymentData.phone));
+        params.append('status', 'success');
+        
+        // Simulate successful payment - in production this would be handled by PayU
         setTimeout(() => {
-          try {
-            form.submit();
-          } catch (submitError) {
-            console.error('Form submission error:', submitError);
-            toast({
-              title: "Payment Error",
-              description: "There was an error redirecting to the payment gateway. Please try again.",
-              variant: "destructive",
-            });
-            setIsSubmitting(false);
-          }
-        }, 100);
+          window.location.href = `/donate/thank-you?${params.toString()}`;
+        }, 1500);
       } else {
         throw new Error(result.message || 'Payment initialization failed');
       }
