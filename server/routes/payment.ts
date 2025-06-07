@@ -142,10 +142,36 @@ router.post('/success', async (req, res) => {
           }
         }
         
+        // Generate and send PDF receipt via email
+        const receiptData: ReceiptData = {
+          txnid: donation.paymentId || paymentResponse.txnid,
+          amount: donation.amount,
+          name: donation.name,
+          email: donation.email,
+          phone: donation.phone,
+          purpose,
+          invoiceNumber,
+          date: donation.createdAt || new Date(),
+          panCard: donation.panCard || undefined
+        };
+
+        // Send PDF receipt via email
+        try {
+          const pdfBuffer = await generatePDFReceipt(receiptData);
+          const emailSent = await sendReceiptEmail(receiptData, pdfBuffer);
+          
+          if (emailSent) {
+            console.log(`PDF receipt sent to ${donation.email}`);
+          }
+        } catch (receiptError) {
+          console.error('Error sending PDF receipt:', receiptError);
+        }
+
         // Send WhatsApp receipt for successful payment
         if (donation.phone && !donation.receiptSent) {
           try {
-            const receiptData = {
+            const { sendWhatsAppReceipt } = await import('../services/invoiceService');
+            await sendWhatsAppReceipt(donation.phone, {
               txnid: donation.paymentId || paymentResponse.txnid,
               amount: donation.amount,
               name: donation.name,
@@ -155,18 +181,16 @@ router.post('/success', async (req, res) => {
               paymentMethod: 'Online Payment',
               purpose,
               invoiceNumber
-            };
-            
-            await sendWhatsAppReceipt(donation.phone, receiptData);
+            });
             
             // Mark receipt as sent
             await storage.updateDonation(donation.id, {
               receiptSent: true
             });
             
-            console.log(`Payment receipt sent to ${donation.phone}`);
+            console.log(`WhatsApp receipt sent to ${donation.phone}`);
           } catch (receiptError) {
-            console.error('Error sending payment receipt:', receiptError);
+            console.error('Error sending WhatsApp receipt:', receiptError);
           }
         }
       }
