@@ -4,8 +4,7 @@ import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Loader2, CreditCard, Wallet, Phone, Globe } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Loader2, CreditCard, Wallet, Phone, Globe, Shield, CheckCircle } from 'lucide-react';
 
 interface PaymentData {
   txnid: string;
@@ -15,30 +14,41 @@ interface PaymentData {
   phone: string;
   productinfo: string;
   key: string;
+  hash: string;
+  surl: string;
+  furl: string;
 }
 
 const PaymentGateway = () => {
   const [paymentData, setPaymentData] = useState<PaymentData | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('upi');
   const [, navigate] = useLocation();
 
   useEffect(() => {
     // Retrieve payment data from localStorage
     const storedData = localStorage.getItem('payuData');
-    if (storedData) {
+    const storedFormData = localStorage.getItem('payuFormData');
+    
+    if (storedData && storedFormData) {
       try {
         const parsedData = JSON.parse(storedData);
+        const parsedFormData = JSON.parse(storedFormData);
+        
+        // Combine both data sources
+        const completePaymentData = {
+          ...parsedData,
+          ...parsedFormData
+        };
         
         // Ensure amount is stored as a number
-        if (parsedData && parsedData.amount) {
-          parsedData.amount = typeof parsedData.amount === 'number' 
-            ? parsedData.amount 
-            : parseFloat(String(parsedData.amount));
+        if (completePaymentData.amount) {
+          completePaymentData.amount = typeof completePaymentData.amount === 'number' 
+            ? completePaymentData.amount 
+            : parseFloat(String(completePaymentData.amount));
         }
         
-        setPaymentData(parsedData);
+        setPaymentData(completePaymentData);
       } catch (err) {
         console.error('Error parsing payment data:', err);
         setError('Invalid payment data. Please try again.');
@@ -48,38 +58,53 @@ const PaymentGateway = () => {
     }
   }, []);
 
-  const handleSimulatePayment = (result: 'success' | 'failure') => {
+  const handlePayUPayment = () => {
+    if (!paymentData) return;
+    
     setIsProcessing(true);
     
-    setTimeout(() => {
-      if (!paymentData) return;
-      
-      // Build URL with parameters
-      const params = new URLSearchParams();
-      params.append('txnid', paymentData.txnid);
-      params.append('amount', String(paymentData.amount));
-      params.append('firstname', paymentData.firstname);
-      params.append('email', paymentData.email);
-      params.append('phone', paymentData.phone);
-      params.append('status', result);
-      params.append('paymentMethod', selectedPaymentMethod);
-      
-      if (result === 'failure') {
-        params.append('error', 'Payment was declined or canceled');
+    // Create and submit form to PayU live gateway
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'https://secure.payu.in/_payment'; // Live PayU URL
+    form.style.display = 'none';
+    
+    // Required PayU fields
+    const formFields = {
+      key: paymentData.key,
+      txnid: paymentData.txnid,
+      amount: String(paymentData.amount),
+      productinfo: paymentData.productinfo,
+      firstname: paymentData.firstname,
+      email: paymentData.email,
+      phone: paymentData.phone,
+      hash: paymentData.hash,
+      surl: paymentData.surl,
+      furl: paymentData.furl,
+    };
+    
+    // Create hidden inputs for all fields
+    Object.entries(formFields).forEach(([key, value]) => {
+      if (value) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = value;
+        form.appendChild(input);
       }
-      
-      // Clear the localStorage data
-      localStorage.removeItem('payuData');
-      
-      // Redirect to appropriate page
-      navigate(result === 'success' 
-        ? `/donate/thank-you?${params.toString()}`
-        : `/donate/payment-failed?${params.toString()}`);
-    }, 1500);
+    });
+    
+    document.body.appendChild(form);
+    form.submit();
+    
+    // Clean up localStorage
+    localStorage.removeItem('payuData');
+    localStorage.removeItem('payuFormData');
   };
 
   const handleCancel = () => {
     localStorage.removeItem('payuData');
+    localStorage.removeItem('payuFormData');
     navigate('/donate');
   };
 
@@ -110,7 +135,7 @@ const PaymentGateway = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <Helmet>
-        <title>Payment Gateway | ISKCON Juhu</title>
+        <title>Secure Payment Gateway | ISKCON Juhu</title>
         <meta name="description" content="Secure payment gateway for ISKCON Juhu donations" />
       </Helmet>
 
@@ -125,19 +150,23 @@ const PaymentGateway = () => {
               }} />
               <CardTitle>ISKCON Juhu</CardTitle>
             </div>
-            <div className="rounded-full bg-white/20 px-3 py-1 text-sm">
-              Payment Gateway
+            <div className="rounded-full bg-white/20 px-3 py-1 text-sm flex items-center gap-1">
+              <Shield className="h-4 w-4" />
+              Secure Payment
             </div>
           </div>
           <CardDescription className="text-primary-foreground/90">
-            Complete your donation securely
+            Complete your donation securely through PayU
           </CardDescription>
         </CardHeader>
         
         <div className="flex flex-col md:flex-row">
-          <div className="md:w-1/3 p-4 bg-gray-50">
-            <h3 className="font-semibold mb-2">Order Summary</h3>
-            <div className="text-sm space-y-2">
+          <div className="md:w-1/3 p-6 bg-gray-50">
+            <h3 className="font-semibold mb-4 flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+              Order Summary
+            </h3>
+            <div className="text-sm space-y-3">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Transaction ID:</span>
                 <span className="font-medium">{paymentData.txnid?.slice(0, 8)}...</span>
@@ -149,131 +178,99 @@ const PaymentGateway = () => {
               </div>
               
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Purpose:</span>
-                <span className="font-medium">{paymentData.productinfo}</span>
+                <span className="text-muted-foreground">Email:</span>
+                <span className="font-medium text-xs">{paymentData.email}</span>
               </div>
               
-              <Separator className="my-2" />
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Purpose:</span>
+                <span className="font-medium text-xs">{paymentData.productinfo}</span>
+              </div>
               
-              <div className="flex justify-between text-primary font-semibold">
+              <Separator className="my-3" />
+              
+              <div className="flex justify-between text-primary font-semibold text-lg">
                 <span>Amount:</span>
-                <span>₹{typeof paymentData.amount === 'number' ? paymentData.amount.toFixed(2) : parseFloat(String(paymentData.amount)).toFixed(2)}</span>
+                <span>₹{paymentData.amount.toFixed(2)}</span>
               </div>
             </div>
           </div>
         
-          <div className="md:w-2/3 p-4">
+          <div className="md:w-2/3 p-6">
             {isProcessing ? (
               <div className="w-full py-16 flex flex-col items-center justify-center">
                 <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-                <p className="text-center text-lg">Processing your payment...</p>
-                <p className="text-center text-sm text-muted-foreground mt-2">Please do not close this window</p>
+                <p className="text-center text-lg font-medium">Redirecting to PayU...</p>
+                <p className="text-center text-sm text-muted-foreground mt-2">Please wait while we redirect you to the secure payment gateway</p>
               </div>
             ) : (
-              <Tabs defaultValue="upi" className="w-full">
-                <TabsList className="grid grid-cols-4 mb-4">
-                  <TabsTrigger value="upi" onClick={() => setSelectedPaymentMethod('upi')}>
-                    <Phone className="h-4 w-4 mr-2" />
-                    UPI
-                  </TabsTrigger>
-                  <TabsTrigger value="cards" onClick={() => setSelectedPaymentMethod('cards')}>
-                    <CreditCard className="h-4 w-4 mr-2" />
-                    Cards
-                  </TabsTrigger>
-                  <TabsTrigger value="wallet" onClick={() => setSelectedPaymentMethod('wallet')}>
-                    <Wallet className="h-4 w-4 mr-2" />
-                    Wallet
-                  </TabsTrigger>
-                  <TabsTrigger value="netbanking" onClick={() => setSelectedPaymentMethod('netbanking')}>
-                    <Globe className="h-4 w-4 mr-2" />
-                    Net Banking
-                  </TabsTrigger>
-                </TabsList>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Choose Payment Method</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    You will be redirected to PayU's secure payment gateway where you can choose from:
+                  </p>
+                </div>
                 
-                <TabsContent value="upi" className="space-y-4">
-                  <div className="p-3 border rounded-md bg-orange-50">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="font-medium">Test Payment Simulation</span>
-                      <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded">Development Mode</span>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-4">
-                      Since we're in development mode, you can simulate a payment to test the flow:
-                    </p>
-                    <div className="bg-white p-4 rounded mb-4">
-                      <div className="mb-4">
-                        <p className="text-sm font-medium mb-2">Select payment outcome:</p>
-                        <div className="space-y-2">
-                          <div className="flex items-center">
-                            <input type="radio" id="payment-success" name="payment-result" value="success" defaultChecked 
-                              className="h-4 w-4 text-primary border-gray-300 focus:ring-primary" />
-                            <label htmlFor="payment-success" className="ml-2 text-sm text-gray-700">Successful Payment</label>
-                          </div>
-                          <div className="flex items-center">
-                            <input type="radio" id="payment-failure" name="payment-result" value="failure"
-                              className="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500" />
-                            <label htmlFor="payment-failure" className="ml-2 text-sm text-gray-700">Failed Payment</label>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-2">
-                      <Button 
-                        type="button" 
-                        variant="outline"
-                        className="w-full"
-                        onClick={handleCancel}
-                      >
-                        Cancel
-                      </Button>
-                      <Button 
-                        type="button" 
-                        className="w-full bg-purple-700 hover:bg-purple-800"
-                        onClick={() => {
-                          const isSuccess = (document.getElementById('payment-success') as HTMLInputElement).checked;
-                          handleSimulatePayment(isSuccess ? 'success' : 'failure');
-                        }}
-                      >
-                        Simulate Payment
-                      </Button>
-                    </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 border rounded-lg flex flex-col items-center text-center hover:border-primary transition-colors">
+                    <Phone className="h-8 w-8 text-primary mb-2" />
+                    <span className="font-medium">UPI</span>
+                    <span className="text-xs text-muted-foreground">Google Pay, PhonePe, Paytm</span>
                   </div>
-                </TabsContent>
+                  
+                  <div className="p-4 border rounded-lg flex flex-col items-center text-center hover:border-primary transition-colors">
+                    <CreditCard className="h-8 w-8 text-primary mb-2" />
+                    <span className="font-medium">Cards</span>
+                    <span className="text-xs text-muted-foreground">Debit & Credit Cards</span>
+                  </div>
+                  
+                  <div className="p-4 border rounded-lg flex flex-col items-center text-center hover:border-primary transition-colors">
+                    <Wallet className="h-8 w-8 text-primary mb-2" />
+                    <span className="font-medium">Wallets</span>
+                    <span className="text-xs text-muted-foreground">Digital Wallets</span>
+                  </div>
+                  
+                  <div className="p-4 border rounded-lg flex flex-col items-center text-center hover:border-primary transition-colors">
+                    <Globe className="h-8 w-8 text-primary mb-2" />
+                    <span className="font-medium">Net Banking</span>
+                    <span className="text-xs text-muted-foreground">All Major Banks</span>
+                  </div>
+                </div>
                 
-                <TabsContent value="cards" className="space-y-4">
-                  <div className="p-4 border rounded-md flex items-center justify-center">
-                    <div className="text-center">
-                      <p className="mb-2 text-gray-600">Please use UPI tab for test payments</p>
-                    </div>
-                  </div>
-                </TabsContent>
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <h4 className="font-medium text-blue-900 mb-2">What happens next?</h4>
+                  <ul className="text-sm text-blue-800 space-y-1">
+                    <li>• You'll be redirected to PayU's secure payment page</li>
+                    <li>• Choose your preferred payment method</li>
+                    <li>• Complete the payment using your banking app or card details</li>
+                    <li>• Receive instant confirmation via WhatsApp</li>
+                    <li>• Get your donation receipt automatically</li>
+                  </ul>
+                </div>
                 
-                <TabsContent value="wallet" className="space-y-4">
-                  <div className="p-4 border rounded-md flex items-center justify-center">
-                    <div className="text-center">
-                      <p className="mb-2 text-gray-600">Please use UPI tab for test payments</p>
-                    </div>
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="netbanking" className="space-y-4">
-                  <div className="p-4 border rounded-md flex items-center justify-center">
-                    <div className="text-center">
-                      <p className="mb-2 text-gray-600">Please use UPI tab for test payments</p>
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
+                <div className="flex gap-3">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="flex-1"
+                    onClick={handleCancel}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    type="button" 
+                    className="flex-1 bg-primary hover:bg-primary/90"
+                    onClick={handlePayUPayment}
+                  >
+                    <Shield className="h-4 w-4 mr-2" />
+                    Proceed to Secure Payment
+                  </Button>
+                </div>
+              </div>
             )}
           </div>
         </div>
-        
-        <CardFooter className="bg-gray-50 border-t p-4 text-xs text-center text-gray-500">
-          <div className="w-full">
-            <p>This is a payment simulation for testing purposes.</p>
-            <p>In production, you would be redirected to the actual payment gateway.</p>
-          </div>
-        </CardFooter>
       </Card>
     </div>
   );
