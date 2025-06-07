@@ -49,9 +49,9 @@ const DonationModal = ({ isOpen, category, event, amount, onClose }: DonationMod
     resolver: zodResolver(donationFormSchema),
     defaultValues: {
       amount: amount || 0,
-      name: user?.name || '',
+      name: user?.username || '',
       email: user?.email || '',
-      phone: user?.phone || '',
+      phone: '',
       panCard: '',
       message: '',
     }
@@ -128,8 +128,8 @@ const DonationModal = ({ isOpen, category, event, amount, onClose }: DonationMod
   
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
+      <DialogContent className="max-w-md max-h-[90vh] flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle className="font-poppins font-bold text-xl text-primary flex justify-between items-center">
             <span>Donate for {title}</span>
             <DialogClose className="text-dark hover:text-primary text-2xl">
@@ -138,8 +138,9 @@ const DonationModal = ({ isOpen, category, event, amount, onClose }: DonationMod
           </DialogTitle>
         </DialogHeader>
         
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <div className="flex-1 overflow-y-auto">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 p-1">
             <div>
               <FormLabel className="block font-poppins font-medium text-dark mb-2">Select Amount</FormLabel>
               
@@ -305,15 +306,16 @@ const DonationModal = ({ isOpen, category, event, amount, onClose }: DonationMod
               )}
             />
             
-            <Button
-              type="submit"
-              className="w-full bg-primary text-white font-poppins font-medium py-3 rounded-lg hover:bg-opacity-90 transition-colors"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Processing..." : "Proceed to Payment"}
-            </Button>
-          </form>
-        </Form>
+              <Button
+                type="submit"
+                className="w-full bg-primary text-white font-poppins font-medium py-3 rounded-lg hover:bg-opacity-90 transition-colors"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Processing..." : "Proceed to Payment"}
+              </Button>
+            </form>
+          </Form>
+        </div>
       </DialogContent>
     </Dialog>
   );
