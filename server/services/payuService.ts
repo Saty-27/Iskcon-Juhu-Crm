@@ -33,16 +33,12 @@ export interface PayUResponse {
   error?: any;
 }
 
-// PayU configuration
+// PayU configuration - LIVE MODE
 export const payuConfig = {
   merchantKey: process.env.PAYU_MERCHANT_KEY,
   merchantSalt: process.env.PAYU_MERCHANT_SALT,
-  baseURL: process.env.NODE_ENV === 'production' 
-    ? 'https://secure.payu.in' 
-    : 'https://sandboxsecure.payu.in',
-  paymentURL: process.env.NODE_ENV === 'production'
-    ? 'https://secure.payu.in/_payment'
-    : 'https://sandboxsecure.payu.in/_payment'
+  baseURL: 'https://secure.payu.in',  // Live PayU URL
+  paymentURL: 'https://secure.payu.in/_payment'  // Live payment URL
 };
 
 // Generate hash for PayU
