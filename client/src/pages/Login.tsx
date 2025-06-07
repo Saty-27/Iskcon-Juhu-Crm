@@ -6,8 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
 import useAuth from '@/hooks/useAuth';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
+
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -80,8 +79,6 @@ const Login = () => {
         <meta property="og:description" content="Log in to your ISKCON Juhu account." />
         <meta property="og:type" content="website" />
       </Helmet>
-      
-      <Header />
       
       <main>
         <section className="py-16">
