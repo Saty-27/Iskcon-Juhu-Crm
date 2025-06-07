@@ -1,189 +1,144 @@
 import { useEffect, useState } from 'react';
-import { Helmet } from 'react-helmet';
-import { useLocation } from 'wouter';
+import { Link, useLocation } from 'wouter';
+import { CheckCircle, Download, Home, Receipt } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-// Transaction data type
-interface TransactionData {
-  txnid?: string;
-  amount?: string;
-  email?: string;
-  firstname?: string;
-  phone?: string;
-  paymentMethod?: string;
-  bankRefNum?: string;
-  status?: string;
-  purpose?: string;
-  categoryId?: string;
+interface PaymentDetails {
+  txnid: string;
+  amount: string;
+  firstname: string;
+  email: string;
+  status: string;
 }
 
 const ThankYou = () => {
-  const [, setLocation] = useLocation();
-  const [txnData, setTxnData] = useState<TransactionData>({});
-  
+  const [location] = useLocation();
+  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
+
   useEffect(() => {
-    // Get transaction details from URL
-    const params = new URLSearchParams(window.location.search);
-    const txnid = params.get('txnid') || '';
-    const amount = params.get('amount') || '';
-    const email = params.get('email') || '';
-    const firstname = params.get('firstname') || '';
-    const phone = params.get('phone') || '';
-    const paymentMethod = params.get('PG_TYPE') || params.get('paymentMethod') || '';
-    const bankRefNum = params.get('bank_ref_num') || '';
-    const status = params.get('status') || 'success';
-    const purpose = params.get('purpose') || '';
-    const categoryId = params.get('categoryId') || '';
-    
-    setTxnData({ 
-      txnid, 
-      amount, 
-      email, 
-      firstname, 
-      phone, 
-      paymentMethod, 
-      bankRefNum,
-      status,
-      purpose,
-      categoryId
-    });
-    
-    // If no transaction ID, redirect to donation page
-    if (!txnid) {
-      setLocation('/donate');
+    // Parse URL parameters
+    const urlParams = new URLSearchParams(location.split('?')[1] || '');
+    const details: PaymentDetails = {
+      txnid: urlParams.get('txnid') || '',
+      amount: urlParams.get('amount') || '',
+      firstname: urlParams.get('firstname') || '',
+      email: urlParams.get('email') || '',
+      status: urlParams.get('status') || ''
+    };
+
+    if (details.txnid && details.amount) {
+      setPaymentDetails(details);
     }
-  }, [setLocation]);
-  
-  // Failure component - when payment status is not success
-  if (txnData.status && txnData.status !== 'success') {
+  }, [location]);
+
+  if (!paymentDetails) {
     return (
-      <>
-        <Helmet>
-          <title>Payment Failed - ISKCON Juhu</title>
-          <meta 
-            name="description" 
-            content="Your donation payment to ISKCON Juhu was not successful. Please try again."
-          />
-        </Helmet>
-        
-        <div className="min-h-screen flex items-center justify-center bg-[#fff7e6] py-12 px-4">
-          <div className="max-w-md w-full text-center">
-            <img 
-              src="https://iskconjuhu.in/ISKCON_logo.png" 
-              alt="ISKCON Logo" 
-              className="w-24 mx-auto mb-6"
-            />
-            
-            <h1 className="font-poppins font-bold text-3xl text-[#d35400] mb-4">
-              Payment Failed
-            </h1>
-            
-            <p className="font-opensans text-gray-700 mb-8">
-              We're sorry, but your donation payment could not be processed at this time. 
-              Please try again or contact us if you continue to experience issues.
-            </p>
-            
-            <div className="space-y-4">
-              <Button
-                onClick={() => setLocation('/')}
-                className="bg-[#e67e22] hover:bg-[#c65f0c] text-white"
-              >
-                Return to Home
-              </Button>
-              
-              <Button
-                onClick={() => setLocation('/donate')}
-                className="block w-full bg-white text-[#e67e22] border border-[#e67e22] hover:bg-[#fdf4e7]"
-              >
-                Try Again
-              </Button>
-            </div>
-          </div>
-        </div>
-      </>
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center p-4">
+        <Card className="max-w-md w-full">
+          <CardContent className="text-center py-8">
+            <p className="text-gray-600 mb-4">Loading payment details...</p>
+            <Link href="/donate">
+              <Button>Return to Donations</Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
-  
-  // Success component
+
   return (
-    <>
-      <Helmet>
-        <title>Thank You for Your Donation - ISKCON Juhu</title>
-        <meta 
-          name="description" 
-          content="Thank you for your generous donation to ISKCON Juhu. Your contribution helps us maintain the temple and support our spiritual and community services."
-        />
-      </Helmet>
-      
-      <div 
-        className="min-h-screen py-10 px-4"
-        style={{
-          background: 'linear-gradient(to bottom right, #fffaf0, #fceabb)',
-          fontFamily: "'Poppins', sans-serif"
-        }}
-      >
-        <div className="max-w-2xl mx-auto bg-white p-8 md:p-12 rounded-2xl shadow-lg text-center">
-          <img 
-            src="https://iskconjuhu.in/ISKCON_logo.png" 
-            alt="ISKCON Logo" 
-            className="w-28 mx-auto mb-6"
-          />
-          
-          <h1 className="font-poppins font-bold text-2xl md:text-3xl text-[#d35400] mb-3">
-            Hare Krishna, {txnData.firstname || 'Devotee'}!
-          </h1>
-          
-          <p className="font-opensans text-gray-700 mb-4 max-w-lg mx-auto">
-            Thank you for your kind donation
-            {txnData.purpose ? (
-              <span> towards <span className="font-semibold text-[#d35400]">{txnData.purpose}</span></span>
-            ) : ""}
-            .
-            <br />We are blessed to have your support.
-          </p>
-          
-          <div className="text-green-600 bg-green-50 px-4 py-2 rounded-full mb-8 font-medium inline-block">
-            A confirmation receipt will be sent to your WhatsApp number shortly.
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center p-4">
+      <Card className="max-w-2xl w-full">
+        <CardHeader className="text-center">
+          <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+            <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
-          
-          <div className="bg-[#fdf4e7] border-l-4 border-[#e67e22] rounded-lg p-6 mb-8 text-left">
-            <div className="grid gap-2">
-              {txnData.email && (
-                <div><span className="inline-block w-40 font-semibold">Email:</span> {txnData.email}</div>
-              )}
-              {txnData.phone && (
-                <div><span className="inline-block w-40 font-semibold">Phone:</span> {txnData.phone}</div>
-              )}
-              {txnData.txnid && (
-                <div><span className="inline-block w-40 font-semibold">Transaction ID:</span> {txnData.txnid}</div>
-              )}
-              {txnData.amount && (
-                <div><span className="inline-block w-40 font-semibold">Amount Donated:</span> ₹{txnData.amount}</div>
-              )}
-              {txnData.paymentMethod && (
-                <div><span className="inline-block w-40 font-semibold">Payment Method:</span> {txnData.paymentMethod}</div>
-              )}
-              {txnData.bankRefNum && (
-                <div><span className="inline-block w-40 font-semibold">Bank Ref No.:</span> {txnData.bankRefNum}</div>
-              )}
+          <CardTitle className="text-2xl font-bold text-green-700">
+            Payment Successful!
+          </CardTitle>
+          <p className="text-gray-600 mt-2">
+            Thank you for your generous donation to ISKCON Juhu
+          </p>
+        </CardHeader>
+
+        <CardContent className="space-y-6">
+          {/* Payment Details */}
+          <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+            <h3 className="font-semibold text-gray-800 mb-3">Payment Details</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+              <div>
+                <span className="font-medium text-gray-600">Transaction ID:</span>
+                <p className="text-gray-800 font-mono">{paymentDetails.txnid}</p>
+              </div>
+              
+              <div>
+                <span className="font-medium text-gray-600">Amount:</span>
+                <p className="text-gray-800 text-lg font-semibold">₹{paymentDetails.amount}</p>
+              </div>
+              
+              <div>
+                <span className="font-medium text-gray-600">Donor Name:</span>
+                <p className="text-gray-800">{paymentDetails.firstname}</p>
+              </div>
+              
+              <div>
+                <span className="font-medium text-gray-600">Email:</span>
+                <p className="text-gray-800">{paymentDetails.email}</p>
+              </div>
             </div>
           </div>
-          
-          <Button
-            onClick={() => setLocation('/')}
-            className="bg-[#e67e22] hover:bg-[#c65f0c] text-white px-8 py-3 rounded-md"
-          >
-            ← Back to Home
-          </Button>
-          
-          <img 
-            src="https://iskconjuhu.in/Prabhupada_with_children.jpg" 
-            alt="Srila Prabhupada" 
-            className="w-full max-w-md mx-auto mt-8 rounded-lg shadow-md"
-          />
-        </div>
-      </div>
-    </>
+
+          {/* Receipt Information */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-start space-x-3">
+              <Receipt className="w-5 h-5 text-blue-600 mt-0.5" />
+              <div>
+                <h4 className="font-semibold text-blue-800">Receipt & Tax Benefits</h4>
+                <p className="text-blue-700 text-sm mt-1">
+                  Your donation receipt will be sent to your WhatsApp and email within 5 minutes. 
+                  This donation is eligible for tax deduction under Section 80G of the Income Tax Act.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Thank You Message */}
+          <div className="text-center space-y-4">
+            <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+              <h4 className="font-semibold text-orange-800 mb-2">🙏 Gratitude from ISKCON Juhu</h4>
+              <p className="text-orange-700 text-sm">
+                Your generous contribution helps us continue our spiritual and community service. 
+                May Lord Krishna bless you abundantly for your devotion and generosity.
+              </p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Link href="/">
+                <Button variant="default" className="w-full sm:w-auto">
+                  <Home className="w-4 h-4 mr-2" />
+                  Return to Home
+                </Button>
+              </Link>
+              
+              <Link href="/donate">
+                <Button variant="outline" className="w-full sm:w-auto">
+                  Make Another Donation
+                </Button>
+              </Link>
+            </div>
+          </div>
+
+          {/* Contact Information */}
+          <div className="text-center text-sm text-gray-600 pt-4 border-t">
+            <p>For any queries regarding your donation, please contact:</p>
+            <p className="font-medium">Email: donations@iskconjuhu.org | Phone: +91-22-2620-6860</p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

@@ -31,9 +31,11 @@ router.post('/initiate', async (req, res) => {
     const txnid = `ISKCON_${nanoid(8)}`;
     
     // Determine success and failure URLs
-    const baseUrl = `${req.protocol}://${req.hostname}`;
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
+    const host = req.headers.host || req.hostname;
+    const baseUrl = `${protocol}://${host}`;
     
-    // In production, these would be full URLs that PayU would redirect to after payment
+    // PayU will redirect to these URLs after payment completion
     const surl = `${baseUrl}/api/payments/success`; 
     const furl = `${baseUrl}/api/payments/failure`;
     
