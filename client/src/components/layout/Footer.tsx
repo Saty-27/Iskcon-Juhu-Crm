@@ -21,7 +21,6 @@ const Footer = () => {
       toast({
         title: "Subscription Successful",
         description: "Thank you for subscribing to our newsletter!",
-        variant: "success",
       });
       setEmail('');
     } catch (error) {
@@ -64,33 +63,33 @@ const Footer = () => {
             <h4 className="font-poppins font-semibold text-xl mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/">
-                  <a className="font-opensans hover:text-secondary transition-colors">Home</a>
+                <Link href="/" className="font-opensans hover:text-secondary transition-colors">
+                  Home
                 </Link>
               </li>
               <li>
-                <Link href="/donate">
-                  <a className="font-opensans hover:text-secondary transition-colors">Donate</a>
+                <Link href="/donate" className="font-opensans hover:text-secondary transition-colors">
+                  Donate
                 </Link>
               </li>
               <li>
-                <Link href="/events">
-                  <a className="font-opensans hover:text-secondary transition-colors">Events</a>
+                <Link href="/events" className="font-opensans hover:text-secondary transition-colors">
+                  Events
                 </Link>
               </li>
               <li>
-                <Link href="/gallery">
-                  <a className="font-opensans hover:text-secondary transition-colors">Gallery</a>
+                <Link href="/gallery" className="font-opensans hover:text-secondary transition-colors">
+                  Gallery
                 </Link>
               </li>
               <li>
-                <Link href="/videos">
-                  <a className="font-opensans hover:text-secondary transition-colors">Videos</a>
+                <Link href="/videos" className="font-opensans hover:text-secondary transition-colors">
+                  Videos
                 </Link>
               </li>
               <li>
-                <Link href="/contact">
-                  <a className="font-opensans hover:text-secondary transition-colors">Contact Us</a>
+                <Link href="/contact" className="font-opensans hover:text-secondary transition-colors">
+                  Contact Us
                 </Link>
               </li>
             </ul>
