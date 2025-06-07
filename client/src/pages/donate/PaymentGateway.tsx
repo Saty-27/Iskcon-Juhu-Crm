@@ -30,10 +30,10 @@ const PaymentGateway = () => {
     const storedData = localStorage.getItem('payuData');
     const storedFormData = localStorage.getItem('payuFormData');
     
-    if (storedData && storedFormData) {
+    if (storedData || storedFormData) {
       try {
-        const parsedData = JSON.parse(storedData);
-        const parsedFormData = JSON.parse(storedFormData);
+        const parsedData = storedData ? JSON.parse(storedData) : {};
+        const parsedFormData = storedFormData ? JSON.parse(storedFormData) : {};
         
         // Combine both data sources
         const completePaymentData = {
@@ -48,13 +48,18 @@ const PaymentGateway = () => {
             : parseFloat(String(completePaymentData.amount));
         }
         
-        setPaymentData(completePaymentData);
+        // Validate required fields
+        if (completePaymentData.txnid && completePaymentData.amount && completePaymentData.firstname) {
+          setPaymentData(completePaymentData);
+        } else {
+          setError('Payment session expired. Please start a new donation.');
+        }
       } catch (err) {
         console.error('Error parsing payment data:', err);
         setError('Invalid payment data. Please try again.');
       }
     } else {
-      setError('No payment data found. Please try again.');
+      setError('Please start your donation from the donation page. This page requires payment data from a donation form.');
     }
   }, []);
 

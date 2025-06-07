@@ -99,8 +99,8 @@ const DonationModal = ({ isOpen, category, event, amount, onClose }: DonationMod
           variant: "default",
         });
         
-        // Store payment data in localStorage for the payment simulator
-        localStorage.setItem('payuData', JSON.stringify({
+        // Store payment data in localStorage for the payment gateway
+        const paymentInfo = {
           txnid: result.paymentData.txnid,
           amount: result.paymentData.amount,
           firstname: result.paymentData.firstname,
@@ -108,7 +108,10 @@ const DonationModal = ({ isOpen, category, event, amount, onClose }: DonationMod
           phone: result.paymentData.phone,
           productinfo: result.paymentData.productinfo,
           key: result.paymentData.key
-        }));
+        };
+        
+        localStorage.setItem('payuData', JSON.stringify(paymentInfo));
+        localStorage.setItem('payuFormData', JSON.stringify(result.paymentData));
         
         // Redirect to payment simulation page
         window.location.href = '/donate/payment-gateway';
