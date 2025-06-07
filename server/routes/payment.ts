@@ -113,6 +113,9 @@ router.post('/success', async (req, res) => {
     // Import invoice service functions
     const { generateInvoiceNumber, sendWhatsAppReceipt } = await import('../services/invoiceService');
     
+    // Initialize default purpose
+    let purpose = "ISKCON Juhu Donation";
+    
     // Update donation status to completed
     if (paymentResponse && paymentResponse.txnid) {
       const donation = await storage.getDonationByPaymentId(paymentResponse.txnid);
@@ -129,7 +132,6 @@ router.post('/success', async (req, res) => {
         });
         
         // Get purpose from category or event
-        let purpose = "ISKCON Juhu Donation";
         if (donation.categoryId) {
           const category = await storage.getDonationCategory(donation.categoryId);
           if (category) {
@@ -196,13 +198,15 @@ router.post('/success', async (req, res) => {
       }
     }
     
-    // Redirect to thank you page with parameters
+    // Redirect to thank you page with parameters including donation purpose
     const params = new URLSearchParams({
       txnid: paymentResponse.txnid || '',
       amount: paymentResponse.amount || '',
       firstname: paymentResponse.firstname || '',
       email: paymentResponse.email || '',
-      status: 'success'
+      status: 'success',
+      purpose: purpose,
+      categoryName: purpose
     });
     
     res.redirect(`/donate/thank-you?${params.toString()}`);

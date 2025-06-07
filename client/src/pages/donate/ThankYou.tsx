@@ -12,6 +12,8 @@ interface PaymentDetails {
   firstname: string;
   email: string;
   status: string;
+  purpose?: string;
+  categoryName?: string;
 }
 
 const ThankYou = () => {
@@ -31,7 +33,9 @@ const ThankYou = () => {
       amount: urlParams.get('amount') || '',
       firstname: urlParams.get('firstname') || '',
       email: urlParams.get('email') || '',
-      status: urlParams.get('status') || ''
+      status: urlParams.get('status') || '',
+      purpose: urlParams.get('purpose') || '',
+      categoryName: urlParams.get('categoryName') || ''
     };
 
     // Set payment details even if some fields are missing for debugging
@@ -50,7 +54,9 @@ const ThankYou = () => {
           amount: fallbackParams.get('amount') || '',
           firstname: fallbackParams.get('firstname') || '',
           email: fallbackParams.get('email') || '',
-          status: fallbackParams.get('status') || ''
+          status: fallbackParams.get('status') || '',
+          purpose: fallbackParams.get('purpose') || '',
+          categoryName: fallbackParams.get('categoryName') || ''
         };
         
         if (fallbackDetails.txnid || fallbackDetails.amount) {
@@ -157,6 +163,16 @@ const ThankYou = () => {
           <p className="text-gray-600 mt-2">
             Thank you for your generous donation to ISKCON Juhu
           </p>
+          {paymentDetails.categoryName && (
+            <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-3">
+              <p className="text-green-800 font-semibold text-lg">
+                🙏 Your donation for "{paymentDetails.categoryName}" was successful!
+              </p>
+              <p className="text-green-700 text-sm mt-1">
+                Your contribution of ₹{paymentDetails.amount} will help support this noble cause.
+              </p>
+            </div>
+          )}
         </CardHeader>
 
         <CardContent className="space-y-6">
@@ -184,6 +200,15 @@ const ThankYou = () => {
                 <span className="font-medium text-gray-600">Email:</span>
                 <p className="text-gray-800">{paymentDetails.email}</p>
               </div>
+              
+              {(paymentDetails.purpose || paymentDetails.categoryName) && (
+                <div className="md:col-span-2">
+                  <span className="font-medium text-gray-600">Donation Purpose:</span>
+                  <p className="text-gray-800 font-semibold text-orange-700">
+                    {paymentDetails.categoryName || paymentDetails.purpose}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 

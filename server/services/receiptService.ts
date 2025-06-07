@@ -80,7 +80,14 @@ export async function generatePDFReceipt(receiptData: ReceiptData): Promise<Buff
       if (receiptData.panCard) {
         addReceiptLine('PAN Card', receiptData.panCard);
       }
-      addReceiptLine('Purpose', receiptData.purpose);
+      
+      // Donation Purpose - highlighted section
+      doc.fontSize(14)
+         .fillColor('#FF6B35')
+         .text('Donation Purpose:', 70, currentY, { width: 150 })
+         .fillColor('#000')
+         .text(receiptData.purpose, 250, currentY, { width: 250 });
+      currentY += lineHeight;
       
       // Amount in box
       doc.fontSize(14)
