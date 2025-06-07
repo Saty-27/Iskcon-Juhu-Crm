@@ -45,13 +45,7 @@ const HeroSlider = () => {
           alt="Sri Sri Radha Rasabihari" 
           className="object-cover w-full h-full"
         />
-        <div className="absolute inset-0 z-20 flex items-center justify-center">
-          <div className="container mx-auto px-4 text-center">
-            <h1 className="hero-heading">
-              Sri Sri Radha Rasabihari Mandir
-            </h1>
-          </div>
-        </div>
+
       </div>
 
       {/* Additional Banner Slides */}
