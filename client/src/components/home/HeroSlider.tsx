@@ -50,23 +50,6 @@ const HeroSlider = () => {
             <h1 className="hero-heading">
               Sri Sri Radha Rasabihari Mandir
             </h1>
-            <p className="text-white text-lg md:text-xl mt-6 max-w-2xl mx-auto">
-              Experience divine consciousness at ISKCON Juhu, Mumbai's most sacred temple
-            </p>
-            <div className="mt-8 flex justify-center gap-4 flex-wrap">
-              <Link href="/donate">
-                <a className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-3 rounded-full 
-                  inline-block transition-all transform hover:-translate-y-1">
-                  Donate Now
-                </a>
-              </Link>
-              <Link href="/events">
-                <a className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-black 
-                  font-bold px-8 py-3 rounded-full inline-block transition-all">
-                  View Events
-                </a>
-              </Link>
-            </div>
           </div>
         </div>
       </div>
