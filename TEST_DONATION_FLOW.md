@@ -30,6 +30,20 @@
 2. Receive WhatsApp notification with PDF receipt
 3. View donation in admin panel
 
+## Post-Payment Pages
+
+### Success Page (`/donate/thank-you`)
+- Shows payment confirmation with transaction details
+- Displays thank you message from ISKCON Juhu
+- Information about WhatsApp receipt and tax benefits
+- Options to return home or make another donation
+
+### Failure Page (`/donate/payment-failed`)
+- Shows payment failure information
+- Lists common reasons for payment failure
+- Provides helpful next steps for users
+- Contact information for support
+
 ## Error Resolution
 
 If you see "No payment data found" error:
@@ -42,3 +56,4 @@ If you see "No payment data found" error:
 - UPI: ✅ Real bank account (iskconjuhu@sbi)
 - WhatsApp: ✅ Live notifications enabled
 - Receipts: ✅ PDF generation active
+- Success/Failure: ✅ Proper user-friendly pages

@@ -74,7 +74,7 @@ router.post('/initiate', async (req, res) => {
       categoryId: categoryId ? Number(categoryId) : null,
       eventId: eventId ? Number(eventId) : null,
       panCard: panCard || null,
-      userId: req.user?.id || null,
+      userId: (req as any).user?.id || null,
       paymentId: txnid
     });
     
