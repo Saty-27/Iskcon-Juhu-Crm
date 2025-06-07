@@ -2,6 +2,7 @@ import express from 'express';
 import { payuConfig, generateHash, getPaymentFormData } from '../services/payuService';
 import { storage } from '../storage';
 import { nanoid } from 'nanoid';
+import { generatePDFReceipt, sendReceiptEmail, type ReceiptData } from '../services/receiptService';
 
 const router = express.Router();
 
@@ -442,6 +443,107 @@ router.post('/verify-upi', async (req, res) => {
       success: false,
       message: 'Failed to verify UPI payment'
     });
+  }
+});
+
+// Generate and download PDF receipt
+router.get('/receipt/:txnid', async (req, res) => {
+  try {
+    const { txnid } = req.params;
+    
+    // Get donation details from database
+    const donation = await storage.getDonationByPaymentId(txnid);
+    
+    if (!donation) {
+      return res.status(404).json({ error: 'Donation not found' });
+    }
+
+    // Get purpose from category or event
+    let purpose = "ISKCON Juhu Donation";
+    if (donation.categoryId) {
+      const category = await storage.getDonationCategory(donation.categoryId);
+      if (category) {
+        purpose = category.name;
+      }
+    } else if (donation.eventId) {
+      const event = await storage.getEvent(donation.eventId);
+      if (event) {
+        purpose = event.title;
+      }
+    }
+
+    const receiptData: ReceiptData = {
+      txnid: donation.paymentId || txnid,
+      amount: donation.amount,
+      name: donation.name,
+      email: donation.email,
+      phone: donation.phone,
+      purpose,
+      invoiceNumber: donation.invoiceNumber || `INV-${txnid}`,
+      date: donation.createdAt || new Date(),
+      panCard: donation.panCard || undefined
+    };
+
+    const pdfBuffer = await generatePDFReceipt(receiptData);
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=ISKCON_Receipt_${receiptData.invoiceNumber}.pdf`);
+    res.send(pdfBuffer);
+  } catch (error) {
+    console.error('Error generating receipt PDF:', error);
+    res.status(500).json({ error: 'Failed to generate receipt' });
+  }
+});
+
+// Send receipt email
+router.post('/send-receipt', async (req, res) => {
+  try {
+    const { txnid } = req.body;
+    
+    // Get donation details from database
+    const donation = await storage.getDonationByPaymentId(txnid);
+    
+    if (!donation) {
+      return res.status(404).json({ error: 'Donation not found' });
+    }
+
+    // Get purpose from category or event
+    let purpose = "ISKCON Juhu Donation";
+    if (donation.categoryId) {
+      const category = await storage.getDonationCategory(donation.categoryId);
+      if (category) {
+        purpose = category.name;
+      }
+    } else if (donation.eventId) {
+      const event = await storage.getEvent(donation.eventId);
+      if (event) {
+        purpose = event.title;
+      }
+    }
+
+    const receiptData: ReceiptData = {
+      txnid: donation.paymentId || txnid,
+      amount: donation.amount,
+      name: donation.name,
+      email: donation.email,
+      phone: donation.phone,
+      purpose,
+      invoiceNumber: donation.invoiceNumber || `INV-${txnid}`,
+      date: donation.createdAt || new Date(),
+      panCard: donation.panCard || undefined
+    };
+
+    const pdfBuffer = await generatePDFReceipt(receiptData);
+    const emailSent = await sendReceiptEmail(receiptData, pdfBuffer);
+
+    if (emailSent) {
+      res.json({ success: true, message: 'Receipt sent successfully' });
+    } else {
+      res.status(500).json({ error: 'Failed to send receipt email' });
+    }
+  } catch (error) {
+    console.error('Error sending receipt:', error);
+    res.status(500).json({ error: 'Failed to send receipt' });
   }
 });
 

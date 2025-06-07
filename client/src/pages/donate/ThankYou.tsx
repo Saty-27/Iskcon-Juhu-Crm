@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'wouter';
-import { CheckCircle, Download, Home, Receipt } from 'lucide-react';
+import { CheckCircle, Download, Home, Receipt, Mail, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useToast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
 
 interface PaymentDetails {
   txnid: string;
@@ -15,6 +17,9 @@ interface PaymentDetails {
 const ThankYou = () => {
   const [location] = useLocation();
   const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     // Parse URL parameters from window.location.search
@@ -54,6 +59,75 @@ const ThankYou = () => {
       }
     }
   }, [location]);
+
+  const handleDownloadReceipt = async () => {
+    if (!paymentDetails?.txnid) return;
+    
+    setIsDownloading(true);
+    try {
+      const response = await fetch(`/api/payments/receipt/${paymentDetails.txnid}`);
+      if (!response.ok) {
+        throw new Error('Failed to download receipt');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `ISKCON_Receipt_${paymentDetails.txnid}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast({
+        title: "Receipt Downloaded",
+        description: "Your donation receipt has been downloaded successfully.",
+        variant: "default",
+      });
+    } catch (error) {
+      toast({
+        title: "Download Failed",
+        description: "Failed to download receipt. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  const handleSendEmail = async () => {
+    if (!paymentDetails?.txnid) return;
+    
+    setIsSendingEmail(true);
+    try {
+      const response = await apiRequest('POST', '/api/payments/send-receipt', {
+        txnid: paymentDetails.txnid
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to send email');
+      }
+      
+      toast({
+        title: "Email Sent",
+        description: "Receipt has been sent to your email address.",
+        variant: "default",
+      });
+    } catch (error) {
+      toast({
+        title: "Email Failed",
+        description: "Failed to send receipt via email. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSendingEmail(false);
+    }
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
 
   if (!paymentDetails) {
     return (
@@ -117,12 +191,44 @@ const ThankYou = () => {
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <div className="flex items-start space-x-3">
               <Receipt className="w-5 h-5 text-blue-600 mt-0.5" />
-              <div>
+              <div className="flex-1">
                 <h4 className="font-semibold text-blue-800">Receipt & Tax Benefits</h4>
-                <p className="text-blue-700 text-sm mt-1">
+                <p className="text-blue-700 text-sm mt-1 mb-3">
                   Your donation receipt will be sent to your WhatsApp and email within 5 minutes. 
                   This donation is eligible for tax deduction under Section 80G of the Income Tax Act.
                 </p>
+                
+                {/* Receipt Action Buttons */}
+                <div className="flex flex-wrap gap-2">
+                  <Button 
+                    onClick={handleDownloadReceipt}
+                    disabled={isDownloading}
+                    size="sm"
+                    variant="default"
+                  >
+                    <Download className="w-4 h-4 mr-1" />
+                    {isDownloading ? 'Downloading...' : 'Download PDF'}
+                  </Button>
+                  
+                  <Button 
+                    onClick={handleSendEmail}
+                    disabled={isSendingEmail}
+                    size="sm"
+                    variant="outline"
+                  >
+                    <Mail className="w-4 h-4 mr-1" />
+                    {isSendingEmail ? 'Sending...' : 'Email Receipt'}
+                  </Button>
+                  
+                  <Button 
+                    onClick={handlePrint}
+                    size="sm"
+                    variant="outline"
+                  >
+                    <Printer className="w-4 h-4 mr-1" />
+                    Print Page
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
