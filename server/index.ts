@@ -5,6 +5,7 @@ import { createDefaultAdmin } from "./createDefaultAdmin";
 import { storage } from "./storage";
 import paymentRoutes from "./routes/payment";
 import receiptRoutes from "./routes/receipt";
+import { validatePaymentConfig } from "./paymentConfig";
 
 const app = express();
 app.use(express.json());
@@ -43,6 +44,16 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Validate payment configuration for live mode
+  const paymentValidation = validatePaymentConfig();
+  if (!paymentValidation.isValid) {
+    console.error('Payment configuration validation failed:');
+    paymentValidation.errors.forEach(error => console.error(`- ${error}`));
+    console.log('Note: Some payment features may not work without proper configuration');
+  } else {
+    console.log('✓ Payment system configured for LIVE PRODUCTION MODE');
+  }
+  
   // Database connection is handled by PostgreSQL automatically
   
   // Create a default admin user if one doesn't exist

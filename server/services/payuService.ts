@@ -1,4 +1,5 @@
 import crypto from 'crypto-js';
+import { PAYMENT_CONFIG } from '../paymentConfig';
 
 // PayU payment service
 export interface PaymentRequest {
@@ -33,12 +34,14 @@ export interface PayUResponse {
   error?: any;
 }
 
-// PayU configuration - LIVE MODE
+// PayU configuration - LIVE PRODUCTION MODE
 export const payuConfig = {
-  merchantKey: process.env.PAYU_MERCHANT_KEY,
-  merchantSalt: process.env.PAYU_MERCHANT_SALT,
-  baseURL: 'https://secure.payu.in',  // Live PayU URL
-  paymentURL: 'https://secure.payu.in/_payment'  // Live payment URL
+  merchantKey: PAYMENT_CONFIG.PAYU.MERCHANT_KEY,
+  merchantSalt: PAYMENT_CONFIG.PAYU.MERCHANT_SALT,
+  baseURL: PAYMENT_CONFIG.PAYU.BASE_URL,
+  paymentURL: PAYMENT_CONFIG.PAYU.PAYMENT_URL,
+  verifyURL: PAYMENT_CONFIG.PAYU.VERIFY_URL,
+  mode: PAYMENT_CONFIG.PAYU.MODE
 };
 
 // Generate hash for PayU
