@@ -17,8 +17,10 @@ const ThankYou = () => {
   const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
 
   useEffect(() => {
-    // Parse URL parameters
-    const urlParams = new URLSearchParams(location.split('?')[1] || '');
+    // Parse URL parameters from window.location.search
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    
     const details: PaymentDetails = {
       txnid: urlParams.get('txnid') || '',
       amount: urlParams.get('amount') || '',
@@ -27,8 +29,29 @@ const ThankYou = () => {
       status: urlParams.get('status') || ''
     };
 
-    if (details.txnid && details.amount) {
+    // Set payment details even if some fields are missing for debugging
+    if (details.txnid || details.amount || queryString) {
       setPaymentDetails(details);
+    }
+    
+    // Fallback: try to get from URL hash or other sources
+    if (!details.txnid && !details.amount) {
+      // Check if parameters are in the location path for wouter
+      const locationParts = location.split('?');
+      if (locationParts.length > 1) {
+        const fallbackParams = new URLSearchParams(locationParts[1]);
+        const fallbackDetails: PaymentDetails = {
+          txnid: fallbackParams.get('txnid') || '',
+          amount: fallbackParams.get('amount') || '',
+          firstname: fallbackParams.get('firstname') || '',
+          email: fallbackParams.get('email') || '',
+          status: fallbackParams.get('status') || ''
+        };
+        
+        if (fallbackDetails.txnid || fallbackDetails.amount) {
+          setPaymentDetails(fallbackDetails);
+        }
+      }
     }
   }, [location]);
 
