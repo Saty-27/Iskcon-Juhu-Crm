@@ -5,6 +5,26 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hero Section Custom Styles */
+.hero-heading {
+    background-color: #FAA817;
+    padding-left: 15px;
+    padding-right: 15px;
+    border-radius: 20px;
+    font-size: 50px;
+    font-weight: bold;
+    color: white;
+    display: inline-block;
+    line-height: 1.2;
+}
+
+@media (max-width: 768px) {
+    .hero-heading {
+        font-size: 40px;
+        text-align: center;
+    }
+}
+
 :root {
   /* Base colors */
   --primary: 288 69% 29%; /* #702963 - ISKCON purple */
