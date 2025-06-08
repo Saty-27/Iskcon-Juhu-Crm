@@ -569,7 +569,7 @@
 /* Current Events Section Styling */
 .current-events-section {
   padding: 60px 20px;
-  background-color: #F5F3F3;
+  background-color: #FDF7F0;
   color: #333;
 }
 
@@ -600,76 +600,88 @@
 }
 
 .current-events-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 30px;
-  max-width: 1200px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
 .current-event-card {
   background: white;
-  border-radius: 12px;
+  border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.08);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   display: flex;
   flex-direction: row;
-  min-height: 280px;
+  min-height: 200px;
+  border: 1px solid #f0f0f0;
 }
 
 .current-event-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+  box-shadow: 0px 12px 30px rgba(0, 0, 0, 0.12);
 }
 
 .event-image-container {
-  flex: 0 0 150px;
+  flex: 0 0 200px;
   position: relative;
+  overflow: hidden;
 }
 
 .event-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.current-event-card:hover .event-image {
+  transform: scale(1.05);
 }
 
 .event-content {
   flex: 1;
-  padding: 20px;
+  padding: 25px 30px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  position: relative;
 }
 
 .event-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 15px;
-  flex-wrap: wrap;
-  gap: 10px;
+  margin-bottom: 12px;
+  position: relative;
 }
 
 .event-title {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 600;
   color: #7B2CBF;
   margin: 0;
   font-family: "Poppins", sans-serif;
+  line-height: 1.2;
   flex: 1;
-  min-width: 200px;
+  padding-right: 15px;
 }
 
 .event-date {
   background-color: #faa817;
   color: white;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 25px;
+  font-size: 13px;
+  font-weight: 600;
   white-space: nowrap;
   font-family: "Poppins", sans-serif;
+  position: absolute;
+  top: 0;
+  right: 0;
+  box-shadow: 0 2px 8px rgba(250, 168, 23, 0.3);
 }
 
 .event-description-container {
@@ -710,40 +722,52 @@
 
 .suggested-amounts {
   display: flex;
-  gap: 8px;
-  margin-bottom: 15px;
+  gap: 12px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
+  margin-top: 8px;
 }
 
 .amount-tag {
-  background-color: #f8f9fa;
+  background-color: #f8f4ff;
   color: #7B2CBF;
-  padding: 4px 12px;
-  border-radius: 15px;
-  font-size: 12px;
-  font-weight: 500;
-  border: 1px solid #e9ecef;
+  padding: 6px 14px;
+  border-radius: 18px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 2px solid #e0d4f7;
   font-family: "Poppins", sans-serif;
+  transition: all 0.2s ease;
+}
+
+.amount-tag:hover {
+  background-color: #7B2CBF;
+  color: white;
+  border-color: #7B2CBF;
 }
 
 .donate-event-button {
   background-color: #7B2CBF;
   color: white;
   border: none;
-  padding: 12px 20px;
-  border-radius: 8px;
+  padding: 14px 30px;
+  border-radius: 30px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   font-family: "Poppins", sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   width: 100%;
   margin-top: auto;
+  text-transform: none;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(123, 44, 191, 0.3);
 }
 
 .donate-event-button:hover {
   background-color: #faa817;
   transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(250, 168, 23, 0.4);
 }
 
 @keyframes fadeIn {
@@ -764,7 +788,6 @@
   }
   
   .current-events-grid {
-    grid-template-columns: 1fr;
     gap: 20px;
   }
   
@@ -777,15 +800,23 @@
     flex: 0 0 200px;
   }
   
+  .event-content {
+    padding: 20px;
+  }
+  
   .event-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+    margin-bottom: 15px;
   }
   
   .event-title {
-    font-size: 20px;
-    min-width: auto;
+    font-size: 22px;
+    padding-right: 80px;
+  }
+  
+  .event-date {
+    position: absolute;
+    top: -5px;
+    right: 0;
   }
 }
 
