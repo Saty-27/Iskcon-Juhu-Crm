@@ -9,32 +9,25 @@ export async function initializeStatsAndSchedules() {
       console.log("Initializing stats data...");
       await db.insert(stats).values([
         {
-          value: 10000,
-          suffix: "+",
-          label: "Meals Distributed Daily",
+          value: 300,
+          suffix: "cr+",
+          label: "Meals Distributed",
           isActive: true,
           orderIndex: 1
         },
         {
-          value: 45,
-          suffix: "+",
-          label: "Years of Service",
+          value: 55,
+          suffix: "years",
+          label: "of service to humanity",
           isActive: true,
           orderIndex: 2
         },
         {
-          value: 150,
+          value: 110,
           suffix: "+",
-          label: "Kitchens Across India",
+          label: "Kitchens across India",
           isActive: true,
           orderIndex: 3
-        },
-        {
-          value: 2500,
-          suffix: "+",
-          label: "Daily Visitors",
-          isActive: true,
-          orderIndex: 4
         }
       ]);
       console.log("Stats data initialized successfully");
