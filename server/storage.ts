@@ -3,6 +3,8 @@ import {
   Banner, InsertBanner, banners,
   Quote, InsertQuote, quotes,
   DonationCategory, InsertDonationCategory, donationCategories,
+  DonationCard, InsertDonationCard, donationCards,
+  BankDetails, InsertBankDetails, bankDetails,
   Event, InsertEvent, events,
   Gallery, InsertGallery, gallery,
   Video, InsertVideo, videos,
@@ -45,6 +47,21 @@ export interface IStorage {
   createDonationCategory(category: InsertDonationCategory): Promise<DonationCategory>;
   updateDonationCategory(id: number, categoryData: Partial<DonationCategory>): Promise<DonationCategory | undefined>;
   deleteDonationCategory(id: number): Promise<boolean>;
+  
+  // Donation card management
+  getDonationCards(): Promise<DonationCard[]>;
+  getDonationCard(id: number): Promise<DonationCard | undefined>;
+  getDonationCardsByCategory(categoryId: number): Promise<DonationCard[]>;
+  createDonationCard(card: InsertDonationCard): Promise<DonationCard>;
+  updateDonationCard(id: number, cardData: Partial<DonationCard>): Promise<DonationCard | undefined>;
+  deleteDonationCard(id: number): Promise<boolean>;
+  
+  // Bank details management
+  getBankDetails(): Promise<BankDetails[]>;
+  getBankDetail(id: number): Promise<BankDetails | undefined>;
+  createBankDetails(details: InsertBankDetails): Promise<BankDetails>;
+  updateBankDetails(id: number, detailsData: Partial<BankDetails>): Promise<BankDetails | undefined>;
+  deleteBankDetails(id: number): Promise<boolean>;
   
   // Event management
   getEvents(): Promise<Event[]>;

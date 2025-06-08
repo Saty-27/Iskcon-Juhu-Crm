@@ -64,6 +64,38 @@ export const insertDonationCategorySchema = createInsertSchema(donationCategorie
   id: true,
 });
 
+// Donation cards table - predefined donation options for each category
+export const donationCards = pgTable("donation_cards", {
+  id: serial("id").primaryKey(),
+  categoryId: integer("category_id").references(() => donationCategories.id, { onDelete: 'cascade' }).notNull(),
+  title: text("title").notNull(),
+  amount: integer("amount").notNull(),
+  description: text("description"),
+  imageUrl: text("image_url"),
+  isActive: boolean("is_active").default(true).notNull(),
+  order: integer("order").notNull(),
+});
+
+export const insertDonationCardSchema = createInsertSchema(donationCards).omit({
+  id: true,
+});
+
+// Bank details table - for bank transfer information
+export const bankDetails = pgTable("bank_details", {
+  id: serial("id").primaryKey(),
+  accountName: text("account_name").notNull(),
+  bankName: text("bank_name").notNull(),
+  accountNumber: text("account_number").notNull(),
+  ifscCode: text("ifsc_code").notNull(),
+  swiftCode: text("swift_code"),
+  qrCodeUrl: text("qr_code_url"),
+  isActive: boolean("is_active").default(true).notNull(),
+});
+
+export const insertBankDetailsSchema = createInsertSchema(bankDetails).omit({
+  id: true,
+});
+
 // Events table
 export const events = pgTable("events", {
   id: serial("id").primaryKey(),
@@ -275,3 +307,9 @@ export type InsertDonation = z.infer<typeof insertDonationSchema>;
 
 export type Subscription = typeof subscriptions.$inferSelect;
 export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
+
+export type DonationCard = typeof donationCards.$inferSelect;
+export type InsertDonationCard = z.infer<typeof insertDonationCardSchema>;
+
+export type BankDetails = typeof bankDetails.$inferSelect;
+export type InsertBankDetails = z.infer<typeof insertBankDetailsSchema>;
