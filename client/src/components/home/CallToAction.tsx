@@ -9,7 +9,7 @@ const CallToAction = () => {
   };
 
   return (
-    <section className="relative overflow-hidden" style={{ backgroundColor: '#E91E63' }}>
+    <section className="relative overflow-hidden" style={{ backgroundColor: 'rgb(255, 45, 85)' }}>
       {/* Decorative elements */}
       <div className="absolute top-4 left-8 text-white opacity-60">
         <div className="grid grid-cols-3 gap-1">
