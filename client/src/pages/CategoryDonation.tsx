@@ -146,22 +146,42 @@ export default function CategoryDonation() {
       }} className="flex-col md:flex-row">
         <div style={{
           flex: 1,
-          background: 'linear-gradient(135deg, #ff6b35, #f7931e)',
-          color: '#fff',
-          padding: '20px',
+          backgroundImage: 'url(/gradientbg.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          position: 'relative',
           borderRadius: '10px',
+          overflow: 'hidden',
           boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)'
         }}>
-          <h2 style={{ fontSize: '24px', marginBottom: '10px', fontWeight: 'bold' }}>
-            {category.heading || category.name}
-          </h2>
-          <p style={{ marginBottom: '20px', lineHeight: '1.6' }}>
-            {category.description && getWordCount(category.description) > 20 
-              ? getTruncatedDescription(category.description, 20)
-              : category.description}
-          </p>
+          {/* Black overlay */}
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            borderRadius: '10px'
+          }}></div>
           
-          {category.description && getWordCount(category.description) > 20 && (
+          {/* Content */}
+          <div style={{
+            position: 'relative',
+            zIndex: 2,
+            color: '#fff',
+            padding: '20px'
+          }}>
+            <h2 style={{ fontSize: '24px', marginBottom: '10px', fontWeight: 'bold' }}>
+              {category.heading || category.name}
+            </h2>
+            <p style={{ marginBottom: '20px', lineHeight: '1.6' }}>
+              {category.description && getWordCount(category.description) > 20 
+                ? getTruncatedDescription(category.description, 20)
+                : category.description}
+            </p>
+            
+            {/* Always show Read More button */}
             <Dialog open={isDescriptionModalOpen} onOpenChange={setIsDescriptionModalOpen}>
               <DialogTrigger asChild>
                 <button style={{
@@ -188,7 +208,7 @@ export default function CategoryDonation() {
                 </div>
               </DialogContent>
             </Dialog>
-          )}
+          </div>
         </div>
         
         <div style={{ flex: 1 }}>
