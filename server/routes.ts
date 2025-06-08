@@ -27,34 +27,16 @@ import { z } from "zod";
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-// Middleware to verify if user is authenticated
+// Middleware to verify if user is authenticated - TEMPORARILY DISABLED
 const isAuthenticated = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  // Check session or JWT token
-  // For demo purposes, we'll just check for userId in the session
-  if (req.session && req.session.userId) {
-    next();
-  } else {
-    res.status(401).json({ message: "Unauthorized" });
-  }
+  // Authentication temporarily disabled for testing
+  next();
 };
 
-// Middleware to verify if user is an admin
+// Middleware to verify if user is an admin - TEMPORARILY DISABLED
 const isAdmin = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  if (!req.session || !req.session.userId) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-
-  try {
-    const user = await storage.getUser(req.session.userId);
-    if (!user || user.role !== "admin") {
-      return res.status(403).json({ message: "Forbidden - Admin access required" });
-    }
-    
-    next();
-  } catch (error) {
-    console.error("Error in admin authorization:", error);
-    return res.status(500).json({ message: "Error checking admin authorization" });
-  }
+  // Admin authentication temporarily disabled for testing
+  next();
 };
 
 // Extend express Request type to include session
