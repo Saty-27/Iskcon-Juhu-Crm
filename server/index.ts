@@ -7,6 +7,7 @@ import { storage } from "./storage";
 import paymentRoutes from "./routes/payment";
 import receiptRoutes from "./routes/receipt";
 import { validatePaymentConfig } from "./paymentConfig";
+import { initializeStatsAndSchedules } from "./initializeData";
 
 const app = express();
 app.use(express.json());
@@ -59,6 +60,9 @@ app.use((req, res, next) => {
   
   // Create a default admin user if one doesn't exist
   await createDefaultAdmin();
+  
+  // Initialize stats and schedules data
+  await initializeStatsAndSchedules();
   
   // Create a new admin user with known credentials
   try {

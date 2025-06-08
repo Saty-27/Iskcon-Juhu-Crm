@@ -104,6 +104,20 @@ export interface IStorage {
   createSubscription(subscription: InsertSubscription): Promise<Subscription>;
   updateSubscription(id: number, subscriptionData: Partial<Subscription>): Promise<Subscription | undefined>;
   deleteSubscription(id: number): Promise<boolean>;
+  
+  // Stats management
+  getStats(): Promise<Stat[]>;
+  getStat(id: number): Promise<Stat | undefined>;
+  createStat(stat: InsertStat): Promise<Stat>;
+  updateStat(id: number, statData: Partial<Stat>): Promise<Stat | undefined>;
+  deleteStat(id: number): Promise<boolean>;
+  
+  // Schedule management
+  getSchedules(): Promise<Schedule[]>;
+  getSchedule(id: number): Promise<Schedule | undefined>;
+  createSchedule(schedule: InsertSchedule): Promise<Schedule>;
+  updateSchedule(id: number, scheduleData: Partial<Schedule>): Promise<Schedule | undefined>;
+  deleteSchedule(id: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
