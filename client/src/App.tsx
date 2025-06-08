@@ -42,10 +42,10 @@ function Router() {
       <Route path="/events" component={Events} />
 
       <Route path="/donate" component={Donate} />
-      <Route path="/donate/:categoryId" component={CategoryDonation} />
       <Route path="/donate/thank-you" component={DonateThankYou} />
       <Route path="/donate/payment-gateway" component={PaymentGateway} />
       <Route path="/donate/payment-failed" component={PaymentFailed} />
+      <Route path="/donate/:categoryId" component={CategoryDonation} />
       <Route path="/gallery" component={Gallery} />
       <Route path="/videos" component={Videos} />
       <Route path="/contact" component={Contact} />
