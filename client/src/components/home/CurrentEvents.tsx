@@ -1,55 +1,52 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
-import { Event } from '@shared/schema';
+import { useLocation } from 'wouter';
+import { Event, DonationCategory } from '@shared/schema';
 import { Skeleton } from '@/components/ui/skeleton';
-import DonationModal from '@/components/donate/DonationModal';
 
 const CurrentEvents = () => {
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
+  const [, setLocation] = useLocation();
+  const [expandedEvent, setExpandedEvent] = useState<number | null>(null);
   
   const { data: events = [], isLoading } = useQuery<Event[]>({
     queryKey: ['/api/events'],
   });
-  
-  const openDonationModal = (event: Event, amount: number | null = null) => {
-    setSelectedEvent(event);
-    setSelectedAmount(amount);
+
+  const { data: categories = [] } = useQuery<DonationCategory[]>({
+    queryKey: ['/api/donation-categories'],
+  });
+
+  const handleDonateClick = (eventTitle: string) => {
+    // Find matching donation category by name or create a fallback
+    const matchingCategory = categories.find(cat => 
+      cat.name.toLowerCase().includes(eventTitle.toLowerCase()) || 
+      eventTitle.toLowerCase().includes(cat.name.toLowerCase())
+    );
+    
+    if (matchingCategory) {
+      setLocation(`/donate/${matchingCategory.id}`);
+    } else {
+      // Default to first category if no match found
+      setLocation(`/donate/${categories[0]?.id || 1}`);
+    }
   };
-  
-  const closeDonationModal = () => {
-    setSelectedEvent(null);
-    setSelectedAmount(null);
+
+  const toggleExpanded = (eventId: number) => {
+    setExpandedEvent(expandedEvent === eventId ? null : eventId);
   };
   
   if (isLoading) {
     return (
-      <section className="py-16 bg-white">
+      <section className="current-events-section">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <Skeleton className="h-10 w-2/3 mx-auto mb-4" />
             <Skeleton className="h-6 w-full max-w-2xl mx-auto" />
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="current-events-grid">
             {[1, 2].map((i) => (
-              <div key={i} className="bg-neutral rounded-xl overflow-hidden shadow-md flex flex-col md:flex-row">
-                <Skeleton className="h-56 md:h-auto md:w-1/3" />
-                <div className="p-6 md:w-2/3">
-                  <div className="flex justify-between items-start mb-2">
-                    <Skeleton className="h-6 w-1/2" />
-                    <Skeleton className="h-6 w-24 rounded" />
-                  </div>
-                  <Skeleton className="h-5 w-full mb-4" />
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {[1, 2, 3].map((j) => (
-                      <Skeleton key={j} className="h-8 w-16 rounded-full" />
-                    ))}
-                  </div>
-                  <Skeleton className="h-10 w-full rounded-lg" />
-                </div>
-              </div>
+              <Skeleton key={i} className="h-96 w-full rounded-lg" />
             ))}
           </div>
         </div>
@@ -62,50 +59,77 @@ const CurrentEvents = () => {
   }
   
   return (
-    <section className="py-16 bg-white">
+    <section className="current-events-section">
       <div className="container mx-auto px-4">
+        {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="font-poppins font-bold text-3xl md:text-4xl text-primary mb-4">
-            Current Events
-          </h2>
-          <p className="font-opensans text-lg max-w-2xl mx-auto text-dark">
+          <h1 className="current-events-title">Current Events</h1>
+          <div className="title-underline"></div>
+          <p className="current-events-subtitle">
             Join us for these special occasions and contribute to make them a success.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Events Grid */}
+        <div className="current-events-grid">
           {events.map((event) => (
-            <div 
-              key={event.id}
-              className="bg-neutral rounded-xl overflow-hidden shadow-md transition-all hover:shadow-lg flex flex-col md:flex-row"
-            >
-              <img 
-                src={event.imageUrl} 
-                alt={event.title} 
-                className="h-56 md:h-auto md:w-1/3 object-cover"
-              />
-              <div className="p-6 md:w-2/3">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-poppins font-semibold text-xl text-primary">{event.title}</h3>
-                  <span className="bg-secondary text-white text-xs font-poppins py-1 px-2 rounded">
+            <div key={event.id} className="current-event-card">
+              {/* Event Image */}
+              <div className="event-image-container">
+                <img 
+                  src={event.imageUrl} 
+                  alt={event.title} 
+                  className="event-image"
+                />
+              </div>
+
+              {/* Event Content */}
+              <div className="event-content">
+                <div className="event-header">
+                  <h3 className="event-title">{event.title}</h3>
+                  <span className="event-date">
                     {format(new Date(event.date), 'MMMM d, yyyy')}
                   </span>
                 </div>
-                <p className="font-opensans text-dark mb-4">{event.description}</p>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {event.suggestedAmounts?.map((amount) => (
-                    <button 
-                      key={amount}
-                      onClick={() => openDonationModal(event, amount)}
-                      className="bg-white hover:bg-gray-100 text-dark font-medium py-1 px-3 rounded-full transition-colors"
-                    >
-                      ₹{amount.toLocaleString('en-IN')}
-                    </button>
-                  ))}
+
+                {/* Event Description with Read More */}
+                <div className={`event-description-container ${expandedEvent === event.id ? "expanded" : ""}`}>
+                  {!expandedEvent || expandedEvent !== event.id ? (
+                    <p className="event-description-preview">
+                      {event.description?.slice(0, 100) || ''}
+                      {event.description && event.description.length > 100 && (
+                        <span 
+                          className="read-more-btn" 
+                          onClick={() => toggleExpanded(event.id)}
+                        >
+                          Read More ➤
+                        </span>
+                      )}
+                    </p>
+                  ) : (
+                    <div className="full-content">
+                      <p className="event-description-full">
+                        {event.description}
+                      </p>
+                    </div>
+                  )}
                 </div>
+
+                {/* Suggested Amounts */}
+                {event.suggestedAmounts && event.suggestedAmounts.length > 0 && (
+                  <div className="suggested-amounts">
+                    {event.suggestedAmounts.slice(0, 3).map((amount) => (
+                      <span key={amount} className="amount-tag">
+                        ₹{amount.toLocaleString('en-IN')}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Donate Button */}
                 <button 
-                  onClick={() => openDonationModal(event)}
-                  className="w-full bg-primary text-white font-poppins font-medium py-2 rounded-lg hover:bg-opacity-90 transition-colors"
+                  className="donate-event-button"
+                  onClick={() => handleDonateClick(event.title)}
                 >
                   Donate for {event.title}
                 </button>
@@ -114,16 +138,6 @@ const CurrentEvents = () => {
           ))}
         </div>
       </div>
-      
-      {/* Donation Modal */}
-      {selectedEvent && (
-        <DonationModal 
-          isOpen={true}
-          event={selectedEvent}
-          amount={selectedAmount}
-          onClose={closeDonationModal}
-        />
-      )}
     </section>
   );
 };

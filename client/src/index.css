@@ -565,3 +565,240 @@
     flex-direction: column;
   }
 }
+
+/* Current Events Section Styling */
+.current-events-section {
+  padding: 60px 20px;
+  background-color: #F5F3F3;
+  color: #333;
+}
+
+.current-events-title {
+  text-align: center;
+  font-size: 48px;
+  font-weight: bold;
+  color: #7B2CBF;
+  margin-bottom: 10px;
+  font-family: "Poppins", sans-serif;
+}
+
+.title-underline {
+  width: 100px;
+  height: 4px;
+  background-color: #faa817;
+  margin: 0 auto 20px auto;
+  border-radius: 2px;
+}
+
+.current-events-subtitle {
+  text-align: center;
+  font-size: 18px;
+  max-width: 600px;
+  margin: 0 auto 40px;
+  color: #666;
+  font-family: "Open Sans", sans-serif;
+}
+
+.current-events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.current-event-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: row;
+  min-height: 280px;
+}
+
+.current-event-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.event-image-container {
+  flex: 0 0 150px;
+  position: relative;
+}
+
+.event-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.event-content {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.event-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.event-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #7B2CBF;
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  flex: 1;
+  min-width: 200px;
+}
+
+.event-date {
+  background-color: #faa817;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  font-family: "Poppins", sans-serif;
+}
+
+.event-description-container {
+  margin-bottom: 15px;
+  flex: 1;
+}
+
+.event-description-preview {
+  color: #666;
+  line-height: 1.6;
+  font-family: "Open Sans", sans-serif;
+  font-size: 14px;
+}
+
+.event-description-full {
+  color: #666;
+  line-height: 1.6;
+  font-family: "Open Sans", sans-serif;
+  font-size: 14px;
+}
+
+.read-more-btn {
+  color: #7B2CBF;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 5px;
+  transition: color 0.3s ease;
+}
+
+.read-more-btn:hover {
+  color: #faa817;
+  text-decoration: underline;
+}
+
+.full-content {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.suggested-amounts {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.amount-tag {
+  background-color: #f8f9fa;
+  color: #7B2CBF;
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid #e9ecef;
+  font-family: "Poppins", sans-serif;
+}
+
+.donate-event-button {
+  background-color: #7B2CBF;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+  width: 100%;
+  margin-top: auto;
+}
+
+.donate-event-button:hover {
+  background-color: #faa817;
+  transform: translateY(-2px);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design for Current Events */
+@media (max-width: 768px) {
+  .current-events-title {
+    font-size: 36px;
+  }
+  
+  .current-events-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .current-event-card {
+    flex-direction: column;
+    min-height: auto;
+  }
+  
+  .event-image-container {
+    flex: 0 0 200px;
+  }
+  
+  .event-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .event-title {
+    font-size: 20px;
+    min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .current-events-section {
+    padding: 40px 15px;
+  }
+  
+  .current-events-title {
+    font-size: 28px;
+  }
+  
+  .current-events-subtitle {
+    font-size: 16px;
+  }
+}
