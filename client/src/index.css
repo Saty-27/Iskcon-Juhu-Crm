@@ -41,7 +41,8 @@
     border: 1px solid #FAA817CC;
     border-radius: 10px;
     padding: 20px;
-    width: 250px;
+    min-width: 280px;
+    width: auto;
     text-align: center;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease;
@@ -56,6 +57,9 @@
     font-weight: 700;
     color: #FAA817CC;
     margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .stat-label {
