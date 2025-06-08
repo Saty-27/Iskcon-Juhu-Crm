@@ -137,6 +137,30 @@ const CurrentEvents = () => {
             </div>
           ))}
         </div>
+
+        {/* Receipt Information */}
+        <div className="receipt-info">
+          <h3 className="receipt-title">Receipts for your donation</h3>
+          <p>
+            80G available as per Income Tax Act 1961 and rules made thereunder.
+            Tax Exemption Certificate Ref. No.: AAATI0017PF20219
+          </p>
+          <p>
+            To get the receipt of donation made through NEFT, RTGS, IMPS PayTm,
+            UPI as mentioned above, please share your legal name, postal address
+            with pincode (and PAN if you need 80G receipt) along with transaction
+            details on pranav@iskcontrust.org
+          </p>
+        </div>
+
+        {/* Support */}
+        <div className="support-section">
+          <h3>Support</h3>
+          <p>
+            For more information please Call <b>+91-6263756519</b> from Monday to
+            Saturday between 9:00am to 6:00pm
+          </p>
+        </div>
       </div>
     </section>
   );
