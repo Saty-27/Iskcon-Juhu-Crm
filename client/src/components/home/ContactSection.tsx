@@ -60,75 +60,93 @@ const ContactSection = () => {
   };
   
   return (
-    <section className="py-16 relative" style={{ backgroundColor: '#f5c987' }}>
+    <section className="py-16 relative" style={{ backgroundColor: 'rgb(255, 45, 85)' }}>
+      {/* Decorative dots - top left */}
+      <div className="absolute top-8 left-8 text-white opacity-60">
+        <div className="grid grid-cols-3 gap-2">
+          {[...Array(9)].map((_, i) => (
+            <div key={i} className="w-1.5 h-1.5 bg-white rounded-full"></div>
+          ))}
+        </div>
+      </div>
+      
+      {/* Decorative dots - top right */}
+      <div className="absolute top-8 right-8 text-white opacity-60">
+        <div className="grid grid-cols-4 gap-2">
+          {[...Array(16)].map((_, i) => (
+            <div key={i} className="w-1.5 h-1.5 bg-white rounded-full"></div>
+          ))}
+        </div>
+      </div>
+
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
           <div>
-            <h2 className="font-poppins font-bold text-3xl md:text-4xl mb-4" style={{ color: '#4B0082' }}>
+            <h2 className="font-poppins font-bold text-3xl md:text-4xl mb-4 text-white">
               Get in Touch
             </h2>
-            <p className="font-opensans text-lg text-gray-800 mb-6">
+            <p className="font-opensans text-lg text-white mb-6">
               We'd love to hear from you. Reach out for inquiries, spiritual guidance, 
               or to participate in our services.
             </p>
             
             <div className="space-y-6">
               <div className="flex items-start">
-                <div className="text-2xl mr-4" style={{ color: '#4B0082' }}>
+                <div className="text-2xl mr-4 text-white">
                   <i className="ri-map-pin-2-fill"></i>
                 </div>
                 <div>
-                  <h4 className="font-poppins font-semibold text-lg mb-1" style={{ color: '#4B0082' }}>Address</h4>
-                  <p className="font-opensans text-gray-700">
+                  <h4 className="font-poppins font-semibold text-lg mb-1 text-white">Address</h4>
+                  <p className="font-opensans text-white">
                     Hare Krishna Land, Juhu, Mumbai, Maharashtra 400049, India
                   </p>
                 </div>
               </div>
               
               <div className="flex items-start">
-                <div className="text-2xl mr-4" style={{ color: '#4B0082' }}>
+                <div className="text-2xl mr-4 text-white">
                   <i className="ri-phone-fill"></i>
                 </div>
                 <div>
-                  <h4 className="font-poppins font-semibold text-lg mb-1" style={{ color: '#4B0082' }}>Phone</h4>
-                  <p className="font-opensans text-gray-700">+91 22 2620 0072</p>
+                  <h4 className="font-poppins font-semibold text-lg mb-1 text-white">Phone</h4>
+                  <p className="font-opensans text-white">+91 22 2620 0072</p>
                 </div>
               </div>
               
               <div className="flex items-start">
-                <div className="text-2xl mr-4" style={{ color: '#4B0082' }}>
+                <div className="text-2xl mr-4 text-white">
                   <i className="ri-mail-fill"></i>
                 </div>
                 <div>
-                  <h4 className="font-poppins font-semibold text-lg mb-1" style={{ color: '#4B0082' }}>Email</h4>
-                  <p className="font-opensans text-gray-700">info@iskconjuhu.in</p>
+                  <h4 className="font-poppins font-semibold text-lg mb-1 text-white">Email</h4>
+                  <p className="font-opensans text-white">info@iskconjuhu.in</p>
                 </div>
               </div>
               
               <div className="flex items-start">
-                <div className="text-2xl mr-4" style={{ color: '#4B0082' }}>
+                <div className="text-2xl mr-4 text-white">
                   <i className="ri-time-fill"></i>
                 </div>
                 <div>
-                  <h4 className="font-poppins font-semibold text-lg mb-1" style={{ color: '#4B0082' }}>Temple Hours</h4>
-                  <p className="font-opensans text-gray-700">Daily: 4:30 AM - 9:00 PM<br/>Special timings during festivals</p>
+                  <h4 className="font-poppins font-semibold text-lg mb-1 text-white">Temple Hours</h4>
+                  <p className="font-opensans text-white">Daily: 4:30 AM - 9:00 PM<br/>Special timings during festivals</p>
                 </div>
               </div>
             </div>
             
             <div className="mt-8">
-              <h4 className="font-poppins font-semibold text-lg mb-3" style={{ color: '#4B0082' }}>Connect With Us</h4>
+              <h4 className="font-poppins font-semibold text-lg mb-3 text-white">Connect With Us</h4>
               <div className="flex space-x-4">
-                <a href="https://facebook.com/iskconjuhu" target="_blank" rel="noopener noreferrer" className="w-10 h-10 text-white rounded-full flex items-center justify-center hover:bg-opacity-80 transition-colors" style={{ backgroundColor: '#4B0082' }}>
+                <a href="https://facebook.com/iskconjuhu" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-opacity-80 transition-colors" style={{ backgroundColor: '#4B0082', color: 'white' }}>
                   <i className="ri-facebook-fill"></i>
                 </a>
-                <a href="https://instagram.com/iskconjuhu" target="_blank" rel="noopener noreferrer" className="w-10 h-10 text-white rounded-full flex items-center justify-center hover:bg-opacity-80 transition-colors" style={{ backgroundColor: '#4B0082' }}>
+                <a href="https://instagram.com/iskconjuhu" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-opacity-80 transition-colors" style={{ backgroundColor: '#4B0082', color: 'white' }}>
                   <i className="ri-instagram-fill"></i>
                 </a>
-                <a href="https://youtube.com/iskconjuhu" target="_blank" rel="noopener noreferrer" className="w-10 h-10 text-white rounded-full flex items-center justify-center hover:bg-opacity-80 transition-colors" style={{ backgroundColor: '#4B0082' }}>
+                <a href="https://youtube.com/iskconjuhu" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-opacity-80 transition-colors" style={{ backgroundColor: '#4B0082', color: 'white' }}>
                   <i className="ri-youtube-fill"></i>
                 </a>
-                <a href="https://twitter.com/iskconjuhu" target="_blank" rel="noopener noreferrer" className="w-10 h-10 text-white rounded-full flex items-center justify-center hover:bg-opacity-80 transition-colors" style={{ backgroundColor: '#4B0082' }}>
+                <a href="https://twitter.com/iskconjuhu" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-opacity-80 transition-colors" style={{ backgroundColor: '#4B0082', color: 'white' }}>
                   <i className="ri-twitter-fill"></i>
                 </a>
               </div>
