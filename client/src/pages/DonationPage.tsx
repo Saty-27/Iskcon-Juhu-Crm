@@ -58,9 +58,9 @@ export default function DonationPage() {
 
   const handleCardSelect = (card: DonationCard) => {
     setSelectedCard(card);
-    setSelectedAmount(null);
+    setSelectedAmount(card.amount);
     setCustomAmount("");
-    setFormData(prev => ({ ...prev, categoryId: selectedCategory!, cardId: card.id }));
+    setFormData(prev => ({ ...prev, categoryId: selectedCategory!, cardId: card.id, amount: card.amount }));
   };
 
   const handleAmountSelect = (amount: number) => {
@@ -212,7 +212,7 @@ export default function DonationPage() {
                   >
                     <CardHeader>
                       <img 
-                        src={card.imageUrl} 
+                        src={card.imageUrl || "/api/placeholder/400/300"} 
                         alt={card.title}
                         className="w-full h-48 object-cover rounded-lg mb-4"
                       />
@@ -220,21 +220,9 @@ export default function DonationPage() {
                     </CardHeader>
                     <CardContent>
                       <p className="text-gray-600 mb-4">{card.description}</p>
-                      {card.suggestedAmounts && card.suggestedAmounts.length > 0 && (
-                        <div className="space-y-2">
-                          <p className="font-medium text-orange-800">Suggested Amounts:</p>
-                          <div className="flex flex-wrap gap-2">
-                            {card.suggestedAmounts.map((amount) => (
-                              <span 
-                                key={amount}
-                                className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm"
-                              >
-                                ₹{amount.toLocaleString()}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                      <div className="mt-4">
+                        <span className="text-xl font-bold text-orange-600">₹{card.amount.toLocaleString()}</span>
+                      </div>
                     </CardContent>
                   </Card>
                 ))}
@@ -250,7 +238,7 @@ export default function DonationPage() {
                       title: "General Donation",
                       description: "Support our general temple activities",
                       imageUrl: "/api/placeholder/400/300",
-                      suggestedAmounts: [500, 1000, 2500, 5000],
+                      amount: 1000,
                       isActive: true,
                       order: 0
                     };
@@ -293,21 +281,13 @@ export default function DonationPage() {
 
                   {/* Amount Selection */}
                   <div>
-                    <Label className="text-base font-medium">Choose Amount</Label>
-                    {selectedCard.suggestedAmounts && selectedCard.suggestedAmounts.length > 0 && (
-                      <div className="grid grid-cols-2 gap-3 mt-3">
-                        {selectedCard.suggestedAmounts.map((amount) => (
-                          <Button
-                            key={amount}
-                            variant={selectedAmount === amount ? "default" : "outline"}
-                            onClick={() => handleAmountSelect(amount)}
-                            className={selectedAmount === amount ? "bg-orange-600 hover:bg-orange-700" : "border-orange-300 hover:border-orange-500"}
-                          >
-                            ₹{amount.toLocaleString()}
-                          </Button>
-                        ))}
+                    <Label className="text-base font-medium">Donation Amount</Label>
+                    <div className="mt-3">
+                      <div className="p-4 bg-orange-50 rounded-lg">
+                        <span className="text-2xl font-bold text-orange-600">₹{selectedCard.amount.toLocaleString()}</span>
+                        <p className="text-sm text-orange-700 mt-1">Fixed amount for this donation</p>
                       </div>
-                    )}
+                    </div>
                     
                     <div className="mt-4">
                       <Label htmlFor="custom-amount">Or Enter Custom Amount</Label>
@@ -428,7 +408,7 @@ export default function DonationPage() {
                           <p><strong>Account Name:</strong> {detail.accountName}</p>
                           <p><strong>Account Number:</strong> {detail.accountNumber}</p>
                           <p><strong>IFSC Code:</strong> {detail.ifscCode}</p>
-                          {detail.upiId && <p><strong>UPI ID:</strong> {detail.upiId}</p>}
+                          {detail.swiftCode && <p><strong>SWIFT Code:</strong> {detail.swiftCode}</p>}
                         </div>
                       ))}
                     </div>
