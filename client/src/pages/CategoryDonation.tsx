@@ -3,8 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Helmet } from 'react-helmet';
 import type { DonationCategory, DonationCard, BankDetails } from "@shared/schema";
 import DonationModal from "@/components/donate/DonationModal";
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
 
 interface DonationOption {
   label: string;
@@ -101,11 +104,26 @@ export default function CategoryDonation() {
   const currentBankDetail = bankDetails[0]; // Use first bank detail
 
   if (!category) {
-    return <div className="min-h-screen flex items-center justify-center">Category not found</div>;
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen flex items-center justify-center">Category not found</div>
+        <Footer />
+      </>
+    );
   }
 
   return (
-    <section style={{ padding: '20px', backgroundColor: '#F5F3F3', color: '#333', minHeight: '100vh' }}>
+    <>
+      <Helmet>
+        <title>{category.name} - Donate - ISKCON Juhu</title>
+        <meta name="description" content={`Support ${category.name} at ISKCON Juhu. ${category.description}`} />
+      </Helmet>
+      
+      <Header />
+      
+      <main>
+        <section style={{ padding: '20px', backgroundColor: '#F5F3F3', color: '#333', minHeight: '100vh' }}>
       {/* Header Information */}
       <div style={{ 
         display: 'flex', 
@@ -300,6 +318,10 @@ export default function CategoryDonation() {
           )}
         </div>
       )}
+        </section>
+      </main>
+      
+      <Footer />
 
       <DonationModal
         isOpen={isModalOpen}
@@ -307,6 +329,6 @@ export default function CategoryDonation() {
         amount={parseInt(selectedPrice) || null}
         onClose={() => setIsModalOpen(false)}
       />
-    </section>
+    </>
   );
 }
