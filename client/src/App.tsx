@@ -39,8 +39,8 @@ function Router() {
       {/* Main routes */}
       <Route path="/" component={Home} />
       <Route path="/events" component={Events} />
-      <Route path="/donate" component={Donate} />
-      <Route path="/donate/:id" component={DonationPage} />
+      <Route path="/donate" component={DonationPage} />
+      <Route path="/donate-old" component={Donate} />
       <Route path="/donate/thank-you" component={DonateThankYou} />
       <Route path="/donate/payment-gateway" component={PaymentGateway} />
       <Route path="/donate/payment-failed" component={PaymentFailed} />

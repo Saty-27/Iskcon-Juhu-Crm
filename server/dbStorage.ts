@@ -1,11 +1,12 @@
 import { eq } from "drizzle-orm";
 import { db } from "./db";
 import { 
-  users, banners, quotes, donationCategories, events, gallery, videos, 
+  users, banners, quotes, donationCategories, donationCards, bankDetails, events, gallery, videos, 
   testimonials, contactMessages, socialLinks, donations, subscriptions,
   stats, schedules,
   type User, type InsertUser, type Banner, type InsertBanner,
   type Quote, type InsertQuote, type DonationCategory, type InsertDonationCategory,
+  type DonationCard, type InsertDonationCard, type BankDetails, type InsertBankDetails,
   type Event, type InsertEvent, type Gallery, type InsertGallery,
   type Video, type InsertVideo, type Testimonial, type InsertTestimonial,
   type ContactMessage, type InsertContactMessage, type SocialLink, type InsertSocialLink,
@@ -122,6 +123,60 @@ export class DatabaseStorage implements IStorage {
 
   async deleteDonationCategory(id: number): Promise<boolean> {
     const result = await db.delete(donationCategories).where(eq(donationCategories.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Donation card operations
+  async getDonationCards(): Promise<DonationCard[]> {
+    return await db.select().from(donationCards);
+  }
+
+  async getDonationCard(id: number): Promise<DonationCard | undefined> {
+    const [card] = await db.select().from(donationCards).where(eq(donationCards.id, id));
+    return card;
+  }
+
+  async getDonationCardsByCategory(categoryId: number): Promise<DonationCard[]> {
+    return await db.select().from(donationCards).where(eq(donationCards.categoryId, categoryId));
+  }
+
+  async createDonationCard(card: InsertDonationCard): Promise<DonationCard> {
+    const [newCard] = await db.insert(donationCards).values(card).returning();
+    return newCard;
+  }
+
+  async updateDonationCard(id: number, cardData: Partial<DonationCard>): Promise<DonationCard | undefined> {
+    const [card] = await db.update(donationCards).set(cardData).where(eq(donationCards.id, id)).returning();
+    return card;
+  }
+
+  async deleteDonationCard(id: number): Promise<boolean> {
+    const result = await db.delete(donationCards).where(eq(donationCards.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Bank details operations
+  async getBankDetails(): Promise<BankDetails[]> {
+    return await db.select().from(bankDetails);
+  }
+
+  async getBankDetail(id: number): Promise<BankDetails | undefined> {
+    const [detail] = await db.select().from(bankDetails).where(eq(bankDetails.id, id));
+    return detail;
+  }
+
+  async createBankDetails(details: InsertBankDetails): Promise<BankDetails> {
+    const [newDetails] = await db.insert(bankDetails).values(details).returning();
+    return newDetails;
+  }
+
+  async updateBankDetails(id: number, detailsData: Partial<BankDetails>): Promise<BankDetails | undefined> {
+    const [details] = await db.update(bankDetails).set(detailsData).where(eq(bankDetails.id, id)).returning();
+    return details;
+  }
+
+  async deleteBankDetails(id: number): Promise<boolean> {
+    const result = await db.delete(bankDetails).where(eq(bankDetails.id, id));
     return result.rowCount > 0;
   }
 

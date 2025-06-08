@@ -7,7 +7,9 @@ import {
   insertUserSchema, 
   insertBannerSchema, 
   insertQuoteSchema, 
-  insertDonationCategorySchema, 
+  insertDonationCategorySchema,
+  insertDonationCardSchema,
+  insertBankDetailsSchema,
   insertEventSchema, 
   insertGallerySchema, 
   insertVideoSchema, 
@@ -254,6 +256,135 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Donation category deleted" });
     } catch (error) {
       res.status(500).json({ message: "Error deleting donation category" });
+    }
+  });
+
+  // Donation Cards API endpoints
+  app.get("/api/donation-cards", async (req, res) => {
+    try {
+      const cards = await storage.getDonationCards();
+      res.json(cards.filter(c => c.isActive));
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching donation cards" });
+    }
+  });
+
+  app.get("/api/donation-cards/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const card = await storage.getDonationCard(id);
+      if (!card) {
+        return res.status(404).json({ message: "Donation card not found" });
+      }
+      res.json(card);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching donation card" });
+    }
+  });
+
+  app.get("/api/donation-cards/category/:categoryId", async (req, res) => {
+    try {
+      const categoryId = parseInt(req.params.categoryId);
+      const cards = await storage.getDonationCardsByCategory(categoryId);
+      res.json(cards.filter(c => c.isActive));
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching donation cards by category" });
+    }
+  });
+
+  app.post("/api/donation-cards", isAdmin, async (req, res) => {
+    try {
+      const data = insertDonationCardSchema.parse(req.body);
+      const card = await storage.createDonationCard(data);
+      res.status(201).json(card);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error creating donation card" });
+    }
+  });
+
+  app.put("/api/donation-cards/:id", isAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const data = insertDonationCardSchema.partial().parse(req.body);
+      const card = await storage.updateDonationCard(id, data);
+      if (!card) {
+        return res.status(404).json({ message: "Donation card not found" });
+      }
+      res.json(card);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error updating donation card" });
+    }
+  });
+
+  app.delete("/api/donation-cards/:id", isAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteDonationCard(id);
+      if (!success) {
+        return res.status(404).json({ message: "Donation card not found" });
+      }
+      res.json({ message: "Donation card deleted" });
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting donation card" });
+    }
+  });
+
+  // Bank Details API endpoints
+  app.get("/api/bank-details", async (req, res) => {
+    try {
+      const details = await storage.getBankDetails();
+      res.json(details.filter(d => d.isActive));
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching bank details" });
+    }
+  });
+
+  app.post("/api/bank-details", isAdmin, async (req, res) => {
+    try {
+      const data = insertBankDetailsSchema.parse(req.body);
+      const details = await storage.createBankDetails(data);
+      res.status(201).json(details);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error creating bank details" });
+    }
+  });
+
+  app.put("/api/bank-details/:id", isAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const data = insertBankDetailsSchema.partial().parse(req.body);
+      const details = await storage.updateBankDetails(id, data);
+      if (!details) {
+        return res.status(404).json({ message: "Bank details not found" });
+      }
+      res.json(details);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error updating bank details" });
+    }
+  });
+
+  app.delete("/api/bank-details/:id", isAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteBankDetails(id);
+      if (!success) {
+        return res.status(404).json({ message: "Bank details not found" });
+      }
+      res.json({ message: "Bank details deleted" });
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting bank details" });
     }
   });
 
