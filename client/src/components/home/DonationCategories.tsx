@@ -1,26 +1,12 @@
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { DonationCategory } from '@shared/schema';
 import { Skeleton } from '@/components/ui/skeleton';
-import DonationModal from '@/components/donate/DonationModal';
+import { Link } from 'wouter';
 
 const DonationCategories = () => {
-  const [selectedCategory, setSelectedCategory] = useState<DonationCategory | null>(null);
-  const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
-  
   const { data: categories = [], isLoading } = useQuery<DonationCategory[]>({
     queryKey: ['/api/donation-categories'],
   });
-  
-  const openDonationModal = (category: DonationCategory, amount: number | null = null) => {
-    setSelectedCategory(category);
-    setSelectedAmount(amount);
-  };
-  
-  const closeDonationModal = () => {
-    setSelectedCategory(null);
-    setSelectedAmount(null);
-  };
   
   if (isLoading) {
     return (
@@ -38,11 +24,6 @@ const DonationCategories = () => {
                 <div className="p-6">
                   <Skeleton className="h-6 w-3/4 mb-2" />
                   <Skeleton className="h-5 w-full mb-4" />
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {[1, 2, 3, 4].map((j) => (
-                      <Skeleton key={j} className="h-8 w-16 rounded-full" />
-                    ))}
-                  </div>
                   <Skeleton className="h-10 w-full rounded-lg" />
                 </div>
               </div>
@@ -52,6 +33,11 @@ const DonationCategories = () => {
       </section>
     );
   }
+  
+  const truncateDescription = (text: string, maxLength: number = 150) => {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength).trim() + '...';
+  };
   
   return (
     <section className="py-16 bg-neutral">
@@ -79,39 +65,18 @@ const DonationCategories = () => {
               />
               <div className="p-6">
                 <h3 className="font-poppins font-semibold text-xl text-primary mb-2">{category.name}</h3>
-                <p className="font-opensans text-dark mb-4">{category.description}</p>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {category.suggestedAmounts?.map((amount) => (
-                    <button 
-                      key={amount}
-                      onClick={() => openDonationModal(category, amount)}
-                      className="bg-gray-100 hover:bg-gray-200 text-dark font-medium py-1 px-3 rounded-full transition-colors"
-                    >
-                      ₹{amount.toLocaleString('en-IN')}
-                    </button>
-                  ))}
-                </div>
-                <button 
-                  onClick={() => openDonationModal(category)}
-                  className="w-full bg-primary text-white font-poppins font-medium py-2 rounded-lg hover:bg-opacity-90 transition-colors"
+                <p className="font-opensans text-dark mb-6">{truncateDescription(category.description || '')}</p>
+                <Link 
+                  href={`/donate/${category.id}`}
+                  className="w-full bg-primary text-white font-poppins font-medium py-3 rounded-lg hover:bg-opacity-90 transition-colors block text-center"
                 >
                   Donate Now
-                </button>
+                </Link>
               </div>
             </div>
           ))}
         </div>
       </div>
-      
-      {/* Donation Modal */}
-      {selectedCategory && (
-        <DonationModal 
-          isOpen={true}
-          category={selectedCategory}
-          amount={selectedAmount}
-          onClose={closeDonationModal}
-        />
-      )}
     </section>
   );
 };
