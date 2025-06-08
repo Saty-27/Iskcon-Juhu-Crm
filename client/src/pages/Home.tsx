@@ -6,6 +6,7 @@ import StatsSection from '@/components/home/StatsSection';
 import TempleSchedule from '@/components/home/TempleSchedule';
 import QuoteRotator from '@/components/home/QuoteRotator';
 import DonationCategories from '@/components/home/DonationCategories';
+import CallToAction from '@/components/home/CallToAction';
 import CurrentEvents from '@/components/home/CurrentEvents';
 import MediaHighlights from '@/components/home/MediaHighlights';
 import Testimonials from '@/components/home/Testimonials';
@@ -33,6 +34,7 @@ const Home = () => {
         </section>
         <QuoteRotator />
         <DonationCategories />
+        <CallToAction />
         <CurrentEvents />
         <MediaHighlights />
         <Testimonials />
