@@ -4,6 +4,7 @@ import { useParams } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Helmet } from 'react-helmet';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import type { DonationCategory, DonationCard, BankDetails } from "@shared/schema";
 import DonationModal from "@/components/donate/DonationModal";
 import Header from '@/components/layout/Header';
@@ -18,6 +19,19 @@ export default function CategoryDonation() {
   const { categoryId } = useParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPrice, setSelectedPrice] = useState<string>("");
+  const [isDescriptionModalOpen, setIsDescriptionModalOpen] = useState(false);
+
+  // Helper function to count words
+  const getWordCount = (text: string): number => {
+    return text.trim().split(/\s+/).filter(word => word.length > 0).length;
+  };
+
+  // Helper function to get truncated description
+  const getTruncatedDescription = (text: string, wordLimit: number): string => {
+    const words = text.trim().split(/\s+/);
+    if (words.length <= wordLimit) return text;
+    return words.slice(0, wordLimit).join(' ') + '...';
+  };
 
   const { data: categories = [] } = useQuery<DonationCategory[]>({
     queryKey: ["/api/donation-categories"]
@@ -138,36 +152,57 @@ export default function CategoryDonation() {
           borderRadius: '10px',
           boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)'
         }}>
-          <h2 style={{ fontSize: '24px', marginBottom: '10px' }}>{category.name}</h2>
-          <p style={{ marginBottom: '20px' }}>{category.description}</p>
-          <Button 
-            style={{
-              backgroundColor: '#faa817',
-              color: '#fff',
-              border: 'none',
-              padding: '10px 15px',
-              borderRadius: '5px',
-              cursor: 'pointer'
-            }}
-          >
-            Read More
-          </Button>
+          <h2 style={{ fontSize: '24px', marginBottom: '10px', fontWeight: 'bold' }}>
+            {category.heading || category.name}
+          </h2>
+          <p style={{ marginBottom: '20px', lineHeight: '1.6' }}>
+            {category.description && getWordCount(category.description) > 20 
+              ? getTruncatedDescription(category.description, 20)
+              : category.description}
+          </p>
+          
+          {category.description && getWordCount(category.description) > 20 && (
+            <Dialog open={isDescriptionModalOpen} onOpenChange={setIsDescriptionModalOpen}>
+              <DialogTrigger asChild>
+                <button style={{
+                  backgroundColor: '#faa817',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '10px 15px',
+                  borderRadius: '5px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}>
+                  Read More
+                </button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>{category.heading || category.name}</DialogTitle>
+                </DialogHeader>
+                <div className="mt-4">
+                  <p className="text-gray-700 leading-relaxed">
+                    {category.description}
+                  </p>
+                </div>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
         
-        {category.imageUrl && (
-          <div>
-            <img
-              src={category.imageUrl}
-              alt={category.name}
-              style={{ 
-                maxWidth: '100%', 
-                height: '350px', 
-                borderRadius: '10px',
-                objectFit: 'cover'
-              }}
-            />
-          </div>
-        )}
+        <div style={{ flex: 1 }}>
+          <img
+            src={category.imageUrl}
+            alt={category.name}
+            style={{
+              width: '100%',
+              height: '350px',
+              objectFit: 'cover',
+              borderRadius: '10px'
+            }}
+          />
+        </div>
       </div>
 
       {/* Donation Options */}
