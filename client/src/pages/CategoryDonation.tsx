@@ -257,11 +257,8 @@ export default function CategoryDonation() {
           display: 'flex',
           justifyContent: 'space-between',
           marginTop: '30px',
-          gap: '20px',
-          '@media (max-width: 768px)': {
-            flexDirection: 'column'
-          }
-        }}>
+          gap: '20px'
+        }} className="flex-col md:flex-row">
           <div style={{
             flex: 1,
             backgroundColor: '#fff',
