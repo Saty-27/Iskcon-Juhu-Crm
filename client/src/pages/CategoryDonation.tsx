@@ -366,7 +366,9 @@ export default function CategoryDonation() {
                   height: '200px', 
                   width: '200px',
                   border: '1px solid #ddd',
-                  borderRadius: '8px'
+                  borderRadius: '8px',
+                  margin: '0 auto',
+                  display: 'block'
                 }}
               />
             </div>
