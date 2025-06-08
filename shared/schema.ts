@@ -54,6 +54,7 @@ export const donationCategories = pgTable("donation_categories", {
   name: text("name").notNull(),
   description: text("description"),
   imageUrl: text("image_url").notNull(),
+  heading: text("heading"),
   isActive: boolean("is_active").default(true).notNull(),
   order: integer("order").notNull(),
   suggestedAmounts: json("suggested_amounts").$type<number[]>(),

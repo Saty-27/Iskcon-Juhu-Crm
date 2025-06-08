@@ -132,6 +132,11 @@ const DonationPage = () => {
         </div>
 
         {/* Meal Donation Section */}
+        {category.heading && (
+          <h2 className="meal-donation-title-anna" style={{ marginBottom: '10px' }}>
+            {category.heading}
+          </h2>
+        )}
         <h2 className="meal-donation-title-anna">Select Amount</h2>
         <div className="meal-options-anna">
           {defaultAmounts.map((amount, index) => (

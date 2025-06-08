@@ -87,6 +87,7 @@ const DonationSections = () => {
       name: '',
       description: '',
       imageUrl: '',
+      heading: '',
       isActive: true,
       order: 1,
       suggestedAmountsString: '',
@@ -100,6 +101,7 @@ const DonationSections = () => {
       name: '',
       description: '',
       imageUrl: '',
+      heading: '',
       isActive: true,
       order: 1,
       suggestedAmountsString: '',
@@ -219,9 +221,10 @@ const DonationSections = () => {
       name: category.name,
       description: category.description || '',
       imageUrl: category.imageUrl,
+      heading: category.heading || '',
       isActive: category.isActive,
       order: category.order,
-      suggestedAmountsString: formatSuggestedAmounts(category.suggestedAmounts),
+      suggestedAmountsString: formatSuggestedAmounts(category.suggestedAmounts || []),
     });
     setIsEditDialogOpen(true);
   };
