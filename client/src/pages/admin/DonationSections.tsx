@@ -452,6 +452,23 @@ const DonationSections = () => {
               
               <FormField
                 control={createForm.control}
+                name="heading"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Heading</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Optional heading above donation amounts" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      This heading will appear above the donation amount buttons
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={createForm.control}
                 name="imageUrl"
                 render={({ field }) => (
                   <FormItem>
@@ -580,6 +597,23 @@ const DonationSections = () => {
                         rows={3}
                       />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={editForm.control}
+                name="heading"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Heading</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Optional heading above donation amounts" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      This heading will appear above the donation amount buttons
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
