@@ -121,10 +121,10 @@ const DonationPage = () => {
                 
                 <div className="mb-6">
                   <p className="font-opensans text-lg leading-relaxed">
-                    {showFullDescription ? category.description : truncateDescription(category.description)}
+                    {showFullDescription ? (category.description || '') : truncateDescription(category.description || '')}
                   </p>
                   
-                  {category.description.length > 100 && (
+                  {(category.description?.length || 0) > 100 && (
                     <Button
                       onClick={() => setShowFullDescription(!showFullDescription)}
                       variant="ghost"
@@ -233,7 +233,7 @@ const DonationPage = () => {
           </DialogHeader>
           <div className="mt-4">
             <p className="font-opensans text-gray-700 leading-relaxed">
-              {category.description}
+              {category.description || ''}
             </p>
           </div>
         </DialogContent>
