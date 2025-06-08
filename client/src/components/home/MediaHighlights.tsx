@@ -80,26 +80,22 @@ const MediaHighlights = () => {
           <div className="bg-white p-6 rounded-xl shadow-md">
             <div className="flex justify-between items-center mb-6">
               <h3 className="font-poppins font-semibold text-xl text-primary">Photo Gallery</h3>
-              <Link href="/gallery">
-                <a className="text-secondary hover:text-primary font-medium transition-colors flex items-center">
-                  View All <i className="ri-arrow-right-line ml-1"></i>
-                </a>
+              <Link href="/gallery" className="text-secondary hover:text-primary font-medium transition-colors flex items-center">
+                View All <i className="ri-arrow-right-line ml-1"></i>
               </Link>
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {galleryItems.slice(0, 6).map((item) => (
-                <Link key={item.id} href="/gallery">
-                  <a className="overflow-hidden rounded-lg h-24 md:h-32 block relative group">
-                    <img 
-                      src={item.imageUrl} 
-                      alt={item.title} 
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-primary bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center">
-                      <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity">View</span>
-                    </div>
-                  </a>
+                <Link key={item.id} href="/gallery" className="overflow-hidden rounded-lg h-24 md:h-32 block relative group">
+                  <img 
+                    src={item.imageUrl} 
+                    alt={item.title} 
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-primary bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center">
+                    <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity">View</span>
+                  </div>
                 </Link>
               ))}
             </div>
@@ -109,10 +105,8 @@ const MediaHighlights = () => {
           <div className="bg-white p-6 rounded-xl shadow-md">
             <div className="flex justify-between items-center mb-6">
               <h3 className="font-poppins font-semibold text-xl text-primary">Video Gallery</h3>
-              <Link href="/videos">
-                <a className="text-secondary hover:text-primary font-medium transition-colors flex items-center">
-                  View All <i className="ri-arrow-right-line ml-1"></i>
-                </a>
+              <Link href="/videos" className="text-secondary hover:text-primary font-medium transition-colors flex items-center">
+                View All <i className="ri-arrow-right-line ml-1"></i>
               </Link>
             </div>
             
