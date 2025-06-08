@@ -74,11 +74,9 @@ const HeroSlider = () => {
                 </p>
               )}
               <div className="flex justify-center gap-4">
-                <Link href="/donate">
-                  <a className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-3 rounded-full 
+                <Link href="/donate" className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-3 rounded-full 
                     inline-block transition-all transform hover:-translate-y-1">
-                    Donate Now
-                  </a>
+                  Donate Now
                 </Link>
               </div>
             </div>

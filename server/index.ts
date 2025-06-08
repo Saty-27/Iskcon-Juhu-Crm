@@ -98,14 +98,31 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = 5000;
+  // Find an available port starting from 5000
+  const findAvailablePort = async (startPort: number): Promise<number> => {
+    const { createServer } = await import('net');
+    return new Promise((resolve, reject) => {
+      const testServer = createServer();
+      testServer.listen(startPort, '0.0.0.0', () => {
+        const address = testServer.address();
+        const port = typeof address === 'object' && address !== null ? address.port : startPort;
+        testServer.close(() => resolve(port));
+      });
+      testServer.on('error', async () => {
+        try {
+          const nextPort = await findAvailablePort(startPort + 1);
+          resolve(nextPort);
+        } catch (err) {
+          reject(err);
+        }
+      });
+    });
+  };
+
+  const port = await findAvailablePort(5000);
   server.listen({
     port,
     host: "0.0.0.0",
-    reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
   });
