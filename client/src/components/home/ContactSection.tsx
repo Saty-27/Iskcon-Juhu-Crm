@@ -64,7 +64,7 @@ const ContactSection = () => {
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
           <div>
-            <h2 className="font-poppins font-bold text-3xl md:text-4xl text-primary mb-4">
+            <h2 className="font-poppins font-bold text-3xl md:text-4xl mb-4" style={{ color: '#4B0082' }}>
               Get in Touch
             </h2>
             <p className="font-opensans text-lg text-dark mb-6">
@@ -74,11 +74,11 @@ const ContactSection = () => {
             
             <div className="space-y-6">
               <div className="flex items-start">
-                <div className="text-2xl text-primary mr-4">
+                <div className="text-2xl mr-4" style={{ color: '#4B0082' }}>
                   <i className="ri-map-pin-2-fill"></i>
                 </div>
                 <div>
-                  <h4 className="font-poppins font-semibold text-lg text-primary mb-1">Address</h4>
+                  <h4 className="font-poppins font-semibold text-lg mb-1" style={{ color: '#4B0082' }}>Address</h4>
                   <p className="font-opensans text-dark">
                     Hare Krishna Land, Juhu, Mumbai, Maharashtra 400049, India
                   </p>
@@ -86,49 +86,49 @@ const ContactSection = () => {
               </div>
               
               <div className="flex items-start">
-                <div className="text-2xl text-primary mr-4">
+                <div className="text-2xl mr-4" style={{ color: '#4B0082' }}>
                   <i className="ri-phone-fill"></i>
                 </div>
                 <div>
-                  <h4 className="font-poppins font-semibold text-lg text-primary mb-1">Phone</h4>
+                  <h4 className="font-poppins font-semibold text-lg mb-1" style={{ color: '#4B0082' }}>Phone</h4>
                   <p className="font-opensans text-dark">+91 22 2620 0072</p>
                 </div>
               </div>
               
               <div className="flex items-start">
-                <div className="text-2xl text-primary mr-4">
+                <div className="text-2xl mr-4" style={{ color: '#4B0082' }}>
                   <i className="ri-mail-fill"></i>
                 </div>
                 <div>
-                  <h4 className="font-poppins font-semibold text-lg text-primary mb-1">Email</h4>
+                  <h4 className="font-poppins font-semibold text-lg mb-1" style={{ color: '#4B0082' }}>Email</h4>
                   <p className="font-opensans text-dark">info@iskconjuhu.in</p>
                 </div>
               </div>
               
               <div className="flex items-start">
-                <div className="text-2xl text-primary mr-4">
+                <div className="text-2xl mr-4" style={{ color: '#4B0082' }}>
                   <i className="ri-time-fill"></i>
                 </div>
                 <div>
-                  <h4 className="font-poppins font-semibold text-lg text-primary mb-1">Temple Hours</h4>
+                  <h4 className="font-poppins font-semibold text-lg mb-1" style={{ color: '#4B0082' }}>Temple Hours</h4>
                   <p className="font-opensans text-dark">Daily: 4:30 AM - 9:00 PM<br/>Special timings during festivals</p>
                 </div>
               </div>
             </div>
             
             <div className="mt-8">
-              <h4 className="font-poppins font-semibold text-lg text-primary mb-3">Connect With Us</h4>
+              <h4 className="font-poppins font-semibold text-lg mb-3" style={{ color: '#4B0082' }}>Connect With Us</h4>
               <div className="flex space-x-4">
-                <a href="https://facebook.com/iskconjuhu" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center hover:bg-secondary transition-colors">
+                <a href="https://facebook.com/iskconjuhu" target="_blank" rel="noopener noreferrer" className="w-10 h-10 text-white rounded-full flex items-center justify-center hover:bg-opacity-80 transition-colors" style={{ backgroundColor: '#4B0082' }}>
                   <i className="ri-facebook-fill"></i>
                 </a>
-                <a href="https://instagram.com/iskconjuhu" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center hover:bg-secondary transition-colors">
+                <a href="https://instagram.com/iskconjuhu" target="_blank" rel="noopener noreferrer" className="w-10 h-10 text-white rounded-full flex items-center justify-center hover:bg-opacity-80 transition-colors" style={{ backgroundColor: '#4B0082' }}>
                   <i className="ri-instagram-fill"></i>
                 </a>
-                <a href="https://youtube.com/iskconjuhu" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center hover:bg-secondary transition-colors">
+                <a href="https://youtube.com/iskconjuhu" target="_blank" rel="noopener noreferrer" className="w-10 h-10 text-white rounded-full flex items-center justify-center hover:bg-opacity-80 transition-colors" style={{ backgroundColor: '#4B0082' }}>
                   <i className="ri-youtube-fill"></i>
                 </a>
-                <a href="https://twitter.com/iskconjuhu" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center hover:bg-secondary transition-colors">
+                <a href="https://twitter.com/iskconjuhu" target="_blank" rel="noopener noreferrer" className="w-10 h-10 text-white rounded-full flex items-center justify-center hover:bg-opacity-80 transition-colors" style={{ backgroundColor: '#4B0082' }}>
                   <i className="ri-twitter-fill"></i>
                 </a>
               </div>
@@ -136,7 +136,7 @@ const ContactSection = () => {
           </div>
           
           <div className="bg-white p-6 md:p-8 rounded-xl shadow-md">
-            <h3 className="font-poppins font-semibold text-xl text-primary mb-6">Send us a Message</h3>
+            <h3 className="font-poppins font-semibold text-xl mb-6" style={{ color: '#4B0082' }}>Send us a Message</h3>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FormField
@@ -243,7 +243,8 @@ const ContactSection = () => {
                 
                 <Button 
                   type="submit" 
-                  className="w-full bg-primary text-white font-poppins font-medium py-3 rounded-lg hover:bg-opacity-90 transition-colors"
+                  className="w-full text-white font-poppins font-medium py-3 rounded-lg hover:bg-opacity-90 transition-colors"
+                  style={{ backgroundColor: '#4B0082' }}
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? "Sending..." : "Send Message"}
