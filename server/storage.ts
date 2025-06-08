@@ -10,7 +10,9 @@ import {
   ContactMessage, InsertContactMessage, contactMessages,
   SocialLink, InsertSocialLink, socialLinks,
   Donation, InsertDonation, donations,
-  Subscription, InsertSubscription, subscriptions
+  Subscription, InsertSubscription, subscriptions,
+  Stat, InsertStat, stats,
+  Schedule, InsertSchedule, schedules
 } from "@shared/schema";
 
 export interface IStorage {

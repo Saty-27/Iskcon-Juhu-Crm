@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, timestamp, boolean, json } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, serial, integer, timestamp, boolean, json } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -189,6 +189,57 @@ export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({
 
 // Export types
 export type User = typeof users.$inferSelect;
+
+// Stats table for the counter section
+export const stats = pgTable("stats", {
+  id: serial("id").primaryKey(),
+  value: integer("value").notNull(),
+  suffix: varchar("suffix", { length: 20 }).notNull(),
+  label: varchar("label", { length: 255 }).notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  orderIndex: integer("order_index").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type Stat = typeof stats.$inferSelect;
+export type InsertStat = typeof stats.$inferInsert;
+
+// Temple schedule table
+export const schedules = pgTable("schedules", {
+  id: serial("id").primaryKey(),
+  time: varchar("time", { length: 10 }).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  isActive: boolean("is_active").default(true).notNull(),
+  orderIndex: integer("order_index").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type Schedule = typeof schedules.$inferSelect;
+export type InsertSchedule = typeof schedules.$inferInsert;
+
+// Insert schemas for stats and schedules
+export const insertStatSchema = createInsertSchema(stats, {
+  value: z.number().min(1),
+  suffix: z.string().min(1).max(20),
+  label: z.string().min(1).max(255),
+}).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertScheduleSchema = createInsertSchema(schedules, {
+  time: z.string().min(1).max(10),
+  title: z.string().min(1).max(255),
+  description: z.string().optional(),
+}).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
 export type InsertUser = z.infer<typeof insertUserSchema>;
 
 export type Banner = typeof banners.$inferSelect;
