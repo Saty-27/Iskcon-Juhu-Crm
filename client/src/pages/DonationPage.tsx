@@ -102,148 +102,108 @@ const DonationPage = () => {
       
       <Header />
       
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="container mx-auto px-4 max-w-6xl">
-          <div className="flex flex-col lg:flex-row gap-8 max-w-6xl">
-            {/* Left Container - Gradient Background with Category Info */}
-            <div className="flex-1 bg-gradient-to-br from-purple-600 via-purple-700 to-purple-800 text-white rounded-xl p-8 relative overflow-hidden">
-              {/* Decorative pattern overlay */}
-              <div className="absolute inset-0 opacity-20">
-                <div className="absolute top-0 left-0 w-20 h-20 bg-white rounded-full -translate-x-10 -translate-y-10"></div>
-                <div className="absolute bottom-0 right-0 w-32 h-32 bg-white rounded-full translate-x-16 translate-y-16"></div>
-                <div className="absolute top-1/2 right-0 w-16 h-16 bg-white rounded-full translate-x-8"></div>
-              </div>
-              
-              <div className="relative z-10 h-full flex flex-col">
-                <h1 className="font-poppins font-bold text-2xl md:text-3xl mb-4 text-white">
-                  {category.name}
-                </h1>
-                
-                <div className="mb-6 flex-1">
-                  <p className="font-opensans text-base leading-relaxed text-white/90">
-                    {showFullDescription ? (category.description || '') : truncateDescription(category.description || '')}
-                  </p>
-                  
-                  {(category.description?.length || 0) > 100 && (
-                    <Button
-                      onClick={() => setShowFullDescription(!showFullDescription)}
-                      className="bg-orange-500 hover:bg-orange-600 text-white mt-4 px-4 py-2 rounded text-sm font-medium"
-                    >
-                      {showFullDescription ? 'Read Less' : 'Read More'}
-                    </Button>
-                  )}
-                </div>
-
-                {/* Category Image */}
-                {category.imageUrl && (
-                  <div className="rounded-lg overflow-hidden mt-auto">
-                    <img 
-                      src={category.imageUrl}
-                      alt={category.name}
-                      className="w-full h-40 object-cover"
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Right Container - Donation Form */}
-            <div className="flex-1 bg-white rounded-xl p-6 shadow-lg">
-              <h2 className="font-poppins font-bold text-xl text-gray-800 mb-4">
-                Make a Donation
-              </h2>
-
-              {/* Suggested Amounts */}
-              <div className="mb-6">
-                <h3 className="font-medium text-gray-700 mb-3 text-sm">Select Amount:</h3>
-                <div className="grid grid-cols-2 gap-3">
-                  {defaultAmounts.slice(0, 4).map((amount) => (
-                    <button
-                      key={amount}
-                      onClick={() => handleAmountSelect(amount)}
-                      className={`p-3 rounded border-2 font-medium transition-all text-sm ${
-                        selectedAmount === amount
-                          ? 'border-orange-500 bg-orange-50 text-orange-700'
-                          : 'border-gray-200 hover:border-orange-300 text-gray-700'
-                      }`}
-                    >
-                      ₹{amount.toLocaleString('en-IN')}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Custom Amount */}
-              <div className="mb-6">
-                <h3 className="font-medium text-gray-700 mb-3 text-sm">Or enter custom amount:</h3>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">₹</span>
-                  <input
-                    type="number"
-                    value={customAmount}
-                    onChange={handleCustomAmountChange}
-                    placeholder="Enter amount"
-                    className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded focus:border-orange-500 focus:outline-none"
-                    min="1"
-                  />
-                </div>
-              </div>
-
-              {/* Donation Summary */}
-              {finalAmount > 0 && (
-                <div className="bg-orange-50 rounded p-3 mb-4">
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium text-gray-700 text-sm">Donation Amount:</span>
-                    <span className="font-bold text-lg text-orange-600">₹{finalAmount}</span>
-                  </div>
-                  <div className="text-xs text-gray-600 mt-1">
-                    For: {category.name}
-                  </div>
-                </div>
-              )}
-
-              {/* Donate Button */}
-              <Button
-                onClick={handleDonate}
-                disabled={finalAmount <= 0}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 rounded disabled:opacity-50 disabled:cursor-not-allowed mb-4"
+      <section className="donation-section-anna">
+        {/* Information Cards */}
+        <div className="info-card-annas">
+          <div className="info-card-anna">
+            <h2 className="info-card-anna-title">{category.name}</h2>
+            <p className="info-card-anna-description">
+              {showFullDescription ? (category.description || '') : truncateDescription(category.description || '')}
+            </p>
+            
+            {(category.description?.length || 0) > 100 && (
+              <button 
+                className="read-more-button-anna"
+                onClick={() => setShowFullDescription(!showFullDescription)}
               >
-                {finalAmount > 0 ? `Donate ₹${finalAmount}` : 'Select Amount to Donate'}
-              </Button>
+                {showFullDescription ? 'Read Less' : 'Read More'}
+              </button>
+            )}
+          </div>
+          <div className="info-card-anna-image">
+            {category.imageUrl && (
+              <img
+                src={category.imageUrl}
+                alt={category.name}
+                height="350px"
+              />
+            )}
+          </div>
+        </div>
 
-              {/* Additional Info */}
-              <div className="text-xs text-gray-600 space-y-1">
-                <p>• 80G tax exemption available</p>
-                <p>• Secure payment processing</p>
-                <p>• Instant receipt via email</p>
-              </div>
+        {/* Meal Donation Section */}
+        <h2 className="meal-donation-title-anna">Select Amount</h2>
+        <div className="meal-options-anna">
+          {defaultAmounts.map((amount, index) => (
+            <div key={index} className="meal-option-anna">
+              <p className="meal-label-anna">₹{amount.toLocaleString('en-IN')}</p>
+              <button 
+                className="add-donation-button" 
+                onClick={() => handleAmountSelect(amount)}
+              >
+                Add Donation
+              </button>
+            </div>
+          ))}
+        </div>
 
-              {/* Account Details Section */}
-              <div className="mt-6 bg-gray-50 rounded-lg p-4">
-                <h3 className="font-semibold text-gray-800 mb-3 text-sm">Account Details</h3>
-                <div className="text-xs text-gray-600 space-y-1">
-                  <p>Indian Overseas Bank</p>
-                  <p>Account Name: ISKCON {category.name} Fund</p>
-                  <p>IFSC Code: IOBA0001245</p>
-                  <p>Account Number: 124501000012629</p>
-                  <p>Swift Code: IOBAINBB</p>
-                </div>
-              </div>
+        {/* Custom Donation */}
+        <div className="custome-donation" style={{background:'white',borderRadius:'10px',padding:'50px',marginTop:'10px'}}>
+          <h3 style={{marginBottom:'10px'}}>Any Donation of Your Choice</h3>
+          <input 
+            type="number" 
+            style={{
+              width:'70%',
+              borderRadius:'5px',
+              marginRight:'10px',
+              border:'1px solid',
+              height:'50px',
+              fontSize:'25px',
+              fontWeight:'500',
+              padding:'5px',
+              marginTop:'10px'
+            }} 
+            value={customAmount} 
+            onChange={handleCustomAmountChange} 
+            placeholder="Enter the Amount"
+          />
+          <button 
+            style={{
+              backgroundColor: '#faa817',
+              color: '#fff',
+              border: 'none',
+              padding: '10px 15px',
+              borderRadius: '5px',
+              cursor: 'pointer',
+              height:'63px',
+              fontSize:'25px',
+              marginTop:'10px'
+            }}  
+            onClick={handleDonate}
+            disabled={finalAmount <= 0}
+          >
+            Donate
+          </button>
+        </div>
 
-              {/* UPI Section */}
-              <div className="mt-4 bg-gray-50 rounded-lg p-4 text-center">
-                <h3 className="font-semibold text-gray-800 mb-2 text-sm">Donate through UPI</h3>
-                <p className="text-xs text-gray-600 mb-3">ISKCON{category.name.replace(/\s+/g, '').toUpperCase()}@IOB</p>
-                <div className="bg-white p-2 rounded inline-block">
-                  <div className="w-24 h-24 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500">
-                    QR Code
-                  </div>
-                </div>
-              </div>
+        {/* Account Details */}
+        <div className="account-details">
+          <div className="account-info">
+            <h3 className="account-title">Account Details</h3>
+            <p>Indian Overseas Bank</p>
+            <p>Account Name: ISKCON {category.name} Fund</p>
+            <p>IFSC Code: IOBA0001245</p>
+            <p>Account Number: 124501000012629</p>
+            <p>Swift Code: IOBAINBB</p>
+          </div>
+          <div className="qr-code">
+            <h3 className="qr-title">Donate through UPI :- ISKCON{category.name.replace(/\s+/g, '').toUpperCase()}@IOB</h3>
+            <div style={{height:'285px',width:'300px', backgroundColor:'#f0f0f0', display:'flex', alignItems:'center', justifyContent:'center', borderRadius:'8px'}}>
+              <span>QR Code Placeholder</span>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Full Description Modal */}
       <Dialog open={showFullDescription} onOpenChange={setShowFullDescription}>
