@@ -597,6 +597,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Stats API endpoints
+  app.get("/api/stats", async (req, res) => {
+    try {
+      const stats = await storage.getStats();
+      res.json(stats.filter(s => s.isActive));
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching stats" });
+    }
+  });
+
+  // Temple schedule API endpoints
+  app.get("/api/schedules", async (req, res) => {
+    try {
+      const schedules = await storage.getSchedules();
+      res.json(schedules.filter(s => s.isActive));
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching schedules" });
+    }
+  });
+
   // Donation API endpoints
   app.post("/api/donations", async (req, res) => {
     try {

@@ -2,6 +2,8 @@ import { Helmet } from 'react-helmet';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import HeroSlider from '@/components/home/HeroSlider';
+import StatsSection from '@/components/home/StatsSection';
+import TempleSchedule from '@/components/home/TempleSchedule';
 import QuoteRotator from '@/components/home/QuoteRotator';
 import DonationCategories from '@/components/home/DonationCategories';
 import CurrentEvents from '@/components/home/CurrentEvents';
@@ -25,6 +27,8 @@ const Home = () => {
       
       <main>
         <HeroSlider />
+        <StatsSection />
+        <TempleSchedule />
         <QuoteRotator />
         <DonationCategories />
         <CurrentEvents />
