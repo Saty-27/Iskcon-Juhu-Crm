@@ -27,8 +27,10 @@ const Home = () => {
       
       <main>
         <HeroSlider />
-        <StatsSection />
-        <TempleSchedule />
+        <section className="temple-info-section">
+          <TempleSchedule />
+          <StatsSection />
+        </section>
         <QuoteRotator />
         <DonationCategories />
         <CurrentEvents />
