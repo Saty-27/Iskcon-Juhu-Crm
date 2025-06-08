@@ -66,7 +66,7 @@ const StatsSection: React.FC = () => {
     <div className="stats-container">
       {stats
         .filter(stat => stat.isActive)
-        .sort((a, b) => a.orderIndex - b.orderIndex)
+        .sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0))
         .map((stat) => (
           <StatBox
             key={stat.id}

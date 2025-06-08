@@ -13,7 +13,7 @@ const TempleSchedule: React.FC = () => {
 
   const activeSchedules = schedules
     .filter(schedule => schedule.isActive)
-    .sort((a, b) => a.orderIndex - b.orderIndex);
+    .sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0));
 
   if (isLoading) {
     return (
