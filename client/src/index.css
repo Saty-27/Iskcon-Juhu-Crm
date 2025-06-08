@@ -379,7 +379,7 @@
 /* Temple Info Section - Unified Container */
 .temple-info-section {
   background: linear-gradient(135deg, #FFF8DC 0%, #F5F5DC 100%);
-  padding: 60px 20px;
+  padding: 60px 0;
   position: relative;
   overflow: hidden;
 }
@@ -395,18 +395,47 @@
   pointer-events: none;
 }
 
+.temple-info-section > * {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
 /* Update individual component styles to integrate with unified container */
 .temple-info-section .temple-schedule-container {
   background: transparent !important;
   padding: 0 0 40px 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
 }
 
 .temple-info-section .stats-container {
   background: transparent !important;
   padding: 40px 0 0 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
 }
 
 .temple-info-section .temple-schedule-container::before,
 .temple-info-section .stats-container::before {
   display: none !important;
+}
+
+/* Improve stats card spacing and alignment */
+.temple-info-section .stat-box {
+  flex: 0 1 250px;
+  max-width: 250px;
+  margin: 0 !important;
+}
+
+/* Center the stats section properly */
+.temple-info-section .stats-container {
+  padding-left: 20px;
+  padding-right: 20px;
 }
