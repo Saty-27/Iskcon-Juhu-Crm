@@ -897,3 +897,54 @@
   color: #faa817;
   font-weight: 600;
 }
+
+/* Process Section Styling */
+.process-section {
+  padding: 40px;
+  background-color: #f9f9f9;
+  text-align: center;
+  font-family: "Poppins", sans-serif;
+}
+
+.process-title {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #4B0082;
+}
+
+.title-underline {
+  width: 100px;
+  height: 4px;
+  background-color: #faa817;
+  margin: 0 auto 20px;
+  border-radius: 2px;
+}
+
+.process-image-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.desktop-image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.mobile-image {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-image {
+    display: none;
+  }
+
+  .mobile-image {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+}
