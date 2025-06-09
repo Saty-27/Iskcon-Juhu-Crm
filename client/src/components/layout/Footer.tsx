@@ -33,12 +33,48 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-primary text-white pt-16 pb-8">
-      <div className="container mx-auto px-4">
+    <footer className="relative pt-16 pb-8 text-white" style={{ backgroundColor: 'rgb(255, 45, 85)' }}>
+      {/* Decorative dots - top left */}
+      <div className="absolute top-8 left-8 text-white opacity-60">
+        <div className="grid grid-cols-3 gap-2">
+          {[...Array(9)].map((_, i) => (
+            <div key={i} className="w-1.5 h-1.5 bg-white rounded-full"></div>
+          ))}
+        </div>
+      </div>
+      
+      {/* Decorative dots - top right */}
+      <div className="absolute top-8 right-8 text-white opacity-60">
+        <div className="grid grid-cols-4 gap-2">
+          {[...Array(16)].map((_, i) => (
+            <div key={i} className="w-1.5 h-1.5 bg-white rounded-full"></div>
+          ))}
+        </div>
+      </div>
+
+      {/* Decorative dots - bottom left */}
+      <div className="absolute bottom-8 left-8 text-white opacity-60">
+        <div className="grid grid-cols-2 gap-2">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="w-1.5 h-1.5 bg-white rounded-full"></div>
+          ))}
+        </div>
+      </div>
+
+      {/* Decorative dots - bottom right */}
+      <div className="absolute bottom-8 right-8 text-white opacity-60">
+        <div className="grid grid-cols-3 gap-2">
+          {[...Array(12)].map((_, i) => (
+            <div key={i} className="w-1.5 h-1.5 bg-white rounded-full"></div>
+          ))}
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           <div>
             <h3 className="font-poppins font-bold text-2xl mb-4">
-              ISKCON <span className="text-secondary">Juhu</span>
+              ISKCON <span className="text-yellow-300">Juhu</span>
             </h3>
             <p className="font-opensans mb-6">
               The International Society for Krishna Consciousness, founded by His Divine Grace 
@@ -51,9 +87,10 @@ const Footer = () => {
                   href={link.url} 
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-white hover:text-secondary transition-colors"
+                  className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-opacity-80 transition-colors"
+                  style={{ backgroundColor: '#4B0082', color: 'white' }}
                 >
-                  <i className={`${link.icon} text-xl`}></i>
+                  <i className={`${link.icon} text-lg`}></i>
                 </a>
               ))}
             </div>
@@ -63,32 +100,32 @@ const Footer = () => {
             <h4 className="font-poppins font-semibold text-xl mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/" className="font-opensans hover:text-secondary transition-colors">
+                <Link href="/" className="font-opensans hover:text-yellow-300 transition-colors">
                   Home
                 </Link>
               </li>
               <li>
-                <Link href="/donate" className="font-opensans hover:text-secondary transition-colors">
+                <Link href="/donate" className="font-opensans hover:text-yellow-300 transition-colors">
                   Donate
                 </Link>
               </li>
               <li>
-                <Link href="/events" className="font-opensans hover:text-secondary transition-colors">
+                <Link href="/events" className="font-opensans hover:text-yellow-300 transition-colors">
                   Events
                 </Link>
               </li>
               <li>
-                <Link href="/gallery" className="font-opensans hover:text-secondary transition-colors">
+                <Link href="/gallery" className="font-opensans hover:text-yellow-300 transition-colors">
                   Gallery
                 </Link>
               </li>
               <li>
-                <Link href="/videos" className="font-opensans hover:text-secondary transition-colors">
+                <Link href="/videos" className="font-opensans hover:text-yellow-300 transition-colors">
                   Videos
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="font-opensans hover:text-secondary transition-colors">
+                <Link href="/contact" className="font-opensans hover:text-yellow-300 transition-colors">
                   Contact Us
                 </Link>
               </li>
@@ -99,22 +136,22 @@ const Footer = () => {
             <h4 className="font-poppins font-semibold text-xl mb-4">Programs</h4>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="font-opensans hover:text-secondary transition-colors">Morning Aarti</a>
+                <a href="#" className="font-opensans hover:text-yellow-300 transition-colors">Morning Aarti</a>
               </li>
               <li>
-                <a href="#" className="font-opensans hover:text-secondary transition-colors">Bhagavad Gita Classes</a>
+                <a href="#" className="font-opensans hover:text-yellow-300 transition-colors">Bhagavad Gita Classes</a>
               </li>
               <li>
-                <a href="#" className="font-opensans hover:text-secondary transition-colors">Sunday Feast</a>
+                <a href="#" className="font-opensans hover:text-yellow-300 transition-colors">Sunday Feast</a>
               </li>
               <li>
-                <a href="#" className="font-opensans hover:text-secondary transition-colors">Kirtan Events</a>
+                <a href="#" className="font-opensans hover:text-yellow-300 transition-colors">Kirtan Events</a>
               </li>
               <li>
-                <a href="#" className="font-opensans hover:text-secondary transition-colors">Youth Programs</a>
+                <a href="#" className="font-opensans hover:text-yellow-300 transition-colors">Youth Programs</a>
               </li>
               <li>
-                <a href="#" className="font-opensans hover:text-secondary transition-colors">Food for Life</a>
+                <a href="#" className="font-opensans hover:text-yellow-300 transition-colors">Food for Life</a>
               </li>
             </ul>
           </div>
@@ -137,8 +174,9 @@ const Footer = () => {
               />
               <button 
                 type="submit" 
-                className="w-full bg-secondary text-white font-poppins font-medium py-2 rounded-lg 
+                className="w-full text-white font-poppins font-medium py-2 rounded-lg 
                 hover:bg-opacity-90 transition-colors"
+                style={{ backgroundColor: '#4B0082' }}
               >
                 Subscribe
               </button>
