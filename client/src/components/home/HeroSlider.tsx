@@ -25,7 +25,7 @@ const HeroSlider = () => {
   
   if (isLoading) {
     return (
-      <section className="relative overflow-hidden h-[500px] md:h-[600px]">
+      <section className="relative overflow-hidden h-screen">
         <Skeleton className="w-full h-full" />
       </section>
     );
@@ -36,7 +36,7 @@ const HeroSlider = () => {
   }
   
   return (
-    <section className="relative overflow-hidden h-[500px] md:h-[600px]">
+    <section className="relative overflow-hidden h-screen">
       {/* Main Hero Section with ISKCON Deities */}
       <div className="h-full w-full absolute inset-0">
         <div className="absolute inset-0 bg-black bg-opacity-50 z-10"></div>
@@ -64,18 +64,18 @@ const HeroSlider = () => {
             className="object-cover w-full h-full"
           />
           <div className="absolute inset-0 z-20 flex items-center justify-center">
-            <div className="container mx-auto px-4 text-center">
-              <h2 className="text-white font-bold text-3xl md:text-5xl mb-4">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+              <h2 className="text-white font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl mb-4 sm:mb-6 lg:mb-8 leading-tight">
                 {banner.title}
               </h2>
               {banner.description && (
-                <p className="text-white text-lg md:text-xl mb-8 max-w-2xl mx-auto">
+                <p className="text-white text-base sm:text-lg md:text-xl lg:text-2xl mb-6 sm:mb-8 lg:mb-10 max-w-xs sm:max-w-md md:max-w-2xl lg:max-w-4xl mx-auto leading-relaxed">
                   {banner.description}
                 </p>
               )}
               <div className="flex justify-center gap-4">
-                <Link href="/donate" className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-3 rounded-full 
-                    inline-block transition-all transform hover:-translate-y-1">
+                <Link href="/donate" className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-2 sm:px-8 sm:py-3 lg:px-10 lg:py-4 rounded-full 
+                    inline-block transition-all transform hover:-translate-y-1 text-sm sm:text-base lg:text-lg">
                   Donate Now
                 </Link>
               </div>
@@ -86,16 +86,16 @@ const HeroSlider = () => {
 
       {/* Slider Navigation */}
       {banners.length > 0 && (
-        <div className="absolute bottom-6 left-0 right-0 z-30 flex justify-center space-x-2">
+        <div className="absolute bottom-4 sm:bottom-6 lg:bottom-8 left-0 right-0 z-30 flex justify-center space-x-2 sm:space-x-3">
           {banners.map((_, index) => (
             <button 
               key={index}
               onClick={() => setCurrentSlide(index)}
-              className={`w-3 h-3 rounded-full ${
+              className={`w-2 h-2 sm:w-3 sm:h-3 lg:w-4 lg:h-4 rounded-full ${
                 index === currentSlide 
                   ? 'bg-orange-500' 
                   : 'bg-white bg-opacity-60'
-              } focus:outline-none transition-all`}
+              } focus:outline-none transition-all hover:scale-110`}
               aria-label={`Go to slide ${index + 1}`}
             ></button>
           ))}
