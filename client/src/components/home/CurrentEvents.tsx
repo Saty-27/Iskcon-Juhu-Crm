@@ -2,12 +2,17 @@ import { useState } from 'react';
 import { format } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
-import { Event, DonationCategory } from '@shared/schema';
+import { Event, DonationCategory, DonationCard } from '@shared/schema';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 const CurrentEvents = () => {
   const [, setLocation] = useLocation();
   const [expandedEvent, setExpandedEvent] = useState<number | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [customAmount, setCustomAmount] = useState('');
   
   const { data: events = [], isLoading } = useQuery<Event[]>({
     queryKey: ['/api/events'],
@@ -17,19 +22,33 @@ const CurrentEvents = () => {
     queryKey: ['/api/donation-categories'],
   });
 
-  const handleDonateClick = (eventTitle: string) => {
-    // Find matching donation category by name or create a fallback
-    const matchingCategory = categories.find(cat => 
-      cat.name.toLowerCase().includes(eventTitle.toLowerCase()) || 
-      eventTitle.toLowerCase().includes(cat.name.toLowerCase())
-    );
-    
-    if (matchingCategory) {
-      setLocation(`/donate/${matchingCategory.id}`);
-    } else {
-      // Default to first category if no match found
-      setLocation(`/donate/${categories[0]?.id || 1}`);
+  const { data: donationCards = [] } = useQuery<DonationCard[]>({
+    queryKey: ['/api/donation-cards'],
+  });
+
+  const handleEventClick = (event: Event) => {
+    setSelectedEvent(event);
+  };
+
+  const handleDonateClick = (amount?: number) => {
+    if (selectedEvent) {
+      // Find matching category for the event
+      const matchingCategory = categories.find(cat => 
+        cat.name.toLowerCase().includes(selectedEvent.title.toLowerCase()) || 
+        selectedEvent.title.toLowerCase().includes(cat.name.toLowerCase())
+      );
+      
+      const categoryId = matchingCategory?.id || categories[0]?.id || 1;
+      const donationAmount = amount || parseFloat(customAmount) || 0;
+      
+      if (donationAmount > 0) {
+        setLocation(`/donate/${categoryId}?amount=${donationAmount}`);
+      } else {
+        setLocation(`/donate/${categoryId}`);
+      }
     }
+    setSelectedEvent(null);
+    setCustomAmount('');
   };
 
   const toggleExpanded = (eventId: number) => {
@@ -129,7 +148,7 @@ const CurrentEvents = () => {
                 {/* Donate Button */}
                 <button 
                   className="donate-event-button"
-                  onClick={() => handleDonateClick(event.title)}
+                  onClick={() => handleEventClick(event)}
                 >
                   Donate for {event.title}
                 </button>
@@ -162,6 +181,68 @@ const CurrentEvents = () => {
           </p>
         </div>
       </div>
+
+      {/* Donation Modal */}
+      <Dialog open={!!selectedEvent} onOpenChange={(open) => !open && setSelectedEvent(null)}>
+        <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden">
+          <DialogHeader className="p-6 pb-0">
+            <DialogTitle className="text-xl font-bold text-center" style={{ color: '#4B0082' }}>
+              {selectedEvent?.title}
+            </DialogTitle>
+            <p className="text-center text-gray-600 mt-2">
+              Join us for this divine celebration of Lord Krishna's appearance day
+            </p>
+          </DialogHeader>
+          
+          <div className="p-6">
+            {/* Predefined Amount Options */}
+            <div className="grid grid-cols-3 gap-3 mb-6">
+              {[501, 1001, 2101].map((amount) => (
+                <button
+                  key={amount}
+                  onClick={() => handleDonateClick(amount)}
+                  className="p-3 border-2 border-gray-200 rounded-lg text-center hover:border-orange-400 hover:bg-orange-50 transition-colors"
+                >
+                  <div className="text-lg font-semibold">₹{amount.toLocaleString('en-IN')}</div>
+                </button>
+              ))}
+            </div>
+
+            {/* Custom Amount Input */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Enter the Amount
+              </label>
+              <div className="flex gap-3">
+                <Input
+                  type="number"
+                  placeholder="Enter amount"
+                  value={customAmount}
+                  onChange={(e) => setCustomAmount(e.target.value)}
+                  className="flex-1"
+                />
+                <Button 
+                  onClick={() => handleDonateClick()}
+                  className="px-8 text-white font-medium"
+                  style={{ backgroundColor: '#FAA817' }}
+                  disabled={!customAmount || parseFloat(customAmount) <= 0}
+                >
+                  Donate
+                </Button>
+              </div>
+            </div>
+
+            {/* Main Donate Button */}
+            <Button 
+              onClick={() => handleDonateClick()}
+              className="w-full py-3 text-white font-medium text-lg"
+              style={{ backgroundColor: '#FAA817' }}
+            >
+              Donate for {selectedEvent?.title}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 };
