@@ -104,59 +104,6 @@ const Videos = () => {
             )}
           </div>
         </section>
-        
-        {/* Categories or Featured Section */}
-        <section className="py-16 bg-neutral">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="font-poppins font-bold text-3xl text-primary mb-4">
-                Video Categories
-              </h2>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-              <div className="bg-white p-6 rounded-xl shadow-md text-center">
-                <div className="w-16 h-16 mx-auto bg-primary bg-opacity-10 rounded-full flex items-center justify-center mb-4">
-                  <i className="ri-vidicon-fill text-2xl text-primary"></i>
-                </div>
-                <h3 className="font-poppins font-semibold text-lg text-primary mb-2">Temple Aartis</h3>
-                <p className="font-opensans text-dark text-sm">
-                  Daily temple ceremonies and aartis
-                </p>
-              </div>
-              
-              <div className="bg-white p-6 rounded-xl shadow-md text-center">
-                <div className="w-16 h-16 mx-auto bg-primary bg-opacity-10 rounded-full flex items-center justify-center mb-4">
-                  <i className="ri-mic-fill text-2xl text-primary"></i>
-                </div>
-                <h3 className="font-poppins font-semibold text-lg text-primary mb-2">Kirtans & Bhajans</h3>
-                <p className="font-opensans text-dark text-sm">
-                  Devotional music and chanting
-                </p>
-              </div>
-              
-              <div className="bg-white p-6 rounded-xl shadow-md text-center">
-                <div className="w-16 h-16 mx-auto bg-primary bg-opacity-10 rounded-full flex items-center justify-center mb-4">
-                  <i className="ri-book-open-fill text-2xl text-primary"></i>
-                </div>
-                <h3 className="font-poppins font-semibold text-lg text-primary mb-2">Spiritual Discourses</h3>
-                <p className="font-opensans text-dark text-sm">
-                  Lectures and teachings by spiritual leaders
-                </p>
-              </div>
-              
-              <div className="bg-white p-6 rounded-xl shadow-md text-center">
-                <div className="w-16 h-16 mx-auto bg-primary bg-opacity-10 rounded-full flex items-center justify-center mb-4">
-                  <i className="ri-calendar-event-fill text-2xl text-primary"></i>
-                </div>
-                <h3 className="font-poppins font-semibold text-lg text-primary mb-2">Festival Celebrations</h3>
-                <p className="font-opensans text-dark text-sm">
-                  Janmashtami, Diwali, and other celebrations
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
       
       <Footer />
