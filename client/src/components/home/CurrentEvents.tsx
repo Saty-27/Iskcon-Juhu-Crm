@@ -184,13 +184,13 @@ const CurrentEvents = () => {
 
       {/* Donation Modal */}
       <Dialog open={!!selectedEvent} onOpenChange={(open) => !open && setSelectedEvent(null)}>
-        <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden">
+        <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden" aria-describedby="donation-modal-description">
           <DialogHeader className="p-6 pb-0">
             <DialogTitle className="text-xl font-bold text-center" style={{ color: '#4B0082' }}>
               {selectedEvent?.title}
             </DialogTitle>
-            <p className="text-center text-gray-600 mt-2">
-              Join us for this divine celebration of Lord Krishna's appearance day
+            <p id="donation-modal-description" className="text-center text-gray-600 mt-2">
+              Join us for this divine celebration and contribute to our sacred cause
             </p>
           </DialogHeader>
           
