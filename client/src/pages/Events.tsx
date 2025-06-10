@@ -1,30 +1,22 @@
 import { Helmet } from 'react-helmet';
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useLocation } from 'wouter';
 import { format } from 'date-fns';
 import { Event } from '@shared/schema';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import DonationModal from '@/components/donate/DonationModal';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CalendarIcon, Clock, MapPin } from 'lucide-react';
 
 const Events = () => {
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
+  const [, setLocation] = useLocation();
   
   const { data: events = [], isLoading } = useQuery<Event[]>({
     queryKey: ['/api/events'],
   });
   
-  const openDonationModal = (event: Event, amount: number | null = null) => {
-    setSelectedEvent(event);
-    setSelectedAmount(amount);
-  };
-  
-  const closeDonationModal = () => {
-    setSelectedEvent(null);
-    setSelectedAmount(null);
+  const handleDonateClick = () => {
+    setLocation('/donate');
   };
   
   return (
@@ -205,7 +197,7 @@ const Events = () => {
                         {event.suggestedAmounts?.map((amount) => (
                           <button 
                             key={amount}
-                            onClick={() => openDonationModal(event, amount)}
+                            onClick={handleDonateClick}
                             className="bg-white hover:bg-gray-100 text-dark font-medium py-1 px-3 rounded-full transition-colors"
                           >
                             ₹{amount.toLocaleString('en-IN')}
@@ -214,7 +206,7 @@ const Events = () => {
                       </div>
                       
                       <button 
-                        onClick={() => openDonationModal(event)}
+                        onClick={handleDonateClick}
                         className="bg-primary text-white font-poppins font-medium py-2 px-6 rounded-lg hover:bg-opacity-90 transition-colors"
                       >
                         Donate for {event.title}
@@ -230,15 +222,7 @@ const Events = () => {
       
       <Footer />
       
-      {/* Donation Modal */}
-      {selectedEvent && (
-        <DonationModal 
-          isOpen={true}
-          event={selectedEvent}
-          amount={selectedAmount}
-          onClose={closeDonationModal}
-        />
-      )}
+
     </>
   );
 };

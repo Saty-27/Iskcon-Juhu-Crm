@@ -2,33 +2,16 @@ import { useState } from 'react';
 import { format } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
-import { Event, DonationCategory, DonationCard } from '@shared/schema';
+import { Event } from '@shared/schema';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 
 const CurrentEvents = () => {
   const [, setLocation] = useLocation();
   const [expandedEvent, setExpandedEvent] = useState<number | null>(null);
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [customAmount, setCustomAmount] = useState('');
   
   const { data: events = [], isLoading } = useQuery<Event[]>({
     queryKey: ['/api/events'],
   });
-
-  const { data: categories = [] } = useQuery<DonationCategory[]>({
-    queryKey: ['/api/donation-categories'],
-  });
-
-  const { data: donationCards = [] } = useQuery<DonationCard[]>({
-    queryKey: ['/api/donation-cards'],
-  });
-
-  const handleEventClick = (event: Event) => {
-    setSelectedEvent(event);
-  };
 
   const handleDonateClick = () => {
     // Redirect directly to the main donate page
@@ -166,67 +149,7 @@ const CurrentEvents = () => {
         </div>
       </div>
 
-      {/* Donation Modal */}
-      <Dialog open={!!selectedEvent} onOpenChange={(open) => !open && setSelectedEvent(null)}>
-        <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden" aria-describedby="donation-modal-description">
-          <DialogHeader className="p-6 pb-0">
-            <DialogTitle className="text-xl font-bold text-center" style={{ color: '#4B0082' }}>
-              {selectedEvent?.title}
-            </DialogTitle>
-            <p id="donation-modal-description" className="text-center text-gray-600 mt-2">
-              Join us for this divine celebration and contribute to our sacred cause
-            </p>
-          </DialogHeader>
-          
-          <div className="p-6">
-            {/* Predefined Amount Options */}
-            <div className="grid grid-cols-3 gap-3 mb-6">
-              {[501, 1001, 2101].map((amount) => (
-                <button
-                  key={amount}
-                  onClick={() => handleDonateClick(amount)}
-                  className="p-3 border-2 border-gray-200 rounded-lg text-center hover:border-orange-400 hover:bg-orange-50 transition-colors"
-                >
-                  <div className="text-lg font-semibold">₹{amount.toLocaleString('en-IN')}</div>
-                </button>
-              ))}
-            </div>
 
-            {/* Custom Amount Input */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Enter the Amount
-              </label>
-              <div className="flex gap-3">
-                <Input
-                  type="number"
-                  placeholder="Enter amount"
-                  value={customAmount}
-                  onChange={(e) => setCustomAmount(e.target.value)}
-                  className="flex-1"
-                />
-                <Button 
-                  onClick={() => handleDonateClick()}
-                  className="px-8 text-white font-medium"
-                  style={{ backgroundColor: '#FAA817' }}
-                  disabled={!customAmount || parseFloat(customAmount) <= 0}
-                >
-                  Donate
-                </Button>
-              </div>
-            </div>
-
-            {/* Main Donate Button */}
-            <Button 
-              onClick={() => handleDonateClick()}
-              className="w-full py-3 text-white font-medium text-lg"
-              style={{ backgroundColor: '#FAA817' }}
-            >
-              Donate for {selectedEvent?.title}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </section>
   );
 };
