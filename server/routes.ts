@@ -1260,8 +1260,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         udf3: eventId?.toString() || '',
         udf4: eventCardId?.toString() || '',
         udf5: isCustomAmount ? 'true' : 'false',
-        surl: `${req.protocol}://${req.get('host')}/payment/success`,
-        furl: `${req.protocol}://${req.get('host')}/payment/failure`,
+        surl: `https://${req.get('host')}/payment/success`,
+        furl: `https://${req.get('host')}/payment/failure`,
         hash: ''
       };
 
@@ -1311,7 +1311,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // PayU Success Response Handler
+  // PayU Success Response Handler (POST for PayU callback)
   app.post("/payment/success", async (req, res) => {
     try {
       const {
@@ -1325,6 +1325,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         payuMoneyId,
         mihpayid
       } = req.body;
+
+      console.log('PayU Success Callback:', { txnid, amount, status, firstname, email });
 
       // Verify hash for security
       const crypto = require('crypto');
@@ -1358,10 +1360,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // PayU Failure Response Handler
+  // GET route for payment success page
+  app.get("/payment/success", (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+  });
+
+  // PayU Failure Response Handler (POST for PayU callback)
   app.post("/payment/failure", async (req, res) => {
     try {
       const { txnid, status } = req.body;
+
+      console.log('PayU Failure Callback:', { txnid, status });
 
       // Update donation status in database
       const donation = await storage.getDonationByPaymentId(txnid);
@@ -1379,6 +1388,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('Payment failure handler error:', error);
       res.redirect('/payment/failure?error=processing_error');
     }
+  });
+
+  // GET route for payment failure page
+  app.get("/payment/failure", (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
   });
 
   const httpServer = createServer(app);
