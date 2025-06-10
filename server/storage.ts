@@ -4,6 +4,7 @@ import {
   Quote, InsertQuote, quotes,
   DonationCategory, InsertDonationCategory, donationCategories,
   DonationCard, InsertDonationCard, donationCards,
+  EventDonationCard, InsertEventDonationCard, eventDonationCards,
   BankDetails, InsertBankDetails, bankDetails,
   Event, InsertEvent, events,
   Gallery, InsertGallery, gallery,
@@ -69,6 +70,13 @@ export interface IStorage {
   createEvent(event: InsertEvent): Promise<Event>;
   updateEvent(id: number, eventData: Partial<Event>): Promise<Event | undefined>;
   deleteEvent(id: number): Promise<boolean>;
+  
+  // Event donation card management
+  getEventDonationCards(eventId: number): Promise<EventDonationCard[]>;
+  getEventDonationCard(id: number): Promise<EventDonationCard | undefined>;
+  createEventDonationCard(card: InsertEventDonationCard): Promise<EventDonationCard>;
+  updateEventDonationCard(id: number, cardData: Partial<EventDonationCard>): Promise<EventDonationCard | undefined>;
+  deleteEventDonationCard(id: number): Promise<boolean>;
   
   // Gallery management
   getGalleryItems(): Promise<Gallery[]>;

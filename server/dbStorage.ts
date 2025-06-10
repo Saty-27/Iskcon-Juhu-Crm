@@ -1,12 +1,13 @@
 import { eq } from "drizzle-orm";
 import { db } from "./db";
 import { 
-  users, banners, quotes, donationCategories, donationCards, bankDetails, events, gallery, videos, 
+  users, banners, quotes, donationCategories, donationCards, eventDonationCards, bankDetails, events, gallery, videos, 
   testimonials, contactMessages, socialLinks, donations, subscriptions,
   stats, schedules,
   type User, type InsertUser, type Banner, type InsertBanner,
   type Quote, type InsertQuote, type DonationCategory, type InsertDonationCategory,
-  type DonationCard, type InsertDonationCard, type BankDetails, type InsertBankDetails,
+  type DonationCard, type InsertDonationCard, type EventDonationCard, type InsertEventDonationCard,
+  type BankDetails, type InsertBankDetails,
   type Event, type InsertEvent, type Gallery, type InsertGallery,
   type Video, type InsertVideo, type Testimonial, type InsertTestimonial,
   type ContactMessage, type InsertContactMessage, type SocialLink, type InsertSocialLink,
@@ -202,6 +203,31 @@ export class DatabaseStorage implements IStorage {
 
   async deleteEvent(id: number): Promise<boolean> {
     const result = await db.delete(events).where(eq(events.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Event donation card operations
+  async getEventDonationCards(eventId: number): Promise<EventDonationCard[]> {
+    return await db.select().from(eventDonationCards).where(eq(eventDonationCards.eventId, eventId));
+  }
+
+  async getEventDonationCard(id: number): Promise<EventDonationCard | undefined> {
+    const [card] = await db.select().from(eventDonationCards).where(eq(eventDonationCards.id, id));
+    return card;
+  }
+
+  async createEventDonationCard(card: InsertEventDonationCard): Promise<EventDonationCard> {
+    const [newCard] = await db.insert(eventDonationCards).values(card).returning();
+    return newCard;
+  }
+
+  async updateEventDonationCard(id: number, cardData: Partial<EventDonationCard>): Promise<EventDonationCard | undefined> {
+    const [card] = await db.update(eventDonationCards).set(cardData).where(eq(eventDonationCards.id, id)).returning();
+    return card;
+  }
+
+  async deleteEventDonationCard(id: number): Promise<boolean> {
+    const result = await db.delete(eventDonationCards).where(eq(eventDonationCards.id, id));
     return result.rowCount > 0;
   }
 

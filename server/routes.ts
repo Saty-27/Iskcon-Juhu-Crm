@@ -502,6 +502,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Event Donation Cards API endpoints
+  app.get("/api/events/:eventId/donation-cards", async (req, res) => {
+    try {
+      const eventId = parseInt(req.params.eventId);
+      const cards = await storage.getEventDonationCards(eventId);
+      res.json(cards.filter(c => c.isActive));
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching event donation cards" });
+    }
+  });
+
   // Gallery API endpoints
   app.get("/api/gallery", async (req, res) => {
     try {
