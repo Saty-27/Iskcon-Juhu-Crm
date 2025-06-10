@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Helmet } from 'react-helmet';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import type { DonationCategory, DonationCard, BankDetails } from "@shared/schema";
-import DonationModal from "@/components/donate/DonationModal";
+
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 
@@ -261,7 +261,7 @@ export default function CategoryDonation() {
               ₹{parseInt(option.price).toLocaleString()}
             </p>
             <Button 
-              onClick={() => openModalWithPrice(option.price)}
+              onClick={() => window.location.href = '/donate'}
               style={{
                 backgroundColor: '#faa817',
                 color: '#fff',
@@ -306,7 +306,7 @@ export default function CategoryDonation() {
             }}
           />
           <Button
-            onClick={openModalWithAnyPrice}
+            onClick={() => window.location.href = '/donate'}
             style={{
               backgroundColor: '#faa817',
               color: '#fff',
@@ -380,12 +380,7 @@ export default function CategoryDonation() {
       
       <Footer />
 
-      <DonationModal
-        isOpen={isModalOpen}
-        category={category}
-        amount={parseInt(selectedPrice) || null}
-        onClose={() => setIsModalOpen(false)}
-      />
+
     </>
   );
 }

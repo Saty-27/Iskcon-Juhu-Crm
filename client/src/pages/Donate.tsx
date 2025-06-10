@@ -93,8 +93,9 @@ const Donate = () => {
                         key={card.id}
                         className="bg-white rounded-xl overflow-hidden shadow-lg transition-transform hover:transform hover:scale-105"
                       >
-                        <div className="p-6">
-                          <h3 className="font-poppins font-semibold text-xl text-primary mb-3">
+                        <div className="p-6 text-center">
+                          {/* Title */}
+                          <h3 className="font-poppins font-semibold text-xl text-primary mb-4">
                             {card.title}
                           </h3>
                           
@@ -105,20 +106,6 @@ const Donate = () => {
                               alt={card.title}
                               className="w-full h-48 object-cover rounded-lg mb-4"
                             />
-                          )}
-                          
-                          {/* Description */}
-                          {card.description && (
-                            <p className="font-opensans text-dark mb-4 text-sm">
-                              {card.description}
-                            </p>
-                          )}
-                          
-                          {/* Category Badge */}
-                          {category && (
-                            <span className="inline-block bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-medium mb-4">
-                              {category.name}
-                            </span>
                           )}
                           
                           {/* Amount */}

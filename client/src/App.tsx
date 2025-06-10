@@ -8,6 +8,7 @@ import Events from "@/pages/Events";
 
 import Donate from "@/pages/Donate";
 import CategoryDonation from "@/pages/CategoryDonation";
+import EventDonation from "@/pages/EventDonation";
 
 import DonateThankYou from "@/pages/donate/ThankYou";
 import PaymentGateway from "@/pages/donate/PaymentGateway";
@@ -48,6 +49,7 @@ function Router() {
       <Route path="/donate/thank-you" component={DonateThankYou} />
       <Route path="/donate/payment-gateway" component={PaymentGateway} />
       <Route path="/donate/payment-failed" component={PaymentFailed} />
+      <Route path="/donate/event/:eventId" component={EventDonation} />
       <Route path="/donate/:categoryId" component={CategoryDonation} />
       <Route path="/gallery" component={Gallery} />
       <Route path="/videos" component={Videos} />

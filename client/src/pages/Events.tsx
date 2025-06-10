@@ -15,8 +15,8 @@ const Events = () => {
     queryKey: ['/api/events'],
   });
   
-  const handleDonateClick = () => {
-    setLocation('/donate');
+  const handleDonateClick = (eventId: number) => {
+    setLocation(`/donate/event/${eventId}`);
   };
   
   return (
