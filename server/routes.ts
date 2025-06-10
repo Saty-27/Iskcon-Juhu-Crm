@@ -429,6 +429,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const events = await storage.getEvents();
       res.json(events.filter(e => e.isActive));
     } catch (error) {
+      console.error("Events API error:", error);
       res.status(500).json({ message: "Error fetching events" });
     }
   });

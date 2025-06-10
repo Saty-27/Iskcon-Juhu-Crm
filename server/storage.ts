@@ -860,7 +860,7 @@ export class MemStorage implements IStorage {
   // Stats methods
   async getStats(): Promise<Stat[]> {
     return Array.from(this.statsData.values())
-      .sort((a, b) => a.order - b.order);
+      .sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0));
   }
 
   async getStat(id: number): Promise<Stat | undefined> {
@@ -897,7 +897,7 @@ export class MemStorage implements IStorage {
   // Schedule methods
   async getSchedules(): Promise<Schedule[]> {
     return Array.from(this.schedulesData.values())
-      .sort((a, b) => a.order - b.order);
+      .sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0));
   }
 
   async getSchedule(id: number): Promise<Schedule | undefined> {
@@ -911,7 +911,10 @@ export class MemStorage implements IStorage {
       ...schedule, 
       id,
       createdAt: now,
-      updatedAt: now
+      updatedAt: now,
+      isActive: true,
+      description: schedule.description ?? null,
+      orderIndex: schedule.orderIndex ?? null
     };
     this.schedulesData.set(id, newSchedule);
     return newSchedule;
@@ -1041,7 +1044,8 @@ export class MemStorage implements IStorage {
       ...message, 
       id, 
       isRead: false, 
-      createdAt: new Date() 
+      createdAt: new Date(),
+
     };
     this.contactMessagesData.set(id, newMessage);
     return newMessage;
