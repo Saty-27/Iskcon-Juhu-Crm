@@ -586,7 +586,7 @@ export class MemStorage implements IStorage {
       isActive: category.isActive ?? true,
       description: category.description ?? null,
       heading: category.heading ?? null,
-      suggestedAmounts: category.suggestedAmounts ?? null
+      suggestedAmounts: Array.isArray(category.suggestedAmounts) ? category.suggestedAmounts : null
     };
     this.donationCategoriesData.set(id, newCategory);
     return newCategory;
@@ -625,7 +625,10 @@ export class MemStorage implements IStorage {
       updatedAt: now,
       customDonationEnabled: event.customDonationEnabled ?? true,
       customDonationTitle: event.customDonationTitle ?? "Any Donation of Your Choice",
-      isActive: event.isActive ?? true
+      isActive: event.isActive ?? true,
+      description: event.description ?? null,
+      suggestedAmounts: Array.isArray(event.suggestedAmounts) ? event.suggestedAmounts : null,
+      readMoreUrl: event.readMoreUrl ?? null
     };
     this.eventsData.set(id, newEvent);
     return newEvent;
@@ -666,7 +669,9 @@ export class MemStorage implements IStorage {
       ...card, 
       id,
       isActive: card.isActive ?? true,
-      order: card.order ?? 0
+      order: card.order ?? 0,
+      description: card.description ?? null,
+      imageUrl: card.imageUrl ?? null
     };
     this.donationCardsData.set(id, newCard);
     return newCard;
@@ -699,7 +704,9 @@ export class MemStorage implements IStorage {
     const newDetails: BankDetails = { 
       ...details, 
       id,
-      isActive: details.isActive ?? true
+      isActive: details.isActive ?? true,
+      swiftCode: details.swiftCode ?? null,
+      qrCodeUrl: details.qrCodeUrl ?? null
     };
     this.bankDetailsData.set(id, newDetails);
     return newDetails;
@@ -782,7 +789,14 @@ export class MemStorage implements IStorage {
       createdAt: now,
       status: donation.status ?? "pending",
       receiptSent: donation.receiptSent ?? false,
-      notificationSent: donation.notificationSent ?? false
+      notificationSent: donation.notificationSent ?? false,
+      message: donation.message ?? null,
+      userId: donation.userId ?? null,
+      eventId: donation.eventId ?? null,
+      categoryId: donation.categoryId ?? null,
+      paymentId: donation.paymentId ?? null,
+      transactionId: donation.transactionId ?? null,
+      invoiceNumber: donation.invoiceNumber ?? null
     };
     this.donationsData.set(id, newDonation);
     return newDonation;
