@@ -197,7 +197,7 @@ const Events = () => {
                         {event.suggestedAmounts?.map((amount) => (
                           <button 
                             key={amount}
-                            onClick={handleDonateClick}
+                            onClick={() => handleDonateClick(event.id)}
                             className="bg-white hover:bg-gray-100 text-dark font-medium py-1 px-3 rounded-full transition-colors"
                           >
                             ₹{amount.toLocaleString('en-IN')}
@@ -206,7 +206,7 @@ const Events = () => {
                       </div>
                       
                       <button 
-                        onClick={handleDonateClick}
+                        onClick={() => handleDonateClick(event.id)}
                         className="bg-primary text-white font-poppins font-medium py-2 px-6 rounded-lg hover:bg-opacity-90 transition-colors"
                       >
                         Donate for {event.title}
