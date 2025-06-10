@@ -152,20 +152,13 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
       };
 
       if (event) {
-        return apiRequest(`/api/events/${event.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(eventData),
-        });
+        return apiRequest(`/api/events/${event.id}`, 'PUT', eventData);
       } else {
-        return apiRequest('/api/events', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(eventData),
-        });
+        return apiRequest('/api/events', 'POST', eventData);
       }
     },
-    onSuccess: (savedEvent) => {
+    onSuccess: async (response) => {
+      const savedEvent = await response.json();
       queryClient.invalidateQueries({ queryKey: ['/api/events'] });
       toast({ title: 'Success', description: `Event ${event ? 'updated' : 'created'} successfully` });
       
@@ -193,19 +186,15 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
       // Delete existing cards for this event
       const existingEventCards = existingDonationCards.filter(card => card.eventId === eventId);
       for (const card of existingEventCards) {
-        await apiRequest(`/api/donation-cards/${card.id}`, { method: 'DELETE' });
+        await apiRequest(`/api/donation-cards/${card.id}`, 'DELETE');
       }
       
       // Create new cards
       for (const card of donationCards) {
-        await apiRequest('/api/donation-cards', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            ...card,
-            eventId,
-            categoryId: 1, // Default category
-          }),
+        await apiRequest('/api/donation-cards', 'POST', {
+          ...card,
+          eventId,
+          categoryId: 1, // Default category
         });
       }
       
@@ -222,17 +211,9 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
     try {
       if (existingBankDetails.length > 0) {
         const activeBankDetails = existingBankDetails.find(bd => bd.isActive) || existingBankDetails[0];
-        await apiRequest(`/api/bank-details/${activeBankDetails.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(bankDetails),
-        });
+        await apiRequest(`/api/bank-details/${activeBankDetails.id}`, 'PUT', bankDetails);
       } else {
-        await apiRequest('/api/bank-details', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(bankDetails),
-        });
+        await apiRequest('/api/bank-details', 'POST', bankDetails);
       }
       
       queryClient.invalidateQueries({ queryKey: ['/api/bank-details'] });
