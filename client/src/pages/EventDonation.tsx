@@ -190,25 +190,10 @@ export default function EventDonation() {
               {card.title}
             </p>
 
-            {/* Card Image */}
-            {card.imageUrl && (
-              <img 
-                src={card.imageUrl} 
-                alt={card.title}
-                style={{
-                  width: '100%',
-                  height: '150px',
-                  objectFit: 'cover',
-                  borderRadius: '5px',
-                  marginBottom: '10px'
-                }}
-              />
-            )}
-
             {/* Amount */}
             <p style={{ 
               color: '#faa817', 
-              marginBottom: '10px',
+              marginBottom: '15px',
               fontSize: '18px',
               fontWeight: 'bold'
             }}>
@@ -225,11 +210,26 @@ export default function EventDonation() {
                 padding: '10px 15px',
                 borderRadius: '5px',
                 cursor: 'pointer',
-                width: '100%'
+                width: '100%',
+                marginBottom: '15px'
               }}
             >
               Add Donation
             </Button>
+
+            {/* Card Image - moved below button */}
+            {card.imageUrl && (
+              <img 
+                src={card.imageUrl} 
+                alt={card.title}
+                style={{
+                  width: '100%',
+                  height: '150px',
+                  objectFit: 'cover',
+                  borderRadius: '5px'
+                }}
+              />
+            )}
           </div>
         )) : (
           <div style={{
