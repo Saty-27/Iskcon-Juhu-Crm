@@ -394,6 +394,43 @@ export class MemStorage implements IStorage {
       icon: "ri-twitter-fill",
       isActive: true
     });
+
+    // Add sample events
+    this.createEvent({
+      title: "Janmashtami Celebration 2024",
+      description: "Join us for the grand celebration of Lord Krishna's birth anniversary with special kirtans, abhishek ceremonies, and divine prasadam distribution.",
+      date: new Date("2024-09-07"),
+      imageUrl: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=600",
+      isActive: true,
+      suggestedAmounts: [501, 1001, 2501, 5001],
+      readMoreUrl: "/events/janmashtami-2024",
+      customDonationEnabled: true,
+      customDonationTitle: "Support Janmashtami Celebration"
+    });
+
+    this.createEvent({
+      title: "Food for Life - Community Kitchen",
+      description: "Help us serve nutritious prasadam to underprivileged communities across Mumbai through our Food for Life program.",
+      date: new Date("2024-08-15"),
+      imageUrl: "https://images.unsplash.com/photo-1488459716781-31db52582fe9?ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=600",
+      isActive: true,
+      suggestedAmounts: [251, 501, 1001, 2501],
+      readMoreUrl: "/events/food-for-life",
+      customDonationEnabled: true,
+      customDonationTitle: "Sponsor Meals for the Needy"
+    });
+
+    this.createEvent({
+      title: "Temple Renovation Project",
+      description: "Contribute to the restoration and beautification of our sacred temple premises to provide a better spiritual environment for devotees.",
+      date: new Date("2024-09-01"),
+      imageUrl: "https://images.unsplash.com/photo-1574666411985-31b06fc26a73?ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=600",
+      isActive: true,
+      suggestedAmounts: [1001, 5001, 10001, 25001],
+      readMoreUrl: "/events/temple-renovation",
+      customDonationEnabled: true,
+      customDonationTitle: "Support Temple Infrastructure"
+    });
   }
 
   // User methods
