@@ -8,18 +8,13 @@ import iskconDeitiesImg from "@assets/Website FFC_20250531_190536_0000_174932785
 const HeroSlider = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   
-  const { data: banners = [], isLoading, error } = useQuery<Banner[]>({
+  const { data: banners = [], isLoading } = useQuery<Banner[]>({
     queryKey: ['/api/banners'],
   });
   
-  // Debug logging
-  console.log('Banners data:', banners);
-  console.log('Banners loading:', isLoading);
-  console.log('Banners error:', error);
-  
   // Auto-advance slides
   useEffect(() => {
-    if (banners.length === 0) return;
+    if (banners.length <= 1) return; // Only auto-advance if there are multiple banners
     
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % banners.length);
@@ -27,6 +22,11 @@ const HeroSlider = () => {
     
     return () => clearInterval(interval);
   }, [banners.length]);
+  
+  // Reset current slide when banners change
+  useEffect(() => {
+    setCurrentSlide(0);
+  }, [banners]);
   
   if (isLoading) {
     return (
@@ -74,9 +74,9 @@ const HeroSlider = () => {
         <div 
           key={banner.id}
           className={`slide h-full w-full absolute inset-0 transition-opacity duration-1000 ${
-            index === currentSlide ? 'opacity-100' : 'opacity-0'
+            banners.length === 1 || index === currentSlide ? 'opacity-100' : 'opacity-0'
           }`}
-          style={{ zIndex: index === currentSlide ? 15 : 5 }}
+          style={{ zIndex: banners.length === 1 || index === currentSlide ? 15 : 5 }}
         >
           <img 
             src={banner.imageUrl} 
