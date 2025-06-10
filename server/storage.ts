@@ -627,7 +627,7 @@ export class MemStorage implements IStorage {
       customDonationTitle: event.customDonationTitle ?? "Any Donation of Your Choice",
       isActive: event.isActive ?? true,
       description: event.description ?? null,
-      suggestedAmounts: Array.isArray(event.suggestedAmounts) ? event.suggestedAmounts : null,
+      suggestedAmounts: event.suggestedAmounts ?? null,
       readMoreUrl: event.readMoreUrl ?? null
     };
     this.eventsData.set(id, newEvent);
@@ -796,8 +796,7 @@ export class MemStorage implements IStorage {
       categoryId: donation.categoryId ?? null,
       paymentId: donation.paymentId ?? null,
       invoiceNumber: donation.invoiceNumber ?? null,
-      panCard: donation.panCard ?? null,
-      notificationSent: donation.notificationSent ?? null
+      panCard: donation.panCard ?? null
     };
     this.donationsData.set(id, newDonation);
     return newDonation;

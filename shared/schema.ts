@@ -57,7 +57,7 @@ export const donationCategories = pgTable("donation_categories", {
   heading: text("heading"),
   isActive: boolean("is_active").default(true).notNull(),
   order: integer("order").notNull(),
-  suggestedAmounts: json("suggested_amounts").$type<number[]>(),
+  suggestedAmounts: json("suggested_amounts").$type<number[] | null>(),
 });
 
 export const insertDonationCategorySchema = createInsertSchema(donationCategories).omit({
@@ -105,7 +105,7 @@ export const events = pgTable("events", {
   imageUrl: text("image_url").notNull(),
   readMoreUrl: text("read_more_url"),
   isActive: boolean("is_active").default(true).notNull(),
-  suggestedAmounts: json("suggested_amounts").$type<number[]>(),
+  suggestedAmounts: json("suggested_amounts").$type<number[] | null>(),
   customDonationEnabled: boolean("custom_donation_enabled").default(true).notNull(),
   customDonationTitle: text("custom_donation_title").default("Any Donation of Your Choice").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
