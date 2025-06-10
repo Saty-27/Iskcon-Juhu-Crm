@@ -4,12 +4,12 @@
  */
 
 export const PAYMENT_CONFIG = {
-  // PayU Production Configuration
+  // PayU Test Configuration (Switch to LIVE when you have production credentials)
   PAYU: {
-    MODE: 'LIVE',
-    BASE_URL: 'https://secure.payu.in',
-    PAYMENT_URL: 'https://secure.payu.in/_payment',
-    VERIFY_URL: 'https://secure.payu.in/merchant/postservice.php?form=2',
+    MODE: 'TEST',
+    BASE_URL: 'https://test.payu.in',
+    PAYMENT_URL: 'https://test.payu.in/_payment',
+    VERIFY_URL: 'https://test.payu.in/merchant/postservice.php?form=2',
     MERCHANT_KEY: process.env.PAYU_MERCHANT_KEY,
     MERCHANT_SALT: process.env.PAYU_MERCHANT_SALT,
   },
