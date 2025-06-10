@@ -468,7 +468,13 @@ export class MemStorage implements IStorage {
 
   async createUser(user: InsertUser): Promise<User> {
     const id = this.userIdCounter++;
-    const newUser: User = { ...user, id, isActive: true };
+    const newUser: User = { 
+      ...user, 
+      id, 
+      isActive: true,
+      phone: user.phone ?? null,
+      role: user.role ?? "user"
+    };
     this.usersData.set(id, newUser);
     return newUser;
   }
@@ -502,7 +508,14 @@ export class MemStorage implements IStorage {
 
   async createBanner(banner: InsertBanner): Promise<Banner> {
     const id = this.bannerIdCounter++;
-    const newBanner: Banner = { ...banner, id };
+    const newBanner: Banner = { 
+      ...banner, 
+      id,
+      isActive: banner.isActive ?? true,
+      description: banner.description ?? null,
+      buttonText: banner.buttonText ?? null,
+      buttonLink: banner.buttonLink ?? null
+    };
     this.bannersData.set(id, newBanner);
     return newBanner;
   }
@@ -532,7 +545,12 @@ export class MemStorage implements IStorage {
 
   async createQuote(quote: InsertQuote): Promise<Quote> {
     const id = this.quoteIdCounter++;
-    const newQuote: Quote = { ...quote, id };
+    const newQuote: Quote = { 
+      ...quote, 
+      id,
+      isActive: quote.isActive ?? true,
+      source: quote.source ?? null
+    };
     this.quotesData.set(id, newQuote);
     return newQuote;
   }
@@ -562,7 +580,14 @@ export class MemStorage implements IStorage {
 
   async createDonationCategory(category: InsertDonationCategory): Promise<DonationCategory> {
     const id = this.donationCategoryIdCounter++;
-    const newCategory: DonationCategory = { ...category, id };
+    const newCategory: DonationCategory = { 
+      ...category, 
+      id,
+      isActive: category.isActive ?? true,
+      description: category.description ?? null,
+      heading: category.heading ?? null,
+      suggestedAmounts: category.suggestedAmounts ?? null
+    };
     this.donationCategoriesData.set(id, newCategory);
     return newCategory;
   }
@@ -1007,117 +1032,6 @@ export class MemStorage implements IStorage {
 
   async deleteContactMessage(id: number): Promise<boolean> {
     return this.contactMessagesData.delete(id);
-  }
-
-  // Social link methods
-  async getSocialLinks(): Promise<SocialLink[]> {
-    return Array.from(this.socialLinksData.values())
-      .filter(link => link.isActive);
-  }
-
-  async getSocialLink(id: number): Promise<SocialLink | undefined> {
-    return this.socialLinksData.get(id);
-  }
-
-  async createSocialLink(link: InsertSocialLink): Promise<SocialLink> {
-    const id = this.socialLinkIdCounter++;
-    const newLink: SocialLink = { ...link, id };
-    this.socialLinksData.set(id, newLink);
-    return newLink;
-  }
-
-  async updateSocialLink(id: number, linkData: Partial<SocialLink>): Promise<SocialLink | undefined> {
-    const link = this.socialLinksData.get(id);
-    if (!link) return undefined;
-    
-    const updatedLink = { ...link, ...linkData };
-    this.socialLinksData.set(id, updatedLink);
-    return updatedLink;
-  }
-
-  async deleteSocialLink(id: number): Promise<boolean> {
-    return this.socialLinksData.delete(id);
-  }
-
-  // Donation methods
-  async getDonations(): Promise<Donation[]> {
-    return Array.from(this.donationsData.values())
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  }
-
-  async getDonation(id: number): Promise<Donation | undefined> {
-    return this.donationsData.get(id);
-  }
-
-  async getUserDonations(userId: number): Promise<Donation[]> {
-    return Array.from(this.donationsData.values())
-      .filter(donation => donation.userId === userId)
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  }
-
-  async createDonation(donation: InsertDonation): Promise<Donation> {
-    const id = this.donationIdCounter++;
-    const newDonation: Donation = { 
-      ...donation, 
-      id, 
-      createdAt: new Date() 
-    };
-    this.donationsData.set(id, newDonation);
-    return newDonation;
-  }
-
-  async updateDonation(id: number, donationData: Partial<Donation>): Promise<Donation | undefined> {
-    const donation = this.donationsData.get(id);
-    if (!donation) return undefined;
-    
-    const updatedDonation = { ...donation, ...donationData };
-    this.donationsData.set(id, updatedDonation);
-    return updatedDonation;
-  }
-
-  async deleteDonation(id: number): Promise<boolean> {
-    return this.donationsData.delete(id);
-  }
-
-  // Subscription methods
-  async getSubscriptions(): Promise<Subscription[]> {
-    return Array.from(this.subscriptionsData.values())
-      .filter(sub => sub.isActive);
-  }
-
-  async getSubscription(id: number): Promise<Subscription | undefined> {
-    return this.subscriptionsData.get(id);
-  }
-
-  async getSubscriptionByEmail(email: string): Promise<Subscription | undefined> {
-    return Array.from(this.subscriptionsData.values()).find(
-      (sub) => sub.email.toLowerCase() === email.toLowerCase()
-    );
-  }
-
-  async createSubscription(subscription: InsertSubscription): Promise<Subscription> {
-    const id = this.subscriptionIdCounter++;
-    const newSubscription: Subscription = { 
-      ...subscription, 
-      id, 
-      isActive: true, 
-      createdAt: new Date() 
-    };
-    this.subscriptionsData.set(id, newSubscription);
-    return newSubscription;
-  }
-
-  async updateSubscription(id: number, subscriptionData: Partial<Subscription>): Promise<Subscription | undefined> {
-    const subscription = this.subscriptionsData.get(id);
-    if (!subscription) return undefined;
-    
-    const updatedSubscription = { ...subscription, ...subscriptionData };
-    this.subscriptionsData.set(id, updatedSubscription);
-    return updatedSubscription;
-  }
-
-  async deleteSubscription(id: number): Promise<boolean> {
-    return this.subscriptionsData.delete(id);
   }
 }
 
