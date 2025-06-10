@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AdminLayout from "@/components/admin/Layout";
 import { Banner, insertBannerSchema } from "@shared/schema";
@@ -13,11 +13,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { apiRequest } from "@/lib/queryClient";
-import { Plus, Pencil, Trash2, Image } from "lucide-react";
+import { Plus, Pencil, Trash2, Image, Upload, Link as LinkIcon } from "lucide-react";
 
 const BannersPage = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
+  const [uploadMethod, setUploadMethod] = useState<'url' | 'file'>('url');
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -118,6 +121,31 @@ const BannersPage = () => {
     }
   };
 
+  const handleFileUpload = async (file: File, form: any) => {
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      
+      const response = await fetch('/api/upload/banner', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+      
+      const result = await response.json();
+      form.setValue('imageUrl', result.imageUrl);
+      toast({ title: "Success", description: "Image uploaded successfully" });
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to upload image", variant: "destructive" });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="container mx-auto p-6">
@@ -163,19 +191,87 @@ const BannersPage = () => {
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={createForm.control}
-                    name="imageUrl"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Image URL</FormLabel>
-                        <FormControl>
-                          <Input placeholder="https://example.com/image.jpg" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+                  <div className="space-y-4">
+                    <FormLabel>Banner Image</FormLabel>
+                    <div className="flex space-x-2 mb-3">
+                      <Button
+                        type="button"
+                        variant={uploadMethod === 'url' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setUploadMethod('url')}
+                        className="flex items-center space-x-2"
+                      >
+                        <LinkIcon className="w-4 h-4" />
+                        <span>URL</span>
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={uploadMethod === 'file' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setUploadMethod('file')}
+                        className="flex items-center space-x-2"
+                      >
+                        <Upload className="w-4 h-4" />
+                        <span>Upload</span>
+                      </Button>
+                    </div>
+
+                    {uploadMethod === 'url' ? (
+                      <FormField
+                        control={createForm.control}
+                        name="imageUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input placeholder="https://example.com/image.jpg" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    ) : (
+                      <div className="space-y-2">
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              handleFileUpload(file, createForm);
+                            }
+                          }}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={isUploading}
+                          className="w-full"
+                        >
+                          {isUploading ? 'Uploading...' : 'Choose Image File'}
+                        </Button>
+                        <FormField
+                          control={createForm.control}
+                          name="imageUrl"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <Input
+                                  placeholder="Image URL will appear here after upload"
+                                  {...field}
+                                  readOnly
+                                  className="bg-gray-50"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
                     )}
-                  />
+                  </div>
                   <FormField
                     control={createForm.control}
                     name="buttonText"
