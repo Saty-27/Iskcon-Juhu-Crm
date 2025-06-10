@@ -1421,6 +1421,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update donation status (for testing and admin purposes)
+  app.put("/api/donations/:id/status", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+      
+      const donation = await storage.updateDonation(parseInt(id), { status });
+      if (!donation) {
+        return res.status(404).json({ message: "Donation not found" });
+      }
+      
+      res.json({ message: "Donation status updated", donation });
+    } catch (error) {
+      console.error('Error updating donation status:', error);
+      res.status(500).json({ message: "Failed to update donation status" });
+    }
+  });
+
   // PayU Failure Response Handler (POST for PayU callback)
   app.post("/payment/failure", async (req, res) => {
     try {
