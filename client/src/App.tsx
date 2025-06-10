@@ -24,6 +24,7 @@ import AdminRoute from "@/components/auth/AdminRoute";
 import AdminDashboard from "@/pages/admin/Dashboard";
 import AdminBanners from "@/pages/admin/Banners";
 import AdminEvents from "@/pages/admin/Events";
+import AdminEventManagement from "@/pages/admin/EventManagement";
 import AdminGallery from "@/pages/admin/Gallery";
 import AdminVideos from "@/pages/admin/Videos";
 import AdminDonations from "@/pages/admin/Donations";
@@ -75,6 +76,13 @@ function Router() {
         {() => (
           <AdminRoute>
             <AdminEvents />
+          </AdminRoute>
+        )}
+      </Route>
+      <Route path="/admin/events/:id">
+        {() => (
+          <AdminRoute>
+            <AdminEventManagement />
           </AdminRoute>
         )}
       </Route>

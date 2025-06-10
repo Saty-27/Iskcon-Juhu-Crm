@@ -103,12 +103,60 @@ export const events = pgTable("events", {
   description: text("description"),
   date: timestamp("date").notNull(),
   imageUrl: text("image_url").notNull(),
+  readMoreUrl: text("read_more_url"),
   isActive: boolean("is_active").default(true).notNull(),
   suggestedAmounts: json("suggested_amounts").$type<number[]>(),
+  customDonationEnabled: boolean("custom_donation_enabled").default(true).notNull(),
+  customDonationTitle: text("custom_donation_title").default("Any Donation of Your Choice").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const insertEventSchema = createInsertSchema(events).omit({
   id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Event donation cards table - for predefined donation amounts per event
+export const eventDonationCards = pgTable("event_donation_cards", {
+  id: serial("id").primaryKey(),
+  eventId: integer("event_id").references(() => events.id, { onDelete: 'cascade' }).notNull(),
+  title: text("title").notNull(),
+  amount: integer("amount").notNull(),
+  description: text("description"),
+  imageUrl: text("image_url"),
+  isActive: boolean("is_active").default(true).notNull(),
+  sortOrder: integer("sort_order").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertEventDonationCardSchema = createInsertSchema(eventDonationCards).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Event bank details table - specific bank details per event
+export const eventBankDetails = pgTable("event_bank_details", {
+  id: serial("id").primaryKey(),
+  eventId: integer("event_id").references(() => events.id, { onDelete: 'cascade' }).notNull(),
+  accountName: text("account_name").notNull(),
+  bankName: text("bank_name").notNull(),
+  accountNumber: text("account_number").notNull(),
+  ifscCode: text("ifsc_code").notNull(),
+  swiftCode: text("swift_code"),
+  qrCodeUrl: text("qr_code_url"),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertEventBankDetailsSchema = createInsertSchema(eventBankDetails).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 // Gallery table
@@ -222,6 +270,41 @@ export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({
 
 // Export types
 export type User = typeof users.$inferSelect;
+export type InsertUser = z.infer<typeof insertUserSchema>;
+export type Banner = typeof banners.$inferSelect;
+export type InsertBanner = z.infer<typeof insertBannerSchema>;
+export type Quote = typeof quotes.$inferSelect;
+export type InsertQuote = z.infer<typeof insertQuoteSchema>;
+export type DonationCategory = typeof donationCategories.$inferSelect;
+export type InsertDonationCategory = z.infer<typeof insertDonationCategorySchema>;
+export type DonationCard = typeof donationCards.$inferSelect;
+export type InsertDonationCard = z.infer<typeof insertDonationCardSchema>;
+export type BankDetails = typeof bankDetails.$inferSelect;
+export type InsertBankDetails = z.infer<typeof insertBankDetailsSchema>;
+export type Event = typeof events.$inferSelect;
+export type InsertEvent = z.infer<typeof insertEventSchema>;
+export type EventDonationCard = typeof eventDonationCards.$inferSelect;
+export type InsertEventDonationCard = z.infer<typeof insertEventDonationCardSchema>;
+export type EventBankDetails = typeof eventBankDetails.$inferSelect;
+export type InsertEventBankDetails = z.infer<typeof insertEventBankDetailsSchema>;
+export type Gallery = typeof gallery.$inferSelect;
+export type InsertGallery = z.infer<typeof insertGallerySchema>;
+export type Video = typeof videos.$inferSelect;
+export type InsertVideo = z.infer<typeof insertVideoSchema>;
+export type Testimonial = typeof testimonials.$inferSelect;
+export type InsertTestimonial = z.infer<typeof insertTestimonialSchema>;
+export type ContactMessage = typeof contactMessages.$inferSelect;
+export type InsertContactMessage = z.infer<typeof insertContactMessageSchema>;
+export type SocialLink = typeof socialLinks.$inferSelect;
+export type InsertSocialLink = z.infer<typeof insertSocialLinkSchema>;
+export type Donation = typeof donations.$inferSelect;
+export type InsertDonation = z.infer<typeof insertDonationSchema>;
+export type Subscription = typeof subscriptions.$inferSelect;
+export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
+export type Stat = typeof stats.$inferSelect;
+export type InsertStat = z.infer<typeof insertStatSchema>;
+export type Schedule = typeof schedules.$inferSelect;
+export type InsertSchedule = z.infer<typeof insertScheduleSchema>;
 
 // Stats table for the counter section
 export const stats = pgTable("stats", {
