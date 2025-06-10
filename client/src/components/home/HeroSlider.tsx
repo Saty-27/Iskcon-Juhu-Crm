@@ -8,9 +8,14 @@ import iskconDeitiesImg from "@assets/Website FFC_20250531_190536_0000_174932785
 const HeroSlider = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   
-  const { data: banners = [], isLoading } = useQuery<Banner[]>({
+  const { data: banners = [], isLoading, error } = useQuery<Banner[]>({
     queryKey: ['/api/banners'],
   });
+  
+  // Debug logging
+  console.log('Banners data:', banners);
+  console.log('Banners loading:', isLoading);
+  console.log('Banners error:', error);
   
   // Auto-advance slides
   useEffect(() => {

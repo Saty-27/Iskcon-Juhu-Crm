@@ -5,6 +5,7 @@ import { Banner, insertBannerSchema } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
@@ -96,10 +97,10 @@ const BannersPage = () => {
     setEditingBanner(banner);
     editForm.reset({
       title: banner.title,
-      description: banner.description || "",
+      description: banner.description ?? "",
       imageUrl: banner.imageUrl,
-      buttonText: banner.buttonText || "",
-      buttonLink: banner.buttonLink || "",
+      buttonText: banner.buttonText ?? "",
+      buttonLink: banner.buttonLink ?? "",
       isActive: banner.isActive,
       order: banner.order,
     });
@@ -211,6 +212,26 @@ const BannersPage = () => {
                           <Input type="number" placeholder="0" {...field} onChange={(e) => field.onChange(parseInt(e.target.value) || 0)} />
                         </FormControl>
                         <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={createForm.control}
+                    name="isActive"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-base">Active Status</FormLabel>
+                          <div className="text-sm text-muted-foreground">
+                            Enable this banner to display on the website
+                          </div>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
                       </FormItem>
                     )}
                   />
@@ -375,6 +396,26 @@ const BannersPage = () => {
                         <Input type="number" placeholder="0" {...field} onChange={(e) => field.onChange(parseInt(e.target.value) || 0)} />
                       </FormControl>
                       <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
+                  name="isActive"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">Active Status</FormLabel>
+                        <div className="text-sm text-muted-foreground">
+                          Enable this banner to display on the website
+                        </div>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
                     </FormItem>
                   )}
                 />
