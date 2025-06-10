@@ -83,17 +83,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/banners/:id", isAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
+      console.log('Updating banner:', id, 'with data:', req.body);
       const data = insertBannerSchema.partial().parse(req.body);
+      console.log('Parsed data:', data);
       const banner = await storage.updateBanner(id, data);
       if (!banner) {
         return res.status(404).json({ message: "Banner not found" });
       }
       res.json(banner);
     } catch (error) {
+      console.error('Banner update error:', error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid data", errors: error.errors });
       }
-      res.status(500).json({ message: "Error updating banner" });
+      res.status(500).json({ message: "Error updating banner", error: error.message });
     }
   });
 
