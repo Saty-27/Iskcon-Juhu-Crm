@@ -53,7 +53,7 @@ app.use((req, res, next) => {
     paymentValidation.errors.forEach(error => console.error(`- ${error}`));
     console.log('Note: Some payment features may not work without proper configuration');
   } else {
-    console.log('✓ Payment system configured for TEST MODE');
+    console.log('✓ Payment system configured for LIVE PRODUCTION MODE');
   }
   
   // Database connection is handled by PostgreSQL automatically
