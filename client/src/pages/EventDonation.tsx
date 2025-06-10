@@ -3,11 +3,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Helmet } from 'react-helmet';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import type { Event, EventDonationCard, BankDetails } from "@shared/schema";
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import PaymentModal from '@/components/payment/PaymentModal';
 
 
 
@@ -15,6 +17,14 @@ export default function EventDonation() {
   const { eventId } = useParams();
   const [selectedPrice, setSelectedPrice] = useState<string>("");
   const [isDescriptionModalOpen, setIsDescriptionModalOpen] = useState(false);
+  const [paymentModal, setPaymentModal] = useState<{
+    isOpen: boolean;
+    eventDonationCard?: EventDonationCard;
+    customAmount?: number;
+  }>({
+    isOpen: false
+  });
+  const [customAmount, setCustomAmount] = useState<string>('');
 
   // Helper function to count words
   const getWordCount = (text: string): number => {
@@ -50,6 +60,30 @@ export default function EventDonation() {
     const value = event.target.value;
     setSelectedPrice(value === '' ? '' : value);
   };
+
+  // Handle event donation card click - open payment modal
+  const handleEventDonateClick = (card: EventDonationCard) => {
+    setPaymentModal({
+      isOpen: true,
+      eventDonationCard: card
+    });
+  };
+
+  // Handle custom amount donation for events
+  const handleCustomEventDonation = () => {
+    const amount = parseInt(customAmount);
+    if (amount && amount > 0) {
+      setPaymentModal({
+        isOpen: true,
+        customAmount: amount
+      });
+    }
+  };
+
+  const closePaymentModal = () => {
+    setPaymentModal({ isOpen: false });
+  };
+
   const currentBankDetail = bankDetails[0]; // Use first bank detail
 
   if (!event) {

@@ -12,6 +12,17 @@ import { Label } from '@/components/ui/label';
 import PaymentModal from '@/components/payment/PaymentModal';
 
 const Donate = () => {
+  const [paymentModal, setPaymentModal] = useState<{
+    isOpen: boolean;
+    donationCard?: DonationCard;
+    customAmount?: number;
+    donationCategory?: DonationCategory;
+  }>({
+    isOpen: false
+  });
+  
+  const [customAmount, setCustomAmount] = useState<string>('');
+
   const { data: categories = [], isLoading: categoriesLoading } = useQuery<DonationCategory[]>({
     queryKey: ['/api/donation-categories'],
   });
@@ -26,10 +37,29 @@ const Donate = () => {
 
   const isLoading = categoriesLoading || cardsLoading;
 
-  // Handle payment redirect
-  const handleDonateClick = (cardId: number, amount: number) => {
-    // Redirect to payment gateway with card and amount info
-    window.location.href = `/donate/payment?cardId=${cardId}&amount=${amount}`;
+  // Handle donation card click - open payment modal
+  const handleDonateClick = (card: DonationCard) => {
+    const category = categories.find(cat => cat.id === card.categoryId);
+    setPaymentModal({
+      isOpen: true,
+      donationCard: card,
+      donationCategory: category
+    });
+  };
+
+  // Handle custom amount donation
+  const handleCustomDonation = () => {
+    const amount = parseInt(customAmount);
+    if (amount && amount > 0) {
+      setPaymentModal({
+        isOpen: true,
+        customAmount: amount
+      });
+    }
+  };
+
+  const closePaymentModal = () => {
+    setPaymentModal({ isOpen: false });
   };
   
   return (
@@ -119,7 +149,7 @@ const Donate = () => {
                           
                           {/* Donate Button */}
                           <Button 
-                            onClick={() => handleDonateClick(card.id, card.amount)}
+                            onClick={() => handleDonateClick(card)}
                             className="w-full bg-primary text-white font-poppins font-medium py-3 rounded-lg hover:bg-opacity-90 transition-colors"
                           >
                             Donate Now
@@ -130,6 +160,45 @@ const Donate = () => {
                   })}
               </div>
             )}
+          </div>
+        </section>
+
+        {/* Custom Amount Donation Section */}
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="max-w-md mx-auto bg-orange-50 p-8 rounded-xl border-2 border-primary">
+              <h2 className="font-poppins font-bold text-2xl md:text-3xl text-primary mb-6 text-center">
+                Custom Donation Amount
+              </h2>
+              <p className="font-opensans text-dark mb-6 text-center">
+                Enter any amount you wish to donate for our temple services and community programs.
+              </p>
+              
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="customAmount" className="text-primary font-semibold">
+                    Enter Amount (₹)
+                  </Label>
+                  <Input
+                    id="customAmount"
+                    type="number"
+                    value={customAmount}
+                    onChange={(e) => setCustomAmount(e.target.value)}
+                    placeholder="Enter donation amount"
+                    min="1"
+                    className="mt-2 text-lg"
+                  />
+                </div>
+                
+                <Button 
+                  onClick={handleCustomDonation}
+                  disabled={!customAmount || parseInt(customAmount) <= 0}
+                  className="w-full bg-primary hover:bg-primary/90 text-white font-poppins font-medium py-3 text-lg"
+                >
+                  Donate Now
+                </Button>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -221,6 +290,15 @@ const Donate = () => {
       </main>
       
       <Footer />
+      
+      {/* Payment Modal */}
+      <PaymentModal
+        isOpen={paymentModal.isOpen}
+        onClose={closePaymentModal}
+        donationCard={paymentModal.donationCard}
+        customAmount={paymentModal.customAmount}
+        donationCategory={paymentModal.donationCategory}
+      />
     </>
   );
 };
