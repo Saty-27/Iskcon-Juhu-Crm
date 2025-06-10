@@ -414,58 +414,76 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
                     </Button>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {donationCards.map((card, index) => (
-                      <Card key={index} className="border-dashed">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                          <h4 className="text-sm font-medium">Card {index + 1}</h4>
-                          <Button 
-                            type="button" 
-                            variant="destructive" 
-                            size="sm"
-                            onClick={() => removeDonationCard(index)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                          <div className="grid grid-cols-2 gap-3">
-                            <div>
-                              <Label>Title</Label>
-                              <Input
-                                placeholder="e.g., Temple Equipment"
-                                value={card.title}
-                                onChange={(e) => updateDonationCard(index, 'title', e.target.value)}
+                    <div className="grid gap-4 lg:grid-cols-2">
+                      {donationCards.map((card, index) => (
+                        <Card key={index} className="border-l-4 border-l-orange-500 bg-orange-50/30">
+                          <CardHeader className="pb-3">
+                            <div className="flex items-center justify-between">
+                              <div className="space-y-1">
+                                <h4 className="text-sm font-semibold text-orange-700">
+                                  Donation Card {index + 1}
+                                </h4>
+                                {card.title && card.amount && (
+                                  <p className="text-xs text-muted-foreground">
+                                    {card.title} - ₹{card.amount}
+                                  </p>
+                                )}
+                              </div>
+                              <Button 
+                                type="button" 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => removeDonationCard(index)}
+                                className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="space-y-3 pt-0">
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="space-y-1">
+                                <Label className="text-xs font-medium">Title</Label>
+                                <Input
+                                  placeholder="e.g., Temple Equipment"
+                                  value={card.title}
+                                  onChange={(e) => updateDonationCard(index, 'title', e.target.value)}
+                                  className="h-8"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs font-medium">Amount (₹)</Label>
+                                <Input
+                                  type="number"
+                                  placeholder="5001"
+                                  value={card.amount || ''}
+                                  onChange={(e) => updateDonationCard(index, 'amount', parseFloat(e.target.value) || 0)}
+                                  className="h-8"
+                                />
+                              </div>
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs font-medium">Description</Label>
+                              <Textarea
+                                placeholder="Brief description of what this donation supports"
+                                value={card.description}
+                                onChange={(e) => updateDonationCard(index, 'description', e.target.value)}
+                                className="min-h-[60px] text-sm resize-none"
                               />
                             </div>
-                            <div>
-                              <Label>Amount (₹)</Label>
+                            <div className="space-y-1">
+                              <Label className="text-xs font-medium">Image URL (Optional)</Label>
                               <Input
-                                type="number"
-                                placeholder="5001"
-                                value={card.amount || ''}
-                                onChange={(e) => updateDonationCard(index, 'amount', parseFloat(e.target.value) || 0)}
+                                placeholder="https://example.com/card-image.jpg"
+                                value={card.imageUrl}
+                                onChange={(e) => updateDonationCard(index, 'imageUrl', e.target.value)}
+                                className="h-8 text-sm"
                               />
                             </div>
-                          </div>
-                          <div>
-                            <Label>Description</Label>
-                            <Textarea
-                              placeholder="Brief description of what this donation supports"
-                              value={card.description}
-                              onChange={(e) => updateDonationCard(index, 'description', e.target.value)}
-                            />
-                          </div>
-                          <div>
-                            <Label>Image URL</Label>
-                            <Input
-                              placeholder="https://example.com/card-image.jpg"
-                              value={card.imageUrl}
-                              onChange={(e) => updateDonationCard(index, 'imageUrl', e.target.value)}
-                            />
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
                     {donationCards.length === 0 && (
                       <div className="text-center py-8 text-muted-foreground">
                         No donation cards added yet. Click "Add Card" to create predefined donation options.
