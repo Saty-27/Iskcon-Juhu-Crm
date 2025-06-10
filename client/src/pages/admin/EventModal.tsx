@@ -91,7 +91,7 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
     enabled: isOpen,
   });
 
-  // Initialize form when event changes
+  // Initialize form when event ID changes
   useEffect(() => {
     if (event) {
       form.reset({
@@ -110,8 +110,25 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
       if (event.suggestedAmounts) {
         setSuggestedAmountsInput(event.suggestedAmounts.join(", "));
       }
-      
-      // Load existing donation cards for this event
+    } else {
+      form.reset({
+        title: "",
+        description: "",
+        date: "",
+        imageUrl: "",
+        readMoreUrl: "",
+        isActive: true,
+        customDonationEnabled: true,
+        customDonationTitle: "Any Donation of Your Choice",
+        suggestedAmounts: [],
+      });
+      setSuggestedAmountsInput("");
+    }
+  }, [event?.id]);
+
+  // Load donation cards when event or cards change
+  useEffect(() => {
+    if (event && existingDonationCards) {
       const eventCards = existingDonationCards.filter(card => card.eventId === event.id);
       setDonationCards(eventCards.map(card => ({
         title: card.title,
@@ -121,13 +138,13 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
         order: card.order,
       })));
     } else {
-      form.reset();
       setDonationCards([]);
-      setSuggestedAmountsInput("");
     }
-    
-    // Load bank details
-    if (existingBankDetails.length > 0) {
+  }, [event?.id, existingDonationCards?.length]);
+
+  // Load bank details when available
+  useEffect(() => {
+    if (existingBankDetails && existingBankDetails.length > 0) {
       const activeBankDetails = existingBankDetails.find(bd => bd.isActive) || existingBankDetails[0];
       setBankDetails({
         accountName: activeBankDetails.accountName,
@@ -139,7 +156,7 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
         isActive: activeBankDetails.isActive,
       });
     }
-  }, [event, existingDonationCards, existingBankDetails]);
+  }, [existingBankDetails?.length]);
 
   const saveEventMutation = useMutation({
     mutationFn: async (data: EventFormData) => {
