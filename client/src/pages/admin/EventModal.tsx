@@ -139,7 +139,7 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
         isActive: activeBankDetails.isActive,
       });
     }
-  }, [event, existingDonationCards, existingBankDetails, form]);
+  }, [event, existingDonationCards, existingBankDetails]);
 
   const saveEventMutation = useMutation({
     mutationFn: async (data: EventFormData) => {
