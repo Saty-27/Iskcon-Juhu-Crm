@@ -1201,7 +1201,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // PayU Payment Integration
-  app.post("/api/payment/create-payu-order", async (req, res) => {
+  app.post("/api/payment/create-payu-order", isAuthenticated, async (req, res) => {
     try {
       const {
         name,

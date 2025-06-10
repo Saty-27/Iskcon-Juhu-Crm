@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import { User, DonationCard, DonationCategory, Event } from '@shared/schema';
 import { apiRequest } from '@/lib/queryClient';
+import useAuth from '@/hooks/useAuth';
 import { Loader2, CreditCard, IndianRupee } from 'lucide-react';
 
 interface PaymentModalProps {
@@ -37,6 +38,7 @@ const PaymentModal = ({
   event
 }: PaymentModalProps) => {
   const { toast } = useToast();
+  const { user: authUser, isAuthenticated, isLoading: authLoading } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -45,12 +47,6 @@ const PaymentModal = ({
     address: '',
     amount: customAmount || donationCard?.amount || eventDonationCard?.amount || 0,
     message: ''
-  });
-
-  // Fetch user data if logged in
-  const { data: user } = useQuery<User>({
-    queryKey: ['/api/auth/me'],
-    enabled: isOpen
   });
 
   // Auto-populate form with user data when available
