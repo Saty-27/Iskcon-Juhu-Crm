@@ -27,7 +27,7 @@ const CurrentEvents = () => {
   });
 
   const handleEventClick = (event: Event) => {
-    setSelectedEvent(event);
+    setLocation(`/event/${event.id}`);
   };
 
   const handleDonateClick = (amount?: number) => {
@@ -150,7 +150,7 @@ const CurrentEvents = () => {
                   className="donate-event-button"
                   onClick={() => handleEventClick(event)}
                 >
-                  Donate for {event.title}
+                  Learn More & Donate
                 </button>
               </div>
             </div>

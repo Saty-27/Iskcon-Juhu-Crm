@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Events from "@/pages/Events";
+import EventDetail from "@/pages/EventDetail";
 import Donate from "@/pages/Donate";
 import CategoryDonation from "@/pages/CategoryDonation";
 
@@ -40,6 +41,7 @@ function Router() {
       {/* Main routes */}
       <Route path="/" component={Home} />
       <Route path="/events" component={Events} />
+      <Route path="/event/:id" component={EventDetail} />
 
       <Route path="/donate" component={Donate} />
       <Route path="/donate/thank-you" component={DonateThankYou} />
