@@ -13,9 +13,9 @@ const CurrentEvents = () => {
     queryKey: ['/api/events'],
   });
 
-  const handleDonateClick = () => {
-    // Redirect directly to the main donate page
-    setLocation('/donate');
+  const handleDonateClick = (eventId: number) => {
+    // Redirect to event-specific donation page
+    setLocation(`/donate/event/${eventId}`);
   };
 
   const toggleExpanded = (eventId: number) => {
@@ -115,7 +115,7 @@ const CurrentEvents = () => {
                 {/* Donate Button */}
                 <button 
                   className="donate-event-button"
-                  onClick={handleDonateClick}
+                  onClick={() => handleDonateClick(event.id)}
                 >
                   Donate for {event.title}
                 </button>
