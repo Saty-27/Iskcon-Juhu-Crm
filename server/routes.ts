@@ -1265,15 +1265,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         hash: ''
       };
 
-      // Generate hash for PayU - standard format without UDF fields first
-      const hashString = `${payuParams.key}|${payuParams.txnid}|${payuParams.amount}|${payuParams.productinfo}|${payuParams.firstname}|${payuParams.email}|||||||||||${process.env.PAYU_MERCHANT_SALT}`;
+      // For live environment, we need to ensure proper hash calculation
+      // PayU hash format: key|txnid|amount|productinfo|firstname|email|udf1|udf2|udf3|udf4|udf5||||||SALT
+      const hashString = `${payuParams.key}|${payuParams.txnid}|${payuParams.amount}|${payuParams.productinfo}|${payuParams.firstname}|${payuParams.email}|${payuParams.udf1}|${payuParams.udf2}|${payuParams.udf3}|${payuParams.udf4}|${payuParams.udf5}||||||${process.env.PAYU_MERCHANT_SALT}`;
       payuParams.hash = crypto.createHash('sha512').update(hashString).digest('hex');
       
-      console.log('PayU Hash Debug:', {
+      console.log('PayU Payment Request:', {
+        environment: 'LIVE',
         key: payuParams.key,
-        salt: process.env.PAYU_MERCHANT_SALT?.substring(0, 5) + '...',
-        hashString: hashString,
-        generatedHash: payuParams.hash
+        txnid: payuParams.txnid,
+        amount: payuParams.amount,
+        hashGenerated: true
       });
 
       // Store donation details in database with pending status
