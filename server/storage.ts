@@ -142,6 +142,8 @@ export class MemStorage implements IStorage {
   private bannersData: Map<number, Banner>;
   private quotesData: Map<number, Quote>;
   private donationCategoriesData: Map<number, DonationCategory>;
+  private donationCardsData: Map<number, DonationCard>;
+  private bankDetailsData: Map<number, BankDetails>;
   private eventsData: Map<number, Event>;
   private galleryData: Map<number, Gallery>;
   private videosData: Map<number, Video>;
@@ -150,11 +152,15 @@ export class MemStorage implements IStorage {
   private socialLinksData: Map<number, SocialLink>;
   private donationsData: Map<number, Donation>;
   private subscriptionsData: Map<number, Subscription>;
+  private statsData: Map<number, Stat>;
+  private schedulesData: Map<number, Schedule>;
   
   private userIdCounter: number;
   private bannerIdCounter: number;
   private quoteIdCounter: number;
   private donationCategoryIdCounter: number;
+  private donationCardIdCounter: number;
+  private bankDetailsIdCounter: number;
   private eventIdCounter: number;
   private galleryIdCounter: number;
   private videoIdCounter: number;
@@ -163,12 +169,16 @@ export class MemStorage implements IStorage {
   private socialLinkIdCounter: number;
   private donationIdCounter: number;
   private subscriptionIdCounter: number;
+  private statIdCounter: number;
+  private scheduleIdCounter: number;
 
   constructor() {
     this.usersData = new Map();
     this.bannersData = new Map();
     this.quotesData = new Map();
     this.donationCategoriesData = new Map();
+    this.donationCardsData = new Map();
+    this.bankDetailsData = new Map();
     this.eventsData = new Map();
     this.galleryData = new Map();
     this.videosData = new Map();
@@ -177,11 +187,15 @@ export class MemStorage implements IStorage {
     this.socialLinksData = new Map();
     this.donationsData = new Map();
     this.subscriptionsData = new Map();
+    this.statsData = new Map();
+    this.schedulesData = new Map();
     
     this.userIdCounter = 1;
     this.bannerIdCounter = 1;
     this.quoteIdCounter = 1;
     this.donationCategoryIdCounter = 1;
+    this.donationCardIdCounter = 1;
+    this.bankDetailsIdCounter = 1;
     this.eventIdCounter = 1;
     this.galleryIdCounter = 1;
     this.videoIdCounter = 1;
@@ -190,6 +204,8 @@ export class MemStorage implements IStorage {
     this.socialLinkIdCounter = 1;
     this.donationIdCounter = 1;
     this.subscriptionIdCounter = 1;
+    this.statIdCounter = 1;
+    this.scheduleIdCounter = 1;
     
     this.initializeData();
   }
@@ -576,7 +592,16 @@ export class MemStorage implements IStorage {
 
   async createEvent(event: InsertEvent): Promise<Event> {
     const id = this.eventIdCounter++;
-    const newEvent: Event = { ...event, id };
+    const now = new Date();
+    const newEvent: Event = { 
+      ...event, 
+      id, 
+      createdAt: now,
+      updatedAt: now,
+      customDonationEnabled: event.customDonationEnabled ?? true,
+      customDonationTitle: event.customDonationTitle ?? "Any Donation of Your Choice",
+      isActive: event.isActive ?? true
+    };
     this.eventsData.set(id, newEvent);
     return newEvent;
   }
@@ -592,6 +617,271 @@ export class MemStorage implements IStorage {
 
   async deleteEvent(id: number): Promise<boolean> {
     return this.eventsData.delete(id);
+  }
+
+  // Donation card methods
+  async getDonationCards(): Promise<DonationCard[]> {
+    return Array.from(this.donationCardsData.values())
+      .sort((a, b) => a.order - b.order);
+  }
+
+  async getDonationCard(id: number): Promise<DonationCard | undefined> {
+    return this.donationCardsData.get(id);
+  }
+
+  async getDonationCardsByCategory(categoryId: number): Promise<DonationCard[]> {
+    return Array.from(this.donationCardsData.values())
+      .filter(card => card.categoryId === categoryId)
+      .sort((a, b) => a.order - b.order);
+  }
+
+  async createDonationCard(card: InsertDonationCard): Promise<DonationCard> {
+    const id = this.donationCardIdCounter++;
+    const newCard: DonationCard = { 
+      ...card, 
+      id,
+      isActive: card.isActive ?? true,
+      order: card.order ?? 0
+    };
+    this.donationCardsData.set(id, newCard);
+    return newCard;
+  }
+
+  async updateDonationCard(id: number, cardData: Partial<DonationCard>): Promise<DonationCard | undefined> {
+    const card = this.donationCardsData.get(id);
+    if (!card) return undefined;
+    
+    const updatedCard = { ...card, ...cardData };
+    this.donationCardsData.set(id, updatedCard);
+    return updatedCard;
+  }
+
+  async deleteDonationCard(id: number): Promise<boolean> {
+    return this.donationCardsData.delete(id);
+  }
+
+  // Bank details methods
+  async getBankDetails(): Promise<BankDetails[]> {
+    return Array.from(this.bankDetailsData.values());
+  }
+
+  async getBankDetail(id: number): Promise<BankDetails | undefined> {
+    return this.bankDetailsData.get(id);
+  }
+
+  async createBankDetails(details: InsertBankDetails): Promise<BankDetails> {
+    const id = this.bankDetailsIdCounter++;
+    const newDetails: BankDetails = { 
+      ...details, 
+      id,
+      isActive: details.isActive ?? true
+    };
+    this.bankDetailsData.set(id, newDetails);
+    return newDetails;
+  }
+
+  async updateBankDetails(id: number, detailsData: Partial<BankDetails>): Promise<BankDetails | undefined> {
+    const details = this.bankDetailsData.get(id);
+    if (!details) return undefined;
+    
+    const updatedDetails = { ...details, ...detailsData };
+    this.bankDetailsData.set(id, updatedDetails);
+    return updatedDetails;
+  }
+
+  async deleteBankDetails(id: number): Promise<boolean> {
+    return this.bankDetailsData.delete(id);
+  }
+
+  // Social link methods
+  async getSocialLinks(): Promise<SocialLink[]> {
+    return Array.from(this.socialLinksData.values());
+  }
+
+  async getSocialLink(id: number): Promise<SocialLink | undefined> {
+    return this.socialLinksData.get(id);
+  }
+
+  async createSocialLink(link: InsertSocialLink): Promise<SocialLink> {
+    const id = this.socialLinkIdCounter++;
+    const newLink: SocialLink = { 
+      ...link, 
+      id,
+      isActive: link.isActive ?? true
+    };
+    this.socialLinksData.set(id, newLink);
+    return newLink;
+  }
+
+  async updateSocialLink(id: number, linkData: Partial<SocialLink>): Promise<SocialLink | undefined> {
+    const link = this.socialLinksData.get(id);
+    if (!link) return undefined;
+    
+    const updatedLink = { ...link, ...linkData };
+    this.socialLinksData.set(id, updatedLink);
+    return updatedLink;
+  }
+
+  async deleteSocialLink(id: number): Promise<boolean> {
+    return this.socialLinksData.delete(id);
+  }
+
+  // Donation methods
+  async getDonations(): Promise<Donation[]> {
+    return Array.from(this.donationsData.values())
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  async getDonation(id: number): Promise<Donation | undefined> {
+    return this.donationsData.get(id);
+  }
+
+  async getDonationByPaymentId(paymentId: string): Promise<Donation | undefined> {
+    return Array.from(this.donationsData.values()).find(
+      donation => donation.paymentId === paymentId
+    );
+  }
+
+  async getUserDonations(userId: number): Promise<Donation[]> {
+    return Array.from(this.donationsData.values())
+      .filter(donation => donation.userId === userId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  async createDonation(donation: InsertDonation): Promise<Donation> {
+    const id = this.donationIdCounter++;
+    const now = new Date();
+    const newDonation: Donation = { 
+      ...donation, 
+      id,
+      createdAt: now,
+      status: donation.status ?? "pending",
+      receiptSent: donation.receiptSent ?? false,
+      notificationSent: donation.notificationSent ?? false
+    };
+    this.donationsData.set(id, newDonation);
+    return newDonation;
+  }
+
+  async updateDonation(id: number, donationData: Partial<Donation>): Promise<Donation | undefined> {
+    const donation = this.donationsData.get(id);
+    if (!donation) return undefined;
+    
+    const updatedDonation = { ...donation, ...donationData };
+    this.donationsData.set(id, updatedDonation);
+    return updatedDonation;
+  }
+
+  async deleteDonation(id: number): Promise<boolean> {
+    return this.donationsData.delete(id);
+  }
+
+  // Subscription methods
+  async getSubscriptions(): Promise<Subscription[]> {
+    return Array.from(this.subscriptionsData.values())
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  async getSubscription(id: number): Promise<Subscription | undefined> {
+    return this.subscriptionsData.get(id);
+  }
+
+  async getSubscriptionByEmail(email: string): Promise<Subscription | undefined> {
+    return Array.from(this.subscriptionsData.values()).find(
+      subscription => subscription.email.toLowerCase() === email.toLowerCase()
+    );
+  }
+
+  async createSubscription(subscription: InsertSubscription): Promise<Subscription> {
+    const id = this.subscriptionIdCounter++;
+    const now = new Date();
+    const newSubscription: Subscription = { 
+      ...subscription, 
+      id,
+      createdAt: now,
+      isActive: subscription.isActive ?? true
+    };
+    this.subscriptionsData.set(id, newSubscription);
+    return newSubscription;
+  }
+
+  async updateSubscription(id: number, subscriptionData: Partial<Subscription>): Promise<Subscription | undefined> {
+    const subscription = this.subscriptionsData.get(id);
+    if (!subscription) return undefined;
+    
+    const updatedSubscription = { ...subscription, ...subscriptionData };
+    this.subscriptionsData.set(id, updatedSubscription);
+    return updatedSubscription;
+  }
+
+  async deleteSubscription(id: number): Promise<boolean> {
+    return this.subscriptionsData.delete(id);
+  }
+
+  // Stats methods
+  async getStats(): Promise<Stat[]> {
+    return Array.from(this.statsData.values())
+      .sort((a, b) => a.order - b.order);
+  }
+
+  async getStat(id: number): Promise<Stat | undefined> {
+    return this.statsData.get(id);
+  }
+
+  async createStat(stat: InsertStat): Promise<Stat> {
+    const id = this.statIdCounter++;
+    const newStat: Stat = { ...stat, id };
+    this.statsData.set(id, newStat);
+    return newStat;
+  }
+
+  async updateStat(id: number, statData: Partial<Stat>): Promise<Stat | undefined> {
+    const stat = this.statsData.get(id);
+    if (!stat) return undefined;
+    
+    const updatedStat = { ...stat, ...statData };
+    this.statsData.set(id, updatedStat);
+    return updatedStat;
+  }
+
+  async deleteStat(id: number): Promise<boolean> {
+    return this.statsData.delete(id);
+  }
+
+  // Schedule methods
+  async getSchedules(): Promise<Schedule[]> {
+    return Array.from(this.schedulesData.values())
+      .sort((a, b) => a.order - b.order);
+  }
+
+  async getSchedule(id: number): Promise<Schedule | undefined> {
+    return this.schedulesData.get(id);
+  }
+
+  async createSchedule(schedule: InsertSchedule): Promise<Schedule> {
+    const id = this.scheduleIdCounter++;
+    const now = new Date();
+    const newSchedule: Schedule = { 
+      ...schedule, 
+      id,
+      createdAt: now,
+      updatedAt: now
+    };
+    this.schedulesData.set(id, newSchedule);
+    return newSchedule;
+  }
+
+  async updateSchedule(id: number, scheduleData: Partial<Schedule>): Promise<Schedule | undefined> {
+    const schedule = this.schedulesData.get(id);
+    if (!schedule) return undefined;
+    
+    const updatedSchedule = { ...schedule, ...scheduleData, updatedAt: new Date() };
+    this.schedulesData.set(id, updatedSchedule);
+    return updatedSchedule;
+  }
+
+  async deleteSchedule(id: number): Promise<boolean> {
+    return this.schedulesData.delete(id);
   }
 
   // Gallery methods
