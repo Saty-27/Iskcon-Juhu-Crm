@@ -20,7 +20,8 @@ const BannersPage = () => {
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
   const [uploadMethod, setUploadMethod] = useState<'url' | 'file'>('url');
   const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const createFileInputRef = useRef<HTMLInputElement>(null);
+  const editFileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -76,8 +77,13 @@ const BannersPage = () => {
       editForm.reset();
       toast({ title: "Success", description: "Banner updated successfully" });
     },
-    onError: () => {
-      toast({ title: "Error", description: "Failed to update banner", variant: "destructive" });
+    onError: (error: any) => {
+      console.error('Update error:', error);
+      toast({ 
+        title: "Error", 
+        description: error?.message || "Failed to update banner", 
+        variant: "destructive" 
+      });
     },
   });
 
@@ -232,7 +238,7 @@ const BannersPage = () => {
                     ) : (
                       <div className="space-y-2">
                         <input
-                          ref={fileInputRef}
+                          ref={createFileInputRef}
                           type="file"
                           accept="image/*"
                           className="hidden"
@@ -246,7 +252,7 @@ const BannersPage = () => {
                         <Button
                           type="button"
                           variant="outline"
-                          onClick={() => fileInputRef.current?.click()}
+                          onClick={() => createFileInputRef.current?.click()}
                           disabled={isUploading}
                           className="w-full"
                         >
@@ -493,16 +499,12 @@ const BannersPage = () => {
                             handleFileUpload(file, editForm);
                           }
                         }}
-                        ref={(input) => {
-                          if (input && !fileInputRef.current) {
-                            fileInputRef.current = input;
-                          }
-                        }}
+                        ref={editFileInputRef}
                       />
                       <Button
                         type="button"
                         variant="outline"
-                        onClick={() => fileInputRef.current?.click()}
+                        onClick={() => editFileInputRef.current?.click()}
                         disabled={isUploading}
                         className="w-full"
                       >
