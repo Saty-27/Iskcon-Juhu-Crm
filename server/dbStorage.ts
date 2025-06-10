@@ -202,8 +202,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteEvent(id: number): Promise<boolean> {
-    const result = await db.delete(events).where(eq(events.id, id));
-    return result.rowCount > 0;
+    try {
+      // The database schema has ON DELETE CASCADE for related tables,
+      // so deleting the event should automatically delete related records
+      const result = await db.delete(events).where(eq(events.id, id));
+      return result.rowCount > 0;
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      return false;
+    }
   }
 
   // Event donation card operations
