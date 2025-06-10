@@ -25,13 +25,16 @@ const PaymentSuccess = () => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const transactionId = urlParams.get('txnid');
+    console.log('PaymentSuccess - Transaction ID:', transactionId);
     setTxnid(transactionId);
   }, [location]);
 
-  const { data: donationDetails, isLoading } = useQuery<DonationDetails>({
-    queryKey: ['/api/donation', txnid],
+  const { data: donationDetails, isLoading, error } = useQuery<DonationDetails>({
+    queryKey: [`/api/donation/${txnid}`],
     enabled: !!txnid,
   });
+
+  console.log('PaymentSuccess Debug:', { txnid, isLoading, error, donationDetails });
 
   const handlePrint = () => {
     window.print();
@@ -76,7 +79,7 @@ const PaymentSuccess = () => {
     );
   }
 
-  if (!donationDetails) {
+  if (error || (!isLoading && !donationDetails)) {
     return (
       <>
         <Header />
@@ -84,11 +87,34 @@ const PaymentSuccess = () => {
           <Card className="max-w-md">
             <CardContent className="text-center p-8">
               <p className="text-gray-600">Unable to load donation details. Please contact support.</p>
+              {error && (
+                <p className="text-red-600 text-sm mt-2">
+                  Error: {error instanceof Error ? error.message : 'Unknown error'}
+                </p>
+              )}
+              <div className="mt-4 text-xs text-gray-500">
+                Transaction ID: {txnid}
+              </div>
               <Link href="/">
                 <Button className="mt-4">Return Home</Button>
               </Link>
             </CardContent>
           </Card>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  if (!donationDetails) {
+    return (
+      <>
+        <Header />
+        <main className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p>Loading donation details...</p>
+          </div>
         </main>
         <Footer />
       </>
