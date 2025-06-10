@@ -301,10 +301,6 @@ export type Donation = typeof donations.$inferSelect;
 export type InsertDonation = z.infer<typeof insertDonationSchema>;
 export type Subscription = typeof subscriptions.$inferSelect;
 export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
-export type Stat = typeof stats.$inferSelect;
-export type InsertStat = z.infer<typeof insertStatSchema>;
-export type Schedule = typeof schedules.$inferSelect;
-export type InsertSchedule = z.infer<typeof insertScheduleSchema>;
 
 // Stats table for the counter section
 export const stats = pgTable("stats", {
@@ -356,43 +352,3 @@ export const insertScheduleSchema = createInsertSchema(schedules, {
   createdAt: true,
   updatedAt: true,
 });
-export type InsertUser = z.infer<typeof insertUserSchema>;
-
-export type Banner = typeof banners.$inferSelect;
-export type InsertBanner = z.infer<typeof insertBannerSchema>;
-
-export type Quote = typeof quotes.$inferSelect;
-export type InsertQuote = z.infer<typeof insertQuoteSchema>;
-
-export type DonationCategory = typeof donationCategories.$inferSelect;
-export type InsertDonationCategory = z.infer<typeof insertDonationCategorySchema>;
-
-export type Event = typeof events.$inferSelect;
-export type InsertEvent = z.infer<typeof insertEventSchema>;
-
-export type Gallery = typeof gallery.$inferSelect;
-export type InsertGallery = z.infer<typeof insertGallerySchema>;
-
-export type Video = typeof videos.$inferSelect;
-export type InsertVideo = z.infer<typeof insertVideoSchema>;
-
-export type Testimonial = typeof testimonials.$inferSelect;
-export type InsertTestimonial = z.infer<typeof insertTestimonialSchema>;
-
-export type ContactMessage = typeof contactMessages.$inferSelect;
-export type InsertContactMessage = z.infer<typeof insertContactMessageSchema>;
-
-export type SocialLink = typeof socialLinks.$inferSelect;
-export type InsertSocialLink = z.infer<typeof insertSocialLinkSchema>;
-
-export type Donation = typeof donations.$inferSelect;
-export type InsertDonation = z.infer<typeof insertDonationSchema>;
-
-export type Subscription = typeof subscriptions.$inferSelect;
-export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
-
-export type DonationCard = typeof donationCards.$inferSelect;
-export type InsertDonationCard = z.infer<typeof insertDonationCardSchema>;
-
-export type BankDetails = typeof bankDetails.$inferSelect;
-export type InsertBankDetails = z.infer<typeof insertBankDetailsSchema>;

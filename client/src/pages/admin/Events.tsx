@@ -10,7 +10,8 @@ import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2, Calendar, Eye } from 'lucide-react';
+import { Plus, Edit, Trash2, Calendar, Eye, Settings } from 'lucide-react';
+import { Link } from 'wouter';
 import { useToast } from '@/hooks/use-toast';
 import { Event, insertEventSchema, InsertEvent } from '@shared/schema';
 import { useForm } from 'react-hook-form';
@@ -300,6 +301,16 @@ const EventsPage = () => {
                     </div>
                     
                     <div className="flex items-center space-x-2">
+                      <Link href={`/admin/events/${event.id}`}>
+                        <Button
+                          size="sm"
+                          variant="default"
+                          className="bg-indigo-600 hover:bg-indigo-700"
+                        >
+                          <Settings size={14} />
+                          Manage Event
+                        </Button>
+                      </Link>
                       <Button
                         size="sm"
                         variant="outline"

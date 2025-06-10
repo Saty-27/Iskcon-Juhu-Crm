@@ -8,12 +8,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Edit, Trash2, Upload, Eye, ArrowLeft, DollarSign, CreditCard } from 'lucide-react';
+import { Plus, Edit, Trash2, Upload, Eye, ArrowLeft, DollarSign, CreditCard, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Event, EventDonationCard, EventBankDetails, insertEventSchema, InsertEvent } from '@shared/schema';
+import { Event, DonationCard, BankDetails, insertEventSchema, InsertEvent } from '@shared/schema';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
@@ -26,8 +26,8 @@ const EventManagement = () => {
   const [isEditingEvent, setIsEditingEvent] = useState(false);
   const [isDonationCardDialogOpen, setIsDonationCardDialogOpen] = useState(false);
   const [isBankDetailsDialogOpen, setIsBankDetailsDialogOpen] = useState(false);
-  const [editingDonationCard, setEditingDonationCard] = useState<EventDonationCard | null>(null);
-  const [editingBankDetails, setEditingBankDetails] = useState<EventBankDetails | null>(null);
+  const [editingDonationCard, setEditingDonationCard] = useState<DonationCard | null>(null);
+  const [editingBankDetails, setEditingBankDetails] = useState<BankDetails | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -37,19 +37,17 @@ const EventManagement = () => {
     enabled: !!eventId,
   });
 
-  // Get event donation cards
-  const { data: donationCards = [], isLoading: cardsLoading } = useQuery<EventDonationCard[]>({
-    queryKey: [`/api/events/${eventId}/donation-cards`],
-    enabled: !!eventId,
+  // Get all donation cards for predefined amounts
+  const { data: donationCards = [], isLoading: cardsLoading } = useQuery<DonationCard[]>({
+    queryKey: ['/api/donation-cards'],
   });
 
-  // Get event bank details
-  const { data: bankDetails = [], isLoading: bankLoading } = useQuery<EventBankDetails[]>({
-    queryKey: [`/api/events/${eventId}/bank-details`],
-    enabled: !!eventId,
+  // Get bank details
+  const { data: bankDetails = [], isLoading: bankLoading } = useQuery<BankDetails[]>({
+    queryKey: ['/api/bank-details'],
   });
 
-  // Event form
+  // Event form with current schema structure
   const eventForm = useForm<InsertEvent>({
     resolver: zodResolver(insertEventSchema),
     defaultValues: {
@@ -57,10 +55,8 @@ const EventManagement = () => {
       description: event?.description || '',
       date: event?.date || new Date(),
       imageUrl: event?.imageUrl || '',
-      readMoreUrl: event?.readMoreUrl || '',
-      isActive: event?.isActive || true,
-      customDonationEnabled: event?.customDonationEnabled || true,
-      customDonationTitle: event?.customDonationTitle || 'Any Donation of Your Choice',
+      isActive: event?.isActive ?? true,
+      suggestedAmounts: event?.suggestedAmounts || [],
     },
   });
 
@@ -71,8 +67,9 @@ const EventManagement = () => {
       amount: 0,
       description: '',
       imageUrl: '',
-      sortOrder: 0,
+      order: 0,
       isActive: true,
+      categoryId: 1, // Default to first category
     },
   });
 
@@ -89,13 +86,24 @@ const EventManagement = () => {
     },
   });
 
+  // Update event form when event data loads
+  React.useEffect(() => {
+    if (event) {
+      eventForm.reset({
+        title: event.title,
+        description: event.description || '',
+        date: event.date,
+        imageUrl: event.imageUrl,
+        isActive: event.isActive,
+        suggestedAmounts: event.suggestedAmounts || [],
+      });
+    }
+  }, [event, eventForm]);
+
   // Mutations
   const updateEventMutation = useMutation({
     mutationFn: (data: Partial<Event>) => 
-      apiRequest(`/api/events/${eventId}`, {
-        method: 'PATCH',
-        body: JSON.stringify(data),
-      }),
+      apiRequest('PATCH', `/api/events/${eventId}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/events/${eventId}`] });
       setIsEditingEvent(false);
@@ -105,12 +113,9 @@ const EventManagement = () => {
 
   const addDonationCardMutation = useMutation({
     mutationFn: (data: any) => 
-      apiRequest(`/api/events/${eventId}/donation-cards`, {
-        method: 'POST',
-        body: JSON.stringify({ ...data, eventId }),
-      }),
+      apiRequest('POST', '/api/donation-cards', data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/events/${eventId}/donation-cards`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/donation-cards'] });
       setIsDonationCardDialogOpen(false);
       donationCardForm.reset();
       toast({ title: 'Success', description: 'Donation card created successfully' });
@@ -119,12 +124,9 @@ const EventManagement = () => {
 
   const updateDonationCardMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: any }) => 
-      apiRequest(`/api/events/${eventId}/donation-cards/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify(data),
-      }),
+      apiRequest('PATCH', `/api/donation-cards/${id}`, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/events/${eventId}/donation-cards`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/donation-cards'] });
       setEditingDonationCard(null);
       setIsDonationCardDialogOpen(false);
       toast({ title: 'Success', description: 'Donation card updated successfully' });
@@ -133,23 +135,18 @@ const EventManagement = () => {
 
   const deleteDonationCardMutation = useMutation({
     mutationFn: (id: number) => 
-      apiRequest(`/api/events/${eventId}/donation-cards/${id}`, {
-        method: 'DELETE',
-      }),
+      apiRequest('DELETE', `/api/donation-cards/${id}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/events/${eventId}/donation-cards`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/donation-cards'] });
       toast({ title: 'Success', description: 'Donation card deleted successfully' });
     },
   });
 
   const addBankDetailsMutation = useMutation({
     mutationFn: (data: any) => 
-      apiRequest(`/api/events/${eventId}/bank-details`, {
-        method: 'POST',
-        body: JSON.stringify({ ...data, eventId }),
-      }),
+      apiRequest('POST', '/api/bank-details', data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/events/${eventId}/bank-details`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/bank-details'] });
       setIsBankDetailsDialogOpen(false);
       bankDetailsForm.reset();
       toast({ title: 'Success', description: 'Bank details created successfully' });
@@ -158,12 +155,9 @@ const EventManagement = () => {
 
   const updateBankDetailsMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: any }) => 
-      apiRequest(`/api/events/${eventId}/bank-details/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify(data),
-      }),
+      apiRequest('PATCH', `/api/bank-details/${id}`, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/events/${eventId}/bank-details`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/bank-details'] });
       setEditingBankDetails(null);
       setIsBankDetailsDialogOpen(false);
       toast({ title: 'Success', description: 'Bank details updated successfully' });
@@ -172,36 +166,12 @@ const EventManagement = () => {
 
   const deleteBankDetailsMutation = useMutation({
     mutationFn: (id: number) => 
-      apiRequest(`/api/events/${eventId}/bank-details/${id}`, {
-        method: 'DELETE',
-      }),
+      apiRequest('DELETE', `/api/bank-details/${id}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/events/${eventId}/bank-details`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/bank-details'] });
       toast({ title: 'Success', description: 'Bank details deleted successfully' });
     },
   });
-
-  // File upload handlers
-  const handleImageUpload = async (file: File, type: 'event' | 'card' | 'qr') => {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('type', type === 'event' ? 'events' : type === 'card' ? 'donation-cards' : 'bank-details');
-    
-    try {
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-      
-      if (!response.ok) throw new Error('Upload failed');
-      
-      const data = await response.json();
-      return data.url;
-    } catch (error) {
-      toast({ title: 'Error', description: 'Failed to upload image', variant: 'destructive' });
-      return null;
-    }
-  };
 
   if (eventLoading) {
     return <AdminLayout><div>Loading...</div></AdminLayout>;
@@ -233,10 +203,6 @@ const EventManagement = () => {
             >
               <Edit className="w-4 h-4 mr-2" />
               Edit Event
-            </Button>
-            <Button variant="outline">
-              <Eye className="w-4 h-4 mr-2" />
-              Preview
             </Button>
           </div>
         </div>
@@ -291,21 +257,14 @@ const EventManagement = () => {
                   <p className="text-gray-700">{event.description || 'No description provided'}</p>
                 </div>
 
-                {event.readMoreUrl && (
-                  <div>
-                    <Label>Read More Link</Label>
-                    <p className="text-blue-600">{event.readMoreUrl}</p>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>Custom Donation Enabled</Label>
-                    <p>{event.customDonationEnabled ? 'Yes' : 'No'}</p>
-                  </div>
-                  <div>
-                    <Label>Custom Donation Title</Label>
-                    <p>{event.customDonationTitle}</p>
+                <div>
+                  <Label>Suggested Amounts</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {event.suggestedAmounts?.map((amount, index) => (
+                      <Badge key={index} variant="outline">
+                        ₹{amount.toLocaleString('en-IN')}
+                      </Badge>
+                    )) || <span className="text-gray-500">No suggested amounts</span>}
                   </div>
                 </div>
               </CardContent>
@@ -346,8 +305,9 @@ const EventManagement = () => {
                               amount: card.amount,
                               description: card.description || '',
                               imageUrl: card.imageUrl || '',
-                              sortOrder: card.sortOrder,
+                              order: card.order,
                               isActive: card.isActive,
+                              categoryId: card.categoryId,
                             });
                             setIsDonationCardDialogOpen(true);
                           }}
@@ -384,7 +344,7 @@ const EventManagement = () => {
                         <Badge variant={card.isActive ? "default" : "secondary"}>
                           {card.isActive ? 'Active' : 'Inactive'}
                         </Badge>
-                        <span className="text-xs text-gray-400">Order: {card.sortOrder}</span>
+                        <span className="text-xs text-gray-400">Order: {card.order}</span>
                       </div>
                     </div>
                   </CardContent>
@@ -592,86 +552,44 @@ const EventManagement = () => {
                     <FormItem>
                       <FormLabel>Description</FormLabel>
                       <FormControl>
-                        <Textarea {...field} placeholder="Enter event description" rows={3} />
+                        <Textarea {...field} value={field.value || ''} placeholder="Enter event description" rows={3} />
                       </FormControl>
                     </FormItem>
                   )}
                 />
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={eventForm.control}
-                    name="imageUrl"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Banner Image URL</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Enter image URL" />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={eventForm.control}
-                    name="readMoreUrl"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Read More Link</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Enter URL for more details" />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </div>
 
                 <FormField
                   control={eventForm.control}
-                  name="customDonationTitle"
+                  name="imageUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Custom Donation Section Title</FormLabel>
+                      <FormLabel>Banner Image URL</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Any Donation of Your Choice" />
+                        <Input {...field} placeholder="Enter image URL" />
                       </FormControl>
                     </FormItem>
                   )}
                 />
 
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={eventForm.control}
-                    name="isActive"
-                    render={({ field }) => (
-                      <FormItem className="flex items-center space-x-2">
-                        <FormControl>
-                          <Switch checked={field.value} onCheckedChange={field.onChange} />
-                        </FormControl>
-                        <FormLabel>Event Active</FormLabel>
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={eventForm.control}
-                    name="customDonationEnabled"
-                    render={({ field }) => (
-                      <FormItem className="flex items-center space-x-2">
-                        <FormControl>
-                          <Switch checked={field.value} onCheckedChange={field.onChange} />
-                        </FormControl>
-                        <FormLabel>Allow Custom Amounts</FormLabel>
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                <FormField
+                  control={eventForm.control}
+                  name="isActive"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center space-x-2">
+                      <FormControl>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                      <FormLabel>Event Active</FormLabel>
+                    </FormItem>
+                  )}
+                />
 
                 <div className="flex justify-end space-x-2">
                   <Button type="button" variant="outline" onClick={() => setIsEditingEvent(false)}>
                     Cancel
                   </Button>
                   <Button type="submit" disabled={updateEventMutation.isPending}>
+                    <Save className="w-4 h-4 mr-2" />
                     {updateEventMutation.isPending ? 'Saving...' : 'Save Changes'}
                   </Button>
                 </div>
@@ -738,11 +656,11 @@ const EventManagement = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="sortOrder">Display Order</Label>
+                  <Label htmlFor="order">Display Order</Label>
                   <Input
-                    id="sortOrder"
+                    id="order"
                     type="number"
-                    {...donationCardForm.register('sortOrder', { valueAsNumber: true })}
+                    {...donationCardForm.register('order', { valueAsNumber: true })}
                     placeholder="0"
                   />
                 </div>
