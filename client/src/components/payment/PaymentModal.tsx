@@ -49,18 +49,32 @@ const PaymentModal = ({
     message: ''
   });
 
+  // Check authentication and redirect if not logged in
+  useEffect(() => {
+    if (isOpen && !authLoading && !isAuthenticated) {
+      toast({
+        title: "Login Required",
+        description: "You need to login to make a donation. Redirecting to login page...",
+        variant: "destructive",
+      });
+      setTimeout(() => {
+        window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+      }, 2000);
+      onClose();
+      return;
+    }
+  }, [isOpen, isAuthenticated, authLoading, toast, onClose]);
+
   // Auto-populate form with user data when available
   useEffect(() => {
-    if (user) {
+    if (authUser) {
       setFormData(prev => ({
         ...prev,
-        name: user.username || '',
-        email: user.email || '',
-        phone: user.phone || '',
-        address: user.address || ''
+        name: authUser.name || '',
+        email: authUser.email || ''
       }));
     }
-  }, [user]);
+  }, [authUser]);
 
   // Set amount when props change
   useEffect(() => {
@@ -164,11 +178,24 @@ const PaymentModal = ({
         throw new Error(paymentData.message || 'Payment initialization failed');
       }
     } catch (error: any) {
-      toast({
-        title: "Payment Error",
-        description: error.message || "Failed to process payment. Please try again.",
-        variant: "destructive"
-      });
+      // Check if it's an authentication error
+      if (error.message && error.message.includes('401')) {
+        toast({
+          title: "Authentication Required",
+          description: "Your session has expired. Redirecting to login...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+        }, 2000);
+        onClose();
+      } else {
+        toast({
+          title: "Payment Error",
+          description: error.message || "Failed to process payment. Please try again.",
+          variant: "destructive"
+        });
+      }
     } finally {
       setIsProcessing(false);
     }
