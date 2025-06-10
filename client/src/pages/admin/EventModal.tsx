@@ -145,7 +145,6 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
     mutationFn: async (data: EventFormData) => {
       const eventData = {
         ...data,
-        date: new Date(data.date),
         imageUrl: data.imageUrl || "/api/placeholder/400/300",
         suggestedAmounts: suggestedAmountsInput 
           ? suggestedAmountsInput.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n))
