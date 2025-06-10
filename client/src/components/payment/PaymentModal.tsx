@@ -141,7 +141,7 @@ const PaymentModal = ({
       };
 
       // Create PayU payment request
-      const response = await apiRequest('POST', '/api/payment/create-payu-order', donationData);
+      const response = await apiRequest('/api/payment/create-payu-order', 'POST', donationData);
       const paymentData = await response.json();
 
       if (paymentData.success) {
