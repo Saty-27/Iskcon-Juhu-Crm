@@ -1288,9 +1288,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({
         success: true,
-        paymentUrl: process.env.NODE_ENV === 'production' 
-          ? 'https://secure.payu.in/_payment'
-          : 'https://test.payu.in/_payment',
+        paymentUrl: 'https://secure.payu.in/_payment',
         params: payuParams,
         txnid: txnid
       });
