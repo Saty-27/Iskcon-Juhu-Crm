@@ -586,7 +586,7 @@ export class MemStorage implements IStorage {
       isActive: category.isActive ?? true,
       description: category.description ?? null,
       heading: category.heading ?? null,
-      suggestedAmounts: Array.isArray(category.suggestedAmounts) ? category.suggestedAmounts : null
+      suggestedAmounts: (category.suggestedAmounts as number[]) ?? null
     };
     this.donationCategoriesData.set(id, newCategory);
     return newCategory;
@@ -627,7 +627,7 @@ export class MemStorage implements IStorage {
       customDonationTitle: event.customDonationTitle ?? "Any Donation of Your Choice",
       isActive: event.isActive ?? true,
       description: event.description ?? null,
-      suggestedAmounts: event.suggestedAmounts ?? null,
+      suggestedAmounts: (event.suggestedAmounts as number[]) ?? null,
       readMoreUrl: event.readMoreUrl ?? null
     };
     this.eventsData.set(id, newEvent);
@@ -838,7 +838,7 @@ export class MemStorage implements IStorage {
       ...subscription, 
       id,
       createdAt: now,
-      isActive: subscription.isActive ?? true
+      isActive: true
     };
     this.subscriptionsData.set(id, newSubscription);
     return newSubscription;
