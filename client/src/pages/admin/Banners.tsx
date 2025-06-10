@@ -30,7 +30,10 @@ const BannersPage = () => {
       title: "",
       description: "",
       imageUrl: "",
+      buttonText: "",
+      buttonLink: "",
       isActive: true,
+      order: 0,
     },
   });
 
@@ -40,7 +43,10 @@ const BannersPage = () => {
       title: "",
       description: "",
       imageUrl: "",
+      buttonText: "",
+      buttonLink: "",
       isActive: true,
+      order: 0,
     },
   });
 
@@ -90,9 +96,12 @@ const BannersPage = () => {
     setEditingBanner(banner);
     editForm.reset({
       title: banner.title,
-      description: banner.description,
+      description: banner.description || "",
       imageUrl: banner.imageUrl,
+      buttonText: banner.buttonText || "",
+      buttonLink: banner.buttonLink || "",
       isActive: banner.isActive,
+      order: banner.order,
     });
   };
 
@@ -166,6 +175,45 @@ const BannersPage = () => {
                       </FormItem>
                     )}
                   />
+                  <FormField
+                    control={createForm.control}
+                    name="buttonText"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Button Text (Optional)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Learn More" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={createForm.control}
+                    name="buttonLink"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Button Link (Optional)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="/donate" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={createForm.control}
+                    name="order"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Display Order</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="0" {...field} onChange={(e) => field.onChange(parseInt(e.target.value) || 0)} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   <Button type="submit" disabled={createMutation.isPending}>
                     {createMutation.isPending ? "Creating..." : "Create Banner"}
                   </Button>
@@ -201,6 +249,15 @@ const BannersPage = () => {
                       <div>
                         <h3 className="text-lg font-semibold text-gray-900">{banner.title}</h3>
                         <p className="text-gray-600 mt-1">{banner.description}</p>
+                        <div className="mt-2 space-y-1">
+                          {banner.buttonText && (
+                            <p className="text-sm text-blue-600">Button: {banner.buttonText}</p>
+                          )}
+                          {banner.buttonLink && (
+                            <p className="text-sm text-gray-500">Link: {banner.buttonLink}</p>
+                          )}
+                          <p className="text-sm text-gray-400">Order: {banner.order}</p>
+                        </div>
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full mt-2 ${
                           banner.isActive 
                             ? 'bg-green-100 text-green-800' 
@@ -277,6 +334,45 @@ const BannersPage = () => {
                       <FormLabel>Image URL</FormLabel>
                       <FormControl>
                         <Input placeholder="https://example.com/image.jpg" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
+                  name="buttonText"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Button Text (Optional)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Learn More" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
+                  name="buttonLink"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Button Link (Optional)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="/donate" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
+                  name="order"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Display Order</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="0" {...field} onChange={(e) => field.onChange(parseInt(e.target.value) || 0)} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
