@@ -1,15 +1,32 @@
 import { Helmet } from 'react-helmet';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
-import { DonationCategory } from '@shared/schema';
+import { DonationCategory, DonationCard, BankDetails } from '@shared/schema';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 
 const Donate = () => {
-  const { data: categories = [], isLoading } = useQuery<DonationCategory[]>({
+  const { data: categories = [], isLoading: categoriesLoading } = useQuery<DonationCategory[]>({
     queryKey: ['/api/donation-categories'],
   });
+
+  const { data: donationCards = [], isLoading: cardsLoading } = useQuery<DonationCard[]>({
+    queryKey: ['/api/donation-cards'],
+  });
+
+  const { data: bankDetails = [] } = useQuery<BankDetails[]>({
+    queryKey: ['/api/bank-details'],
+  });
+
+  const isLoading = categoriesLoading || cardsLoading;
+
+  // Handle payment redirect
+  const handleDonateClick = (cardId: number, amount: number) => {
+    // Redirect to payment gateway with card and amount info
+    window.location.href = `/donate/payment?cardId=${cardId}&amount=${amount}`;
+  };
   
   return (
     <>
@@ -38,15 +55,15 @@ const Donate = () => {
           </div>
         </section>
         
-        {/* Donation Categories */}
+        {/* Dynamic Donation Cards */}
         <section className="py-16">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="font-poppins font-bold text-3xl md:text-4xl text-primary mb-4">
-                Ways to Contribute
+                Support Our Divine Mission
               </h2>
               <p className="font-opensans text-lg max-w-2xl mx-auto text-dark">
-                Choose from various donation initiatives that resonate with your heart.
+                Choose from various donation opportunities to contribute to our sacred cause.
               </p>
             </div>
             
@@ -58,13 +75,7 @@ const Donate = () => {
                     <div className="p-6">
                       <Skeleton className="h-6 w-3/4 mb-2" />
                       <Skeleton className="h-4 w-full mb-4" />
-                      <Skeleton className="h-4 w-full mb-2" />
-                      <Skeleton className="h-4 w-2/3 mb-4" />
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {[1, 2, 3, 4].map((j) => (
-                          <Skeleton key={j} className="h-8 w-16 rounded-full" />
-                        ))}
-                      </div>
+                      <Skeleton className="h-8 w-24 mb-4" />
                       <Skeleton className="h-10 w-full rounded-lg" />
                     </div>
                   </div>
@@ -72,35 +83,115 @@ const Donate = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {categories.map((category) => (
-                  <div 
-                    key={category.id}
-                    className="bg-white rounded-xl overflow-hidden shadow-lg transition-transform hover:transform hover:scale-105"
-                  >
-                    <img 
-                      src={category.imageUrl} 
-                      alt={category.name}
-                      className="w-full h-48 object-cover"
-                    />
-                    <div className="p-6">
-                      <h3 className="font-poppins font-semibold text-xl text-primary mb-2">{category.name}</h3>
-                      <p className="font-opensans text-dark mb-4">{category.description}</p>
-                      <Link 
-                        href={`/donate/${category.id}`}
-                        className="w-full bg-primary text-white font-poppins font-medium py-2 rounded-lg hover:bg-opacity-90 transition-colors block text-center"
+                {donationCards
+                  .filter(card => card.isActive)
+                  .sort((a, b) => a.order - b.order)
+                  .map((card) => {
+                    const category = categories.find(cat => cat.id === card.categoryId);
+                    return (
+                      <div 
+                        key={card.id}
+                        className="bg-white rounded-xl overflow-hidden shadow-lg transition-transform hover:transform hover:scale-105"
                       >
-                        Donate Now
-                      </Link>
-                    </div>
-                  </div>
-                ))}
+                        <div className="p-6">
+                          <h3 className="font-poppins font-semibold text-xl text-primary mb-3">
+                            {card.title}
+                          </h3>
+                          
+                          {/* Card Image */}
+                          {card.imageUrl && (
+                            <img 
+                              src={card.imageUrl} 
+                              alt={card.title}
+                              className="w-full h-48 object-cover rounded-lg mb-4"
+                            />
+                          )}
+                          
+                          {/* Description */}
+                          {card.description && (
+                            <p className="font-opensans text-dark mb-4 text-sm">
+                              {card.description}
+                            </p>
+                          )}
+                          
+                          {/* Category Badge */}
+                          {category && (
+                            <span className="inline-block bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-medium mb-4">
+                              {category.name}
+                            </span>
+                          )}
+                          
+                          {/* Amount */}
+                          <div className="text-2xl font-bold text-primary mb-4">
+                            ₹{card.amount.toLocaleString('en-IN')}
+                          </div>
+                          
+                          {/* Donate Button */}
+                          <Button 
+                            onClick={() => handleDonateClick(card.id, card.amount)}
+                            className="w-full bg-primary text-white font-poppins font-medium py-3 rounded-lg hover:bg-opacity-90 transition-colors"
+                          >
+                            Donate Now
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
               </div>
             )}
           </div>
         </section>
+
+        {/* Bank Details Section */}
+        {bankDetails.length > 0 && (
+          <section className="py-16 bg-neutral">
+            <div className="container mx-auto px-4">
+              <div className="text-center mb-12">
+                <h2 className="font-poppins font-bold text-3xl md:text-4xl text-primary mb-4">
+                  Alternative Payment Methods
+                </h2>
+                <p className="font-opensans text-lg max-w-2xl mx-auto text-dark">
+                  You can also donate directly through bank transfer or UPI.
+                </p>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                {bankDetails
+                  .filter(bank => bank.isActive)
+                  .map((bank) => (
+                    <div key={bank.id} className="bg-white p-6 rounded-xl shadow-md">
+                      <h3 className="font-poppins font-semibold text-xl text-primary mb-4">
+                        Bank Transfer Details
+                      </h3>
+                      <div className="space-y-2 text-sm">
+                        <p><strong>Bank Name:</strong> {bank.bankName}</p>
+                        <p><strong>Account Name:</strong> {bank.accountName}</p>
+                        <p><strong>Account Number:</strong> {bank.accountNumber}</p>
+                        <p><strong>IFSC Code:</strong> {bank.ifscCode}</p>
+                        {bank.swiftCode && (
+                          <p><strong>Swift Code:</strong> {bank.swiftCode}</p>
+                        )}
+                      </div>
+                      
+                      {bank.qrCodeUrl && (
+                        <div className="mt-6 text-center">
+                          <h4 className="font-medium mb-3">Scan QR Code for UPI</h4>
+                          <img 
+                            src={bank.qrCodeUrl} 
+                            alt="UPI QR Code" 
+                            className="h-40 w-40 mx-auto border rounded-lg"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </section>
+        )}
         
         {/* Tax Benefits Section */}
-        <section className="py-16 bg-neutral">
+        <section className="py-16 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-md">
               <h2 className="font-poppins font-bold text-2xl md:text-3xl text-primary mb-6 text-center">

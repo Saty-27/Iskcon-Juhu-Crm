@@ -30,25 +30,9 @@ const CurrentEvents = () => {
     setSelectedEvent(event);
   };
 
-  const handleDonateClick = (amount?: number) => {
-    if (selectedEvent) {
-      // Find matching category for the event
-      const matchingCategory = categories.find(cat => 
-        cat.name.toLowerCase().includes(selectedEvent.title.toLowerCase()) || 
-        selectedEvent.title.toLowerCase().includes(cat.name.toLowerCase())
-      );
-      
-      const categoryId = matchingCategory?.id || categories[0]?.id || 1;
-      const donationAmount = amount || parseFloat(customAmount) || 0;
-      
-      if (donationAmount > 0) {
-        setLocation(`/donate/${categoryId}?amount=${donationAmount}`);
-      } else {
-        setLocation(`/donate/${categoryId}`);
-      }
-    }
-    setSelectedEvent(null);
-    setCustomAmount('');
+  const handleDonateClick = () => {
+    // Redirect directly to the main donate page
+    setLocation('/donate');
   };
 
   const toggleExpanded = (eventId: number) => {
@@ -148,7 +132,7 @@ const CurrentEvents = () => {
                 {/* Donate Button */}
                 <button 
                   className="donate-event-button"
-                  onClick={() => handleEventClick(event)}
+                  onClick={handleDonateClick}
                 >
                   Donate for {event.title}
                 </button>
