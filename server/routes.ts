@@ -1229,7 +1229,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const crypto = require('crypto');
       const { nanoid } = require('nanoid');
 
-      // Check if PayU keys are configured
+      // For demo purposes, if PayU credentials are test credentials, use demo mode
+      const isDemoMode = process.env.PAYU_MERCHANT_KEY === '2fKjPt' || !process.env.PAYU_MERCHANT_KEY;
+      
+      if (isDemoMode) {
+        // Demo payment simulation
+        const txnid = `DEMO_TXN_${nanoid(12)}_${Date.now()}`;
+        
+        // Create donation record for demo
+        const donation = await storage.createDonation({
+          userId: (req as any).session.userId,
+          amount: parseFloat(amount),
+          name: name,
+          email: email,
+          phone: phone,
+          address: address || '',
+          message: message || '',
+          paymentId: txnid,
+          status: 'pending',
+          categoryId: categoryId || null,
+          eventId: eventId || null,
+          categoryName: categoryId ? 'General Donation' : null,
+          eventName: eventId ? 'Event Donation' : null,
+          paymentGatewayResponse: JSON.stringify({ demo: true })
+        });
+
+        return res.json({
+          success: true,
+          demo: true,
+          message: "Demo payment - redirecting to success page",
+          txnid: txnid,
+          redirectUrl: `/payment/success?txnid=${txnid}&amount=${amount}&demo=true`
+        });
+      }
+
+      // Check if PayU keys are configured for real payments
       if (!process.env.PAYU_MERCHANT_KEY || !process.env.PAYU_MERCHANT_SALT) {
         return res.status(500).json({
           success: false,

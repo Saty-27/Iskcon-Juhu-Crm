@@ -155,25 +155,37 @@ const PaymentModal = ({
       const paymentData = await response.json();
 
       if (paymentData.success) {
-        // Create PayU form and submit
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = paymentData.paymentUrl;
+        if (paymentData.demo) {
+          // Demo mode - redirect to success page directly
+          toast({
+            title: "Demo Payment",
+            description: "Redirecting to payment success page...",
+          });
+          setTimeout(() => {
+            window.location.href = paymentData.redirectUrl;
+          }, 1000);
+          onClose();
+        } else {
+          // Real PayU payment - create form and submit
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = paymentData.paymentUrl;
 
-        // Add all PayU parameters
-        Object.entries(paymentData.params).forEach(([key, value]) => {
-          const input = document.createElement('input');
-          input.type = 'hidden';
-          input.name = key;
-          input.value = value as string;
-          form.appendChild(input);
-        });
+          // Add all PayU parameters
+          Object.entries(paymentData.params).forEach(([key, value]) => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = value as string;
+            form.appendChild(input);
+          });
 
-        document.body.appendChild(form);
-        form.submit();
-        document.body.removeChild(form);
-        
-        onClose();
+          document.body.appendChild(form);
+          form.submit();
+          document.body.removeChild(form);
+          
+          onClose();
+        }
       } else {
         throw new Error(paymentData.message || 'Payment initialization failed');
       }
