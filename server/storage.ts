@@ -151,6 +151,7 @@ export class MemStorage implements IStorage {
   private quotesData: Map<number, Quote>;
   private donationCategoriesData: Map<number, DonationCategory>;
   private donationCardsData: Map<number, DonationCard>;
+  private eventDonationCardsData: Map<number, EventDonationCard>;
   private bankDetailsData: Map<number, BankDetails>;
   private eventsData: Map<number, Event>;
   private galleryData: Map<number, Gallery>;
@@ -168,6 +169,7 @@ export class MemStorage implements IStorage {
   private quoteIdCounter: number;
   private donationCategoryIdCounter: number;
   private donationCardIdCounter: number;
+  private eventDonationCardIdCounter: number;
   private bankDetailsIdCounter: number;
   private eventIdCounter: number;
   private galleryIdCounter: number;

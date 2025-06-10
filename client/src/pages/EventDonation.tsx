@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Helmet } from 'react-helmet';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import type { Event, DonationCard, BankDetails } from "@shared/schema";
+import type { Event, EventDonationCard, BankDetails } from "@shared/schema";
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 
@@ -32,8 +32,9 @@ export default function EventDonation() {
     queryKey: ["/api/events"]
   });
 
-  const { data: donationCards = [] } = useQuery<DonationCard[]>({
-    queryKey: ["/api/donation-cards"]
+  const { data: eventDonationCards = [] } = useQuery<EventDonationCard[]>({
+    queryKey: [`/api/events/${eventId}/donation-cards`],
+    enabled: !!eventId
   });
 
   const { data: bankDetails = [] } = useQuery<BankDetails[]>({
@@ -42,8 +43,8 @@ export default function EventDonation() {
 
   const event = events.find(e => e.id === parseInt(eventId || "0"));
   
-  // Filter donation cards to show all active cards (not filtered by category for events)
-  const activeDonationCards = donationCards.filter(card => card.isActive);
+  // Filter event donation cards to show only active ones
+  const activeEventDonationCards = eventDonationCards.filter(card => card.isActive);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -169,7 +170,7 @@ export default function EventDonation() {
         flexWrap: 'wrap',
         gap: '20px'
       }}>
-        {activeDonationCards.map((card) => (
+        {activeEventDonationCards.length > 0 ? activeEventDonationCards.map((card) => (
           <div key={card.id} style={{
             backgroundColor: '#fff',
             padding: '15px',
@@ -230,7 +231,38 @@ export default function EventDonation() {
               Add Donation
             </Button>
           </div>
-        ))}
+        )) : (
+          <div style={{
+            textAlign: 'center',
+            padding: '40px',
+            backgroundColor: '#f8f9fa',
+            borderRadius: '10px',
+            border: '2px dashed #dee2e6',
+            width: '100%'
+          }}>
+            <h3 style={{ marginBottom: '15px', color: '#6c757d' }}>
+              No donation cards available for this event
+            </h3>
+            <p style={{ color: '#6c757d', marginBottom: '20px' }}>
+              Donation cards for this event can be managed in the admin panel. 
+              Please visit the general donation page for other donation options.
+            </p>
+            <Button 
+              onClick={() => window.location.href = '/donate'}
+              style={{
+                backgroundColor: '#faa817',
+                color: '#fff',
+                border: 'none',
+                padding: '12px 24px',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                fontSize: '16px'
+              }}
+            >
+              Go to Donation Page
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Custom Donation */}
