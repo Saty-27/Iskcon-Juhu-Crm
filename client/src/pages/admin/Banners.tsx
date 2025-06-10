@@ -443,19 +443,91 @@ const BannersPage = () => {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={editForm.control}
-                  name="imageUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Image URL</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://example.com/image.jpg" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                <div className="space-y-4">
+                  <FormLabel>Banner Image</FormLabel>
+                  <div className="flex space-x-2 mb-3">
+                    <Button
+                      type="button"
+                      variant={uploadMethod === 'url' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setUploadMethod('url')}
+                      className="flex items-center space-x-2"
+                    >
+                      <LinkIcon className="w-4 h-4" />
+                      <span>URL</span>
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={uploadMethod === 'file' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setUploadMethod('file')}
+                      className="flex items-center space-x-2"
+                    >
+                      <Upload className="w-4 h-4" />
+                      <span>Upload</span>
+                    </Button>
+                  </div>
+
+                  {uploadMethod === 'url' ? (
+                    <FormField
+                      control={editForm.control}
+                      name="imageUrl"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input placeholder="https://example.com/image.jpg" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  ) : (
+                    <div className="space-y-2">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            handleFileUpload(file, editForm);
+                          }
+                        }}
+                        ref={(input) => {
+                          if (input && !fileInputRef.current) {
+                            fileInputRef.current = input;
+                          }
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isUploading}
+                        className="w-full"
+                      >
+                        {isUploading ? 'Uploading...' : 'Choose Image File'}
+                      </Button>
+                      <FormField
+                        control={editForm.control}
+                        name="imageUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input
+                                placeholder="Image URL will appear here after upload"
+                                {...field}
+                                readOnly
+                                className="bg-gray-50"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                   )}
-                />
+                </div>
                 <FormField
                   control={editForm.control}
                   name="buttonText"

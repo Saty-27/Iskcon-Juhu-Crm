@@ -60,6 +60,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     })
   );
 
+  // Configure multer for file uploads
+  const uploadDir = path.join(process.cwd(), 'uploads', 'banners');
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+
+  const storage_multer = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, uploadDir);
+    },
+    filename: function (req, file, cb) {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, 'banner-' + uniqueSuffix + path.extname(file.originalname));
+    }
+  });
+
+  const upload = multer({ 
+    storage: storage_multer,
+    limits: {
+      fileSize: 5 * 1024 * 1024 // 5MB limit
+    },
+    fileFilter: function (req, file, cb) {
+      if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only image files are allowed!'));
+      }
+    }
+  });
+
+  // Serve uploaded banner images
+  app.use('/uploads/banners', express.static(uploadDir));
+
+  // Banner upload endpoint
+  app.post("/api/upload/banner", isAdmin, upload.single('image'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      
+      const imageUrl = `/uploads/banners/${req.file.filename}`;
+      res.json({ imageUrl });
+    } catch (error) {
+      res.status(500).json({ message: "Error uploading file", error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
   // Banner API endpoints
   app.get("/api/banners", async (req, res) => {
     try {
