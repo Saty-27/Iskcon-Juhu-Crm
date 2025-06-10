@@ -188,6 +188,7 @@ export class MemStorage implements IStorage {
     this.quotesData = new Map();
     this.donationCategoriesData = new Map();
     this.donationCardsData = new Map();
+    this.eventDonationCardsData = new Map();
     this.bankDetailsData = new Map();
     this.eventsData = new Map();
     this.galleryData = new Map();
@@ -205,6 +206,7 @@ export class MemStorage implements IStorage {
     this.quoteIdCounter = 1;
     this.donationCategoryIdCounter = 1;
     this.donationCardIdCounter = 1;
+    this.eventDonationCardIdCounter = 1;
     this.bankDetailsIdCounter = 1;
     this.eventIdCounter = 1;
     this.galleryIdCounter = 1;
@@ -1072,6 +1074,35 @@ export class MemStorage implements IStorage {
 
   async deleteContactMessage(id: number): Promise<boolean> {
     return this.contactMessagesData.delete(id);
+  }
+
+  // Event donation card operations
+  async getEventDonationCards(eventId: number): Promise<EventDonationCard[]> {
+    return Array.from(this.eventDonationCardsData.values()).filter(card => card.eventId === eventId);
+  }
+
+  async getEventDonationCard(id: number): Promise<EventDonationCard | undefined> {
+    return this.eventDonationCardsData.get(id);
+  }
+
+  async createEventDonationCard(card: InsertEventDonationCard): Promise<EventDonationCard> {
+    const id = this.eventDonationCardIdCounter++;
+    const newCard: EventDonationCard = { ...card, id };
+    this.eventDonationCardsData.set(id, newCard);
+    return newCard;
+  }
+
+  async updateEventDonationCard(id: number, cardData: Partial<EventDonationCard>): Promise<EventDonationCard | undefined> {
+    const card = this.eventDonationCardsData.get(id);
+    if (!card) return undefined;
+    
+    const updatedCard = { ...card, ...cardData };
+    this.eventDonationCardsData.set(id, updatedCard);
+    return updatedCard;
+  }
+
+  async deleteEventDonationCard(id: number): Promise<boolean> {
+    return this.eventDonationCardsData.delete(id);
   }
 }
 
