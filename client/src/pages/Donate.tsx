@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
@@ -6,6 +7,9 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import PaymentModal from '@/components/payment/PaymentModal';
 
 const Donate = () => {
   const { data: categories = [], isLoading: categoriesLoading } = useQuery<DonationCategory[]>({

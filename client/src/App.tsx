@@ -13,6 +13,8 @@ import EventDonation from "@/pages/EventDonation";
 import DonateThankYou from "@/pages/donate/ThankYou";
 import PaymentGateway from "@/pages/donate/PaymentGateway";
 import PaymentFailed from "@/pages/donate/PaymentFailed";
+import PaymentSuccess from "@/pages/PaymentSuccess";
+import PaymentFailure from "@/pages/PaymentFailure";
 import Gallery from "@/pages/Gallery";
 import Videos from "@/pages/Videos";
 import Contact from "@/pages/Contact";
@@ -51,6 +53,10 @@ function Router() {
       <Route path="/donate/payment-failed" component={PaymentFailed} />
       <Route path="/donate/event/:eventId" component={EventDonation} />
       <Route path="/donate/:categoryId" component={CategoryDonation} />
+      
+      {/* Payment result pages */}
+      <Route path="/payment/success" component={PaymentSuccess} />
+      <Route path="/payment/failure" component={PaymentFailure} />
       <Route path="/gallery" component={Gallery} />
       <Route path="/videos" component={Videos} />
       <Route path="/contact" component={Contact} />
