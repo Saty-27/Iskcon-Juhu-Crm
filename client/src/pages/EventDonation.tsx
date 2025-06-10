@@ -9,10 +9,7 @@ import type { Event, DonationCard, BankDetails } from "@shared/schema";
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 
-interface DonationOption {
-  label: string;
-  price: string;
-}
+
 
 export default function EventDonation() {
   const { eventId } = useParams();
@@ -44,42 +41,14 @@ export default function EventDonation() {
   });
 
   const event = events.find(e => e.id === parseInt(eventId || "0"));
-  const eventCards = donationCards.filter(card => card.isActive);
-
-  const openModalWithPrice = (price: string) => {
-    window.location.href = '/donate';
-  };
-
-  const openModalWithAnyPrice = () => {
-    if (selectedPrice) {
-      window.location.href = '/donate';
-    }
-  };
+  
+  // Filter donation cards to show all active cards (not filtered by category for events)
+  const activeDonationCards = donationCards.filter(card => card.isActive);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setSelectedPrice(value === '' ? '' : value);
   };
-
-  // Define donation options based on event suggested amounts or default options
-  const getDonationOptions = (): DonationOption[] => {
-    if (event?.suggestedAmounts && event.suggestedAmounts.length > 0) {
-      return event.suggestedAmounts.map((amount, index) => ({
-        label: `Donation Option ${index + 1}`,
-        price: amount.toString()
-      }));
-    }
-    
-    // Default options for events
-    return [
-      { label: "General Event Support", price: "1001" },
-      { label: "Event Decoration", price: "2501" },
-      { label: "Event Prasadam", price: "5001" },
-      { label: "Complete Event Sponsorship", price: "10001" },
-    ];
-  };
-
-  const donationOptions = getDonationOptions();
   const currentBankDetail = bankDetails[0]; // Use first bank detail
 
   if (!event) {
@@ -190,7 +159,7 @@ export default function EventDonation() {
         </div>
       </div>
 
-      {/* Donation Options */}
+      {/* Dynamic Donation Cards from Admin Panel */}
       <h2 style={{ fontSize: '24px', marginBottom: '20px' }}>
         {event.title} Donation Options
       </h2>
@@ -200,31 +169,52 @@ export default function EventDonation() {
         flexWrap: 'wrap',
         gap: '20px'
       }}>
-        {donationOptions.map((option, index) => (
-          <div key={index} style={{
+        {activeDonationCards.map((card) => (
+          <div key={card.id} style={{
             backgroundColor: '#fff',
             padding: '15px',
             border: '1px solid #ddd',
             borderRadius: '8px',
             flex: '1 1 calc(25% - 20px)',
             boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
-            minWidth: '250px'
+            minWidth: '250px',
+            textAlign: 'center'
           }}>
+            {/* Title */}
             <p style={{ 
               fontSize: '16px', 
               marginBottom: '10px', 
               fontWeight: 'bold' 
             }}>
-              {option.label}
+              {card.title}
             </p>
+
+            {/* Card Image */}
+            {card.imageUrl && (
+              <img 
+                src={card.imageUrl} 
+                alt={card.title}
+                style={{
+                  width: '100%',
+                  height: '150px',
+                  objectFit: 'cover',
+                  borderRadius: '5px',
+                  marginBottom: '10px'
+                }}
+              />
+            )}
+
+            {/* Amount */}
             <p style={{ 
               color: '#faa817', 
               marginBottom: '10px',
               fontSize: '18px',
               fontWeight: 'bold'
             }}>
-              ₹{parseInt(option.price).toLocaleString()}
+              ₹{card.amount.toLocaleString()}
             </p>
+
+            {/* Donate Button */}
             <Button 
               onClick={() => window.location.href = '/donate'}
               style={{
