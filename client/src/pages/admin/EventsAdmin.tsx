@@ -21,7 +21,7 @@ const EventsAdmin = () => {
   });
 
   const deleteEventMutation = useMutation({
-    mutationFn: (id: number) => apiRequest(`/api/events/${id}`, { method: 'DELETE' }),
+    mutationFn: (id: number) => apiRequest(`/api/events/${id}`, 'DELETE'),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/events'] });
       toast({ title: 'Success', description: 'Event deleted successfully' });
