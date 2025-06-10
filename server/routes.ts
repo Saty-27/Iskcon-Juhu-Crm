@@ -1200,6 +1200,180 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // PayU Payment Integration
+  app.post("/api/payment/create-payu-order", async (req, res) => {
+    try {
+      const {
+        name,
+        email,
+        phone,
+        address,
+        amount,
+        message,
+        categoryId,
+        cardId,
+        eventId,
+        eventCardId,
+        isCustomAmount
+      } = req.body;
+
+      // Validate required fields
+      if (!name || !email || !phone || !amount || amount <= 0) {
+        return res.status(400).json({
+          success: false,
+          message: "Missing required fields: name, email, phone, and amount are required"
+        });
+      }
+
+      // Import required modules for PayU
+      const crypto = require('crypto');
+      const { nanoid } = require('nanoid');
+
+      // Check if PayU keys are configured
+      if (!process.env.PAYU_MERCHANT_KEY || !process.env.PAYU_MERCHANT_SALT) {
+        return res.status(500).json({
+          success: false,
+          message: "Payment gateway not configured. Please contact administrator."
+        });
+      }
+
+      // Generate unique transaction ID
+      const txnid = `TXN_${nanoid(12)}_${Date.now()}`;
+      
+      // PayU required parameters
+      const payuParams = {
+        key: process.env.PAYU_MERCHANT_KEY,
+        txnid: txnid,
+        amount: amount.toString(),
+        productinfo: isCustomAmount ? "Custom Donation" : (cardId ? "Donation Card" : "Event Donation"),
+        firstname: name.split(' ')[0],
+        lastname: name.split(' ').slice(1).join(' ') || '',
+        email: email,
+        phone: phone,
+        address1: address || '',
+        city: '',
+        state: '',
+        country: 'India',
+        zipcode: '',
+        udf1: categoryId?.toString() || '',
+        udf2: cardId?.toString() || '',
+        udf3: eventId?.toString() || '',
+        udf4: eventCardId?.toString() || '',
+        udf5: isCustomAmount ? 'true' : 'false',
+        surl: `${req.protocol}://${req.get('host')}/payment/success`,
+        furl: `${req.protocol}://${req.get('host')}/payment/failure`,
+        hash: ''
+      };
+
+      // Generate hash for PayU
+      const hashString = `${payuParams.key}|${payuParams.txnid}|${payuParams.amount}|${payuParams.productinfo}|${payuParams.firstname}|${payuParams.email}|||||||||||${process.env.PAYU_MERCHANT_SALT}`;
+      payuParams.hash = crypto.createHash('sha512').update(hashString).digest('hex');
+
+      // Store donation details in database with pending status
+      const donationData = {
+        name,
+        email,
+        phone,
+        address: address || '',
+        amount: parseInt(amount),
+        message: message || '',
+        paymentId: txnid,
+        status: 'pending' as const,
+        categoryId: categoryId || null,
+        eventId: eventId || null,
+        userId: req.session?.userId || null
+      };
+
+      await storage.createDonation(donationData);
+
+      res.json({
+        success: true,
+        paymentUrl: process.env.NODE_ENV === 'production' 
+          ? 'https://secure.payu.in/_payment'
+          : 'https://test.payu.in/_payment',
+        params: payuParams,
+        txnid: txnid
+      });
+
+    } catch (error: any) {
+      console.error('PayU order creation error:', error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to create payment order"
+      });
+    }
+  });
+
+  // PayU Success Response Handler
+  app.post("/payment/success", async (req, res) => {
+    try {
+      const {
+        txnid,
+        amount,
+        productinfo,
+        firstname,
+        email,
+        status,
+        hash,
+        payuMoneyId,
+        mihpayid
+      } = req.body;
+
+      // Verify hash for security
+      const crypto = require('crypto');
+      const reverseHashString = `${process.env.PAYU_MERCHANT_SALT}|${status}|||||||||||${email}|${firstname}|${productinfo}|${amount}|${txnid}|${process.env.PAYU_MERCHANT_KEY}`;
+      const reverseHash = crypto.createHash('sha512').update(reverseHashString).digest('hex');
+
+      if (hash !== reverseHash) {
+        console.error('Hash verification failed');
+        return res.redirect('/payment/failure?error=verification_failed');
+      }
+
+      // Update donation status in database
+      const donation = await storage.getDonationByPaymentId(txnid);
+      if (donation) {
+        await storage.updateDonation(donation.id, {
+          status: status === 'success' ? 'success' : 'failed',
+          paymentGatewayResponse: JSON.stringify(req.body),
+          updatedAt: new Date()
+        });
+      }
+
+      if (status === 'success') {
+        res.redirect(`/payment/success?txnid=${txnid}&amount=${amount}`);
+      } else {
+        res.redirect(`/payment/failure?txnid=${txnid}&error=payment_failed`);
+      }
+
+    } catch (error) {
+      console.error('Payment success handler error:', error);
+      res.redirect('/payment/failure?error=processing_error');
+    }
+  });
+
+  // PayU Failure Response Handler
+  app.post("/payment/failure", async (req, res) => {
+    try {
+      const { txnid, status } = req.body;
+
+      // Update donation status in database
+      const donation = await storage.getDonationByPaymentId(txnid);
+      if (donation) {
+        await storage.updateDonation(donation.id, {
+          status: 'failed',
+          paymentGatewayResponse: JSON.stringify(req.body),
+          updatedAt: new Date()
+        });
+      }
+
+      res.redirect(`/payment/failure?txnid=${txnid}&error=payment_cancelled`);
+
+    } catch (error) {
+      console.error('Payment failure handler error:', error);
+      res.redirect('/payment/failure?error=processing_error');
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
