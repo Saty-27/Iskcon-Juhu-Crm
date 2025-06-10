@@ -102,7 +102,7 @@ export const events = pgTable("events", {
   title: text("title").notNull(),
   description: text("description"),
   date: timestamp("date").notNull(),
-  imageUrl: text("image_url").notNull(),
+  imageUrl: text("image_url").default("").notNull(),
   readMoreUrl: text("read_more_url"),
   isActive: boolean("is_active").default(true).notNull(),
   suggestedAmounts: json("suggested_amounts").$type<number[] | null>(),

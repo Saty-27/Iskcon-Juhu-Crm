@@ -21,7 +21,7 @@ const eventFormSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
   date: z.string().min(1, "Date is required"),
-  imageUrl: z.string().url("Must be a valid URL"),
+  imageUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   readMoreUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   isActive: z.boolean(),
   customDonationEnabled: z.boolean(),
@@ -146,6 +146,7 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
       const eventData = {
         ...data,
         date: new Date(data.date),
+        imageUrl: data.imageUrl || "/api/placeholder/400/300",
         suggestedAmounts: suggestedAmountsInput 
           ? suggestedAmountsInput.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n))
           : null,
