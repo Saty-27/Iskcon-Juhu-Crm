@@ -10,8 +10,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import PaymentModal from '@/components/payment/PaymentModal';
+import useAuth from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 
 const Donate = () => {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { toast } = useToast();
+  
   const [paymentModal, setPaymentModal] = useState<{
     isOpen: boolean;
     donationCard?: DonationCard;
@@ -37,13 +42,31 @@ const Donate = () => {
 
   const isLoading = categoriesLoading || cardsLoading;
 
+  // Check authentication before allowing donation
+  const checkAuthAndProceed = (callback: () => void) => {
+    if (!authLoading && !isAuthenticated) {
+      toast({
+        title: "Login Required",
+        description: "You need to login to make a donation. Redirecting to login page...",
+        variant: "destructive",
+      });
+      setTimeout(() => {
+        window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+      }, 1500);
+      return;
+    }
+    callback();
+  };
+
   // Handle donation card click - open payment modal
   const handleDonateClick = (card: DonationCard) => {
-    const category = categories.find(cat => cat.id === card.categoryId);
-    setPaymentModal({
-      isOpen: true,
-      donationCard: card,
-      donationCategory: category
+    checkAuthAndProceed(() => {
+      const category = categories.find(cat => cat.id === card.categoryId);
+      setPaymentModal({
+        isOpen: true,
+        donationCard: card,
+        donationCategory: category
+      });
     });
   };
 
@@ -51,9 +74,11 @@ const Donate = () => {
   const handleCustomDonation = () => {
     const amount = parseInt(customAmount);
     if (amount && amount > 0) {
-      setPaymentModal({
-        isOpen: true,
-        customAmount: amount
+      checkAuthAndProceed(() => {
+        setPaymentModal({
+          isOpen: true,
+          customAmount: amount
+        });
       });
     }
   };

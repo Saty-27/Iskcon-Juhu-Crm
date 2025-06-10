@@ -52,6 +52,7 @@ const PaymentModal = ({
   // Check authentication and redirect if not logged in
   useEffect(() => {
     if (isOpen && !authLoading && !isAuthenticated) {
+      onClose(); // Close modal immediately
       toast({
         title: "Login Required",
         description: "You need to login to make a donation. Redirecting to login page...",
@@ -59,8 +60,7 @@ const PaymentModal = ({
       });
       setTimeout(() => {
         window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
-      }, 2000);
-      onClose();
+      }, 1500);
       return;
     }
   }, [isOpen, isAuthenticated, authLoading, toast, onClose]);
