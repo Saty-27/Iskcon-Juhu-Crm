@@ -96,7 +96,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid data", errors: error.errors });
       }
-      res.status(500).json({ message: "Error updating banner", error: error.message });
+      res.status(500).json({ message: "Error updating banner", error: error instanceof Error ? error.message : String(error) });
     }
   });
 
