@@ -25,6 +25,7 @@ import AdminDashboard from "@/pages/admin/Dashboard";
 import AdminBanners from "@/pages/admin/Banners";
 import AdminEvents from "@/pages/admin/Events";
 import AdminEventManagement from "@/pages/admin/EventManagement";
+import EventsAdmin from "@/pages/admin/EventsAdmin";
 import AdminGallery from "@/pages/admin/Gallery";
 import AdminVideos from "@/pages/admin/Videos";
 import AdminDonations from "@/pages/admin/Donations";
@@ -75,7 +76,7 @@ function Router() {
       <Route path="/admin/events">
         {() => (
           <AdminRoute>
-            <AdminEvents />
+            <EventsAdmin />
           </AdminRoute>
         )}
       </Route>
