@@ -251,7 +251,7 @@ export default function EventDonation() {
 
             {/* Donate Button */}
             <Button 
-              onClick={() => window.location.href = '/donate'}
+              onClick={() => handleEventDonateClick(card)}
               style={{
                 backgroundColor: '#faa817',
                 color: '#fff',
@@ -262,7 +262,7 @@ export default function EventDonation() {
                 width: '100%'
               }}
             >
-              Add Donation
+              Donate Now
             </Button>
           </div>
         )) : (
@@ -312,8 +312,8 @@ export default function EventDonation() {
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
           <Input
             type="number"
-            value={selectedPrice}
-            onChange={handleInputChange}
+            value={customAmount}
+            onChange={(e) => setCustomAmount(e.target.value)}
             placeholder="Enter the Amount"
             style={{
               flex: '1',
@@ -327,7 +327,8 @@ export default function EventDonation() {
             }}
           />
           <Button
-            onClick={() => window.location.href = '/donate'}
+            onClick={handleCustomEventDonation}
+            disabled={!customAmount || parseInt(customAmount) <= 0}
             style={{
               backgroundColor: '#faa817',
               color: '#fff',
@@ -340,7 +341,7 @@ export default function EventDonation() {
               minWidth: '100px'
             }}
           >
-            Donate
+            Donate Now
           </Button>
         </div>
       </div>
@@ -401,6 +402,14 @@ export default function EventDonation() {
       
       <Footer />
 
+      {/* Payment Modal */}
+      <PaymentModal
+        isOpen={paymentModal.isOpen}
+        onClose={closePaymentModal}
+        eventDonationCard={paymentModal.eventDonationCard}
+        customAmount={paymentModal.customAmount}
+        event={event}
+      />
     </>
   );
 }
