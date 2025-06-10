@@ -795,8 +795,9 @@ export class MemStorage implements IStorage {
       eventId: donation.eventId ?? null,
       categoryId: donation.categoryId ?? null,
       paymentId: donation.paymentId ?? null,
-      transactionId: donation.transactionId ?? null,
-      invoiceNumber: donation.invoiceNumber ?? null
+      invoiceNumber: donation.invoiceNumber ?? null,
+      panCard: donation.panCard ?? null,
+      notificationSent: donation.notificationSent ?? null
     };
     this.donationsData.set(id, newDonation);
     return newDonation;
@@ -869,7 +870,14 @@ export class MemStorage implements IStorage {
 
   async createStat(stat: InsertStat): Promise<Stat> {
     const id = this.statIdCounter++;
-    const newStat: Stat = { ...stat, id };
+    const newStat: Stat = { 
+      ...stat, 
+      id,
+      isActive: stat.isActive ?? true,
+      createdAt: stat.createdAt ?? null,
+      updatedAt: stat.updatedAt ?? null,
+      orderIndex: stat.orderIndex ?? null
+    };
     this.statsData.set(id, newStat);
     return newStat;
   }
@@ -995,7 +1003,12 @@ export class MemStorage implements IStorage {
 
   async createTestimonial(testimonial: InsertTestimonial): Promise<Testimonial> {
     const id = this.testimonialIdCounter++;
-    const newTestimonial: Testimonial = { ...testimonial, id };
+    const newTestimonial: Testimonial = { 
+      ...testimonial, 
+      id,
+      isActive: testimonial.isActive ?? true,
+      imageUrl: testimonial.imageUrl ?? null
+    };
     this.testimonialsData.set(id, newTestimonial);
     return newTestimonial;
   }
