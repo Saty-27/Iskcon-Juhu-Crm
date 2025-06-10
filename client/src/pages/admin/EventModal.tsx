@@ -34,7 +34,7 @@ const donationCardSchema = z.object({
   amount: z.number().min(1, "Amount must be greater than 0"),
   description: z.string().optional(),
   imageUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-  sortOrder: z.number(),
+  order: z.number(),
 });
 
 const bankDetailsSchema = z.object({
@@ -207,7 +207,11 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
       // Create new cards
       for (const card of donationCards) {
         await apiRequest('/api/event-donation-cards', 'POST', {
-          ...card,
+          title: card.title,
+          amount: card.amount,
+          description: card.description || "",
+          imageUrl: card.imageUrl || "",
+          sortOrder: card.order,
           eventId,
           isActive: true,
         });
