@@ -15,7 +15,7 @@ import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Upload, GripVertical } from "lucide-react";
-import type { Event, DonationCard, BankDetails } from "@shared/schema";
+import type { Event, DonationCard, EventDonationCard, BankDetails } from "@shared/schema";
 
 const eventFormSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -34,7 +34,7 @@ const donationCardSchema = z.object({
   amount: z.number().min(1, "Amount must be greater than 0"),
   description: z.string().optional(),
   imageUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-  order: z.number(),
+  sortOrder: z.number(),
 });
 
 const bankDetailsSchema = z.object({
@@ -81,9 +81,9 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
     },
   });
 
-  const { data: existingDonationCards = [] } = useQuery<DonationCard[]>({
-    queryKey: ['/api/donation-cards'],
-    enabled: !!event,
+  const { data: existingEventDonationCards = [] } = useQuery<EventDonationCard[]>({
+    queryKey: [`/api/events/${event?.id}/donation-cards`],
+    enabled: !!event?.id,
   });
 
   const { data: existingBankDetails = [] } = useQuery<BankDetails[]>({
@@ -128,19 +128,18 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
 
   // Load donation cards when event or cards change
   useEffect(() => {
-    if (event && existingDonationCards) {
-      const eventCards = existingDonationCards.filter(card => card.eventId === event.id);
-      setDonationCards(eventCards.map(card => ({
+    if (event && existingEventDonationCards) {
+      setDonationCards(existingEventDonationCards.map(card => ({
         title: card.title,
         amount: card.amount,
         description: card.description || "",
         imageUrl: card.imageUrl || "",
-        order: card.order,
+        order: card.sortOrder,
       })));
     } else {
       setDonationCards([]);
     }
-  }, [event?.id, existingDonationCards?.length]);
+  }, [event?.id, existingEventDonationCards?.length]);
 
   // Load bank details when available
   useEffect(() => {
@@ -201,21 +200,20 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
   const saveDonationCards = async (eventId: number) => {
     try {
       // Delete existing cards for this event
-      const existingEventCards = existingDonationCards.filter(card => card.eventId === eventId);
-      for (const card of existingEventCards) {
-        await apiRequest(`/api/donation-cards/${card.id}`, 'DELETE');
+      for (const card of existingEventDonationCards) {
+        await apiRequest(`/api/event-donation-cards/${card.id}`, 'DELETE');
       }
       
       // Create new cards
       for (const card of donationCards) {
-        await apiRequest('/api/donation-cards', 'POST', {
+        await apiRequest('/api/event-donation-cards', 'POST', {
           ...card,
           eventId,
-          categoryId: 1, // Default category
+          isActive: true,
         });
       }
       
-      queryClient.invalidateQueries({ queryKey: ['/api/donation-cards'] });
+      queryClient.invalidateQueries({ queryKey: [`/api/events/${eventId}/donation-cards`] });
       toast({ title: 'Success', description: 'Donation cards saved successfully' });
     } catch (error) {
       toast({ title: 'Error', description: 'Failed to save donation cards', variant: 'destructive' });

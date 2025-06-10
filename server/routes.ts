@@ -513,6 +513,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/event-donation-cards", async (req, res) => {
+    try {
+      const card = await storage.createEventDonationCard(req.body);
+      res.status(201).json(card);
+    } catch (error) {
+      res.status(500).json({ message: "Error creating event donation card" });
+    }
+  });
+
+  app.put("/api/event-donation-cards/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const card = await storage.updateEventDonationCard(id, req.body);
+      if (!card) {
+        return res.status(404).json({ message: "Event donation card not found" });
+      }
+      res.json(card);
+    } catch (error) {
+      res.status(500).json({ message: "Error updating event donation card" });
+    }
+  });
+
+  app.delete("/api/event-donation-cards/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteEventDonationCard(id);
+      if (!success) {
+        return res.status(404).json({ message: "Event donation card not found" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting event donation card" });
+    }
+  });
+
   // Gallery API endpoints
   app.get("/api/gallery", async (req, res) => {
     try {
