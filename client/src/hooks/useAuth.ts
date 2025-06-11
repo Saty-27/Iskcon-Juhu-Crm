@@ -31,7 +31,19 @@ const useAuth = () => {
   const { data: user, isLoading, error } = useQuery({
     queryKey: ['/api/auth/me'],
     retry: false,
-    refetchOnWindowFocus: false
+    refetchOnWindowFocus: false,
+    queryFn: async () => {
+      const res = await fetch('/api/auth/me', {
+        credentials: 'include'
+      });
+      if (res.status === 401) {
+        return null; // Return null for unauthenticated instead of throwing
+      }
+      if (!res.ok) {
+        throw new Error('Failed to fetch user');
+      }
+      return res.json();
+    }
   });
 
   // Login mutation
@@ -91,7 +103,7 @@ const useAuth = () => {
   });
 
   useEffect(() => {
-    if (user && !error) {
+    if (user && user !== null && !error) {
       setIsAuthenticated(true);
     } else {
       setIsAuthenticated(false);
