@@ -92,30 +92,31 @@ const MediaHighlights = () => {
                 </div>
               ) : (
                 galleryItems.slice(0, 6).map((item) => (
-                  <Link key={item.id} href="/gallery" className="overflow-hidden rounded-lg h-24 md:h-32 block relative group bg-gray-100">
+                  <Link key={item.id} href="/gallery" className="overflow-hidden rounded-lg h-24 md:h-32 block relative group bg-white border">
                     <img 
                       src={item.imageUrl} 
                       alt={item.title} 
                       className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                      loading="lazy"
+                      loading="eager"
                       onLoad={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.parentElement?.classList.remove('bg-gray-100');
+                        console.log('Image loaded successfully:', item.imageUrl);
+                        target.style.display = 'block';
                       }}
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
+                        console.error('Image failed to load:', item.imageUrl);
                         target.style.display = 'none';
-                        target.parentElement?.classList.add('bg-red-100');
                         if (!target.parentElement?.querySelector('.fallback-text')) {
                           const fallback = document.createElement('div');
-                          fallback.className = 'fallback-text w-full h-full flex items-center justify-center text-gray-400 text-xs';
-                          fallback.textContent = 'Image unavailable';
+                          fallback.className = 'fallback-text w-full h-full flex items-center justify-center text-gray-400 text-xs bg-gray-50';
+                          fallback.textContent = item.title;
                           target.parentElement?.appendChild(fallback);
                         }
                       }}
                     />
-                    <div className="absolute inset-0 bg-primary bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center">
-                      <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity">View</span>
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all flex items-center justify-center">
+                      <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity text-sm font-medium">View</span>
                     </div>
                   </Link>
                 ))
