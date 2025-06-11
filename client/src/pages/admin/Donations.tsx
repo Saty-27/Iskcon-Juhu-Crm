@@ -162,7 +162,7 @@ export default function Donations() {
           <div className="bg-purple-50 p-4 rounded-lg">
             <div className="text-sm text-purple-600 font-medium">Total Amount</div>
             <div className="text-2xl font-bold text-purple-900">
-              ₹{donations.reduce((sum, d) => sum + d.amount, 0).toLocaleString()}
+              ₹{donations.filter(d => d.status === 'success').reduce((sum, d) => sum + d.amount, 0).toLocaleString()}
             </div>
           </div>
         </div>
