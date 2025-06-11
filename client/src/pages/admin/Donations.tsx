@@ -144,128 +144,128 @@ export default function Donations() {
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-lg font-semibold mb-4">All Donations</h2>
-        <div className="flex gap-4 mb-6">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-            <Input
-              placeholder="Search by donor name, email, phone, or payment ID..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+          <div className="flex gap-4 mb-6">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+              <Input
+                placeholder="Search by donor name, email, phone, or payment ID..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="success">Completed</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="failed">Failed</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="category">Category</SelectItem>
+                <SelectItem value="event">Event</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="success">Completed</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="failed">Failed</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={typeFilter} onValueChange={setTypeFilter}>
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="Type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="category">Category</SelectItem>
-              <SelectItem value="event">Event</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
 
-        {/* Donations Table */}
-        <div className="border rounded-lg">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>ID</TableHead>
-                <TableHead>Donor</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredDonations.length === 0 ? (
+          {/* Donations Table */}
+          <div className="border rounded-lg">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-gray-500">
-                    No donations found matching your criteria
-                  </TableCell>
+                  <TableHead>ID</TableHead>
+                  <TableHead>Donor</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
-              ) : (
-                filteredDonations.map((donation) => (
-                  <TableRow key={donation.id}>
-                    <TableCell className="font-medium">{donation.id}</TableCell>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{donation.name}</div>
-                        <div className="text-sm text-gray-500">{donation.email}</div>
-                        <div className="text-sm text-gray-500">{donation.phone}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {donation.categoryName || donation.eventTitle || 'General Donation'}
-                    </TableCell>
-                    <TableCell className="font-medium">₹{donation.amount.toLocaleString()}</TableCell>
-                    <TableCell>
-                      {format(new Date(donation.createdAt), 'MMM dd, yyyy')}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={getStatusBadgeVariant(donation.status)}>
-                        {donation.status === 'success' ? 'Completed' : 
-                         donation.status.charAt(0).toUpperCase() + donation.status.slice(1)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm">
-                          <Eye size={14} />
-                          View
-                        </Button>
-                        <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
-                          Delete
-                        </Button>
-                      </div>
+              </TableHeader>
+              <TableBody>
+                {filteredDonations.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+                      No donations found matching your criteria
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+                ) : (
+                  filteredDonations.map((donation) => (
+                    <TableRow key={donation.id}>
+                      <TableCell className="font-medium">{donation.id}</TableCell>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{donation.name}</div>
+                          <div className="text-sm text-gray-500">{donation.email}</div>
+                          <div className="text-sm text-gray-500">{donation.phone}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {donation.categoryName || donation.eventTitle || 'General Donation'}
+                      </TableCell>
+                      <TableCell className="font-medium">₹{donation.amount.toLocaleString()}</TableCell>
+                      <TableCell>
+                        {format(new Date(donation.createdAt), 'MMM dd, yyyy')}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={getStatusBadgeVariant(donation.status)}>
+                          {donation.status === 'success' ? 'Completed' : 
+                           donation.status.charAt(0).toUpperCase() + donation.status.slice(1)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Button variant="outline" size="sm">
+                            <Eye size={14} />
+                            View
+                          </Button>
+                          <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
+                            Delete
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
 
-        {/* Summary Stats */}
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-green-50 p-4 rounded-lg">
-            <div className="text-sm text-green-600 font-medium">Total Donations</div>
-            <div className="text-2xl font-bold text-green-900">{donations.length}</div>
-          </div>
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <div className="text-sm text-blue-600 font-medium">Completed</div>
-            <div className="text-2xl font-bold text-blue-900">
-              {donations.filter(d => d.status === 'success').length}
+          {/* Summary Stats */}
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="bg-green-50 p-4 rounded-lg">
+              <div className="text-sm text-green-600 font-medium">Total Donations</div>
+              <div className="text-2xl font-bold text-green-900">{donations.length}</div>
             </div>
-          </div>
-          <div className="bg-yellow-50 p-4 rounded-lg">
-            <div className="text-sm text-yellow-600 font-medium">Pending</div>
-            <div className="text-2xl font-bold text-yellow-900">
-              {donations.filter(d => d.status === 'pending').length}
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <div className="text-sm text-blue-600 font-medium">Completed</div>
+              <div className="text-2xl font-bold text-blue-900">
+                {donations.filter(d => d.status === 'success').length}
+              </div>
             </div>
-          </div>
-          <div className="bg-purple-50 p-4 rounded-lg">
-            <div className="text-sm text-purple-600 font-medium">Total Amount</div>
-            <div className="text-2xl font-bold text-purple-900">
-              ₹{donations.reduce((sum, d) => sum + d.amount, 0).toLocaleString()}
+            <div className="bg-yellow-50 p-4 rounded-lg">
+              <div className="text-sm text-yellow-600 font-medium">Pending</div>
+              <div className="text-2xl font-bold text-yellow-900">
+                {donations.filter(d => d.status === 'pending').length}
+              </div>
+            </div>
+            <div className="bg-purple-50 p-4 rounded-lg">
+              <div className="text-sm text-purple-600 font-medium">Total Amount</div>
+              <div className="text-2xl font-bold text-purple-900">
+                ₹{donations.reduce((sum, d) => sum + d.amount, 0).toLocaleString()}
+              </div>
             </div>
           </div>
         </div>
-      </div>
       </div>
     </AdminLayout>
   );
