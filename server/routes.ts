@@ -65,9 +65,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const bannersDir = path.join(uploadsDir, 'banners');
   const cardsDir = path.join(uploadsDir, 'cards');
   const qrCodesDir = path.join(uploadsDir, 'qr-codes');
+  const galleryDir = path.join(uploadsDir, 'gallery');
+  const videosDir = path.join(uploadsDir, 'videos');
   
   // Create directories if they don't exist
-  [uploadsDir, bannersDir, cardsDir, qrCodesDir].forEach(dir => {
+  [uploadsDir, bannersDir, cardsDir, qrCodesDir, galleryDir, videosDir].forEach(dir => {
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
@@ -82,6 +84,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         destDir = cardsDir;
       } else if (type === 'qr') {
         destDir = qrCodesDir;
+      } else if (type === 'gallery') {
+        destDir = galleryDir;
+      } else if (type === 'video') {
+        destDir = videosDir;
       }
       
       cb(null, destDir);
@@ -126,6 +132,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         folder = 'cards';
       } else if (type === 'qr') {
         folder = 'qr-codes';
+      } else if (type === 'gallery') {
+        folder = 'gallery';
+      } else if (type === 'video') {
+        folder = 'videos';
       }
       
       const imageUrl = `/uploads/${folder}/${req.file.filename}`;
