@@ -286,7 +286,6 @@ const Donate = () => {
       <PaymentModal
         isOpen={paymentModal.isOpen}
         onClose={closePaymentModal}
-        donationCard={paymentModal.donationCard}
         customAmount={paymentModal.customAmount}
         donationCategory={paymentModal.donationCategory}
       />
