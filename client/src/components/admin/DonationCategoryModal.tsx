@@ -30,7 +30,7 @@ const bankDetailsFormSchema = z.object({
   bankName: z.string().min(1, "Bank name is required"),
   ifscCode: z.string().min(1, "IFSC code is required"),
   swiftCode: z.string().optional(),
-  upiQrCodeUrl: z.string().optional(),
+  qrCodeUrl: z.string().optional(),
 });
 
 const categoryFormSchema = z.object({
@@ -141,7 +141,7 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
         bankName: bankDetail.bankName,
         ifscCode: bankDetail.ifscCode,
         swiftCode: bankDetail.swiftCode || "",
-        upiQrCodeUrl: bankDetail.upiQrCodeUrl || "",
+        qrCodeUrl: bankDetail.qrCodeUrl || "",
       });
     }
   }, [existingBankDetails]);
@@ -158,10 +158,9 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
         suggestedAmounts,
       };
 
-      const response = await apiRequest('/api/donation-categories', 'POST', categoryData);
-      return response;
+      return await apiRequest('/api/donation-categories', 'POST', categoryData);
     },
-    onSuccess: async (newCategory) => {
+    onSuccess: async (newCategory: any) => {
       // Create donation cards for this category
       if (donationCards.length > 0) {
         for (const card of donationCards) {
@@ -169,6 +168,7 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
             ...card,
             categoryId: newCategory.id,
             isActive: true,
+            order: 0,
           });
         }
       }
@@ -619,10 +619,10 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
                         <Label>UPI QR Code URL</Label>
                         <Input
                           placeholder="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=iskcon@ybl&pn=ISKCON"
-                          value={bankDetails?.upiQrCodeUrl || ''}
+                          value={bankDetails?.qrCodeUrl || ''}
                           onChange={(e) => setBankDetails(prev => ({
                             ...prev,
-                            upiQrCodeUrl: e.target.value,
+                            qrCodeUrl: e.target.value,
                             accountName: prev?.accountName || '',
                             accountNumber: prev?.accountNumber || '',
                             bankName: prev?.bankName || '',
