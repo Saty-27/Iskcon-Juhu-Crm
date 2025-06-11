@@ -39,12 +39,11 @@ const ContactSection = () => {
     setIsSubmitting(true);
     
     try {
-      await apiRequest('POST', '/api/contact', data);
+      await apiRequest('/api/contact', 'POST', data);
       
       toast({
         title: "Message Sent",
         description: "Thank you! We'll get back to you soon.",
-        variant: "success",
       });
       
       form.reset();
