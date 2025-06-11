@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -14,24 +14,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, Upload, GripVertical } from "lucide-react";
+import { Plus, Trash2, GripVertical } from "lucide-react";
 import type { DonationCategory, DonationCard, BankDetails } from "@shared/schema";
-
-// Form schemas
-const donationCardFormSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  description: z.string().optional(),
-  amount: z.number().min(1, "Amount must be greater than 0"),
-});
-
-const bankDetailsFormSchema = z.object({
-  accountName: z.string().min(1, "Account name is required"),
-  accountNumber: z.string().min(1, "Account number is required"),
-  bankName: z.string().min(1, "Bank name is required"),
-  ifscCode: z.string().min(1, "IFSC code is required"),
-  swiftCode: z.string().optional(),
-  qrCodeUrl: z.string().optional(),
-});
 
 const categoryFormSchema = z.object({
   name: z.string().min(1, "Category name is required"),
@@ -44,8 +28,6 @@ const categoryFormSchema = z.object({
 });
 
 type CategoryFormData = z.infer<typeof categoryFormSchema>;
-type DonationCardFormData = z.infer<typeof donationCardFormSchema>;
-type BankDetailsFormData = z.infer<typeof bankDetailsFormSchema>;
 
 interface DonationCategoryModalProps {
   isOpen: boolean;
@@ -55,8 +37,8 @@ interface DonationCategoryModalProps {
 
 export default function DonationCategoryModal({ isOpen, onClose, category }: DonationCategoryModalProps) {
   const [activeTab, setActiveTab] = useState("details");
-  const [donationCards, setDonationCards] = useState<DonationCardFormData[]>([]);
-  const [bankDetails, setBankDetails] = useState<BankDetailsFormData | null>(null);
+  const [donationCards, setDonationCards] = useState<any[]>([]);
+  const [bankDetails, setBankDetails] = useState<any>(null);
   const [suggestedAmountsInput, setSuggestedAmountsInput] = useState("");
   
   const { toast } = useToast();
@@ -148,7 +130,6 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
 
   const createCategoryMutation = useMutation({
     mutationFn: async (data: CategoryFormData) => {
-      // Parse suggested amounts
       const suggestedAmounts = suggestedAmountsInput
         ? suggestedAmountsInput.split(',').map(amount => parseInt(amount.trim())).filter(amount => !isNaN(amount))
         : [];
@@ -161,7 +142,6 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
       return await apiRequest('/api/donation-categories', 'POST', categoryData);
     },
     onSuccess: async (newCategory: any) => {
-      // Create donation cards for this category
       if (donationCards.length > 0) {
         for (const card of donationCards) {
           await apiRequest('/api/donation-cards', 'POST', {
@@ -173,7 +153,6 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
         }
       }
 
-      // Update bank details if provided
       if (bankDetails && existingBankDetails.length > 0) {
         await apiRequest(`/api/bank-details/${existingBankDetails[0].id}`, 'PUT', bankDetails);
       } else if (bankDetails) {
@@ -195,7 +174,6 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
     mutationFn: async (data: CategoryFormData) => {
       if (!category) return;
 
-      // Parse suggested amounts
       const suggestedAmounts = suggestedAmountsInput
         ? suggestedAmountsInput.split(',').map(amount => parseInt(amount.trim())).filter(amount => !isNaN(amount))
         : [];
@@ -209,24 +187,22 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
       return category.id;
     },
     onSuccess: async (categoryId) => {
-      // Delete existing donation cards for this category
       const existingCards = existingDonationCards.filter(card => card.categoryId === categoryId);
       for (const card of existingCards) {
         await apiRequest(`/api/donation-cards/${card.id}`, 'DELETE');
       }
 
-      // Create new donation cards
       if (donationCards.length > 0) {
         for (const card of donationCards) {
           await apiRequest('/api/donation-cards', 'POST', {
             ...card,
             categoryId,
             isActive: true,
+            order: 0,
           });
         }
       }
 
-      // Update bank details if provided
       if (bankDetails && existingBankDetails.length > 0) {
         await apiRequest(`/api/bank-details/${existingBankDetails[0].id}`, 'PUT', bankDetails);
       } else if (bankDetails) {
@@ -260,7 +236,7 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
     setDonationCards(donationCards.filter((_, i) => i !== index));
   };
 
-  const updateDonationCard = (index: number, field: keyof DonationCardFormData, value: any) => {
+  const updateDonationCard = (index: number, field: string, value: any) => {
     const updated = [...donationCards];
     updated[index] = { ...updated[index], [field]: value };
     setDonationCards(updated);
@@ -534,14 +510,14 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
                         <Input
                           placeholder="International Society for Krishna Consciousness"
                           value={bankDetails?.accountName || ''}
-                          onChange={(e) => setBankDetails(prev => ({
+                          onChange={(e) => setBankDetails((prev: any) => ({
                             ...prev,
                             accountName: e.target.value,
                             accountNumber: prev?.accountNumber || '',
                             bankName: prev?.bankName || '',
                             ifscCode: prev?.ifscCode || '',
                             swiftCode: prev?.swiftCode || '',
-                            upiQrCodeUrl: prev?.upiQrCodeUrl || '',
+                            qrCodeUrl: prev?.qrCodeUrl || '',
                           }))}
                         />
                       </div>
@@ -550,14 +526,14 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
                         <Input
                           placeholder="HDFC Bank"
                           value={bankDetails?.bankName || ''}
-                          onChange={(e) => setBankDetails(prev => ({
+                          onChange={(e) => setBankDetails((prev: any) => ({
                             ...prev,
                             bankName: e.target.value,
                             accountName: prev?.accountName || '',
                             accountNumber: prev?.accountNumber || '',
                             ifscCode: prev?.ifscCode || '',
                             swiftCode: prev?.swiftCode || '',
-                            upiQrCodeUrl: prev?.upiQrCodeUrl || '',
+                            qrCodeUrl: prev?.qrCodeUrl || '',
                           }))}
                         />
                       </div>
@@ -569,14 +545,14 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
                         <Input
                           placeholder="50765432109876"
                           value={bankDetails?.accountNumber || ''}
-                          onChange={(e) => setBankDetails(prev => ({
+                          onChange={(e) => setBankDetails((prev: any) => ({
                             ...prev,
                             accountNumber: e.target.value,
                             accountName: prev?.accountName || '',
                             bankName: prev?.bankName || '',
                             ifscCode: prev?.ifscCode || '',
                             swiftCode: prev?.swiftCode || '',
-                            upiQrCodeUrl: prev?.upiQrCodeUrl || '',
+                            qrCodeUrl: prev?.qrCodeUrl || '',
                           }))}
                         />
                       </div>
@@ -585,14 +561,14 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
                         <Input
                           placeholder="HDFC0001234"
                           value={bankDetails?.ifscCode || ''}
-                          onChange={(e) => setBankDetails(prev => ({
+                          onChange={(e) => setBankDetails((prev: any) => ({
                             ...prev,
                             ifscCode: e.target.value,
                             accountName: prev?.accountName || '',
                             accountNumber: prev?.accountNumber || '',
                             bankName: prev?.bankName || '',
                             swiftCode: prev?.swiftCode || '',
-                            upiQrCodeUrl: prev?.upiQrCodeUrl || '',
+                            qrCodeUrl: prev?.qrCodeUrl || '',
                           }))}
                         />
                       </div>
@@ -604,14 +580,14 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
                         <Input
                           placeholder="HDFCINBB456"
                           value={bankDetails?.swiftCode || ''}
-                          onChange={(e) => setBankDetails(prev => ({
+                          onChange={(e) => setBankDetails((prev: any) => ({
                             ...prev,
                             swiftCode: e.target.value,
                             accountName: prev?.accountName || '',
                             accountNumber: prev?.accountNumber || '',
                             bankName: prev?.bankName || '',
                             ifscCode: prev?.ifscCode || '',
-                            upiQrCodeUrl: prev?.upiQrCodeUrl || '',
+                            qrCodeUrl: prev?.qrCodeUrl || '',
                           }))}
                         />
                       </div>
@@ -620,7 +596,7 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
                         <Input
                           placeholder="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=iskcon@ybl&pn=ISKCON"
                           value={bankDetails?.qrCodeUrl || ''}
-                          onChange={(e) => setBankDetails(prev => ({
+                          onChange={(e) => setBankDetails((prev: any) => ({
                             ...prev,
                             qrCodeUrl: e.target.value,
                             accountName: prev?.accountName || '',
