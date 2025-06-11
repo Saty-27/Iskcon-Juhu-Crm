@@ -51,7 +51,7 @@ const DonationCategoriesPage = () => {
   const handleDelete = async (id: number) => {
     // Check if category has donation cards
     try {
-      const response = await fetch(`/api/donation-categories/${id}/donation-cards`);
+      const response = await fetch(`/api/donation-cards/category/${id}`);
       const cards = await response.json();
       
       if (cards.length > 0) {

@@ -59,7 +59,7 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
   });
 
   const { data: existingDonationCards = [] } = useQuery<DonationCard[]>({
-    queryKey: [`/api/donation-categories/${category?.id}/donation-cards`],
+    queryKey: [`/api/donation-cards/category/${category?.id}`],
     enabled: !!category?.id,
   });
 
@@ -96,8 +96,8 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
         suggestedAmounts: [],
       });
       setSuggestedAmountsInput("");
+      setDonationCards([]);
     }
-    setDonationCards([]);
     setBankDetails(null);
     setActiveTab("details");
   }, [category, form]);
@@ -107,10 +107,19 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
     if (category && existingDonationCards.length > 0) {
       const categoryCards = existingDonationCards.filter(card => card.categoryId === category.id);
       setDonationCards(categoryCards.map(card => ({
+        id: card.id,
         title: card.title,
         description: card.description || "",
         amount: card.amount,
+        imageUrl: card.imageUrl || "",
+        isActive: card.isActive,
       })));
+    } else if (category && existingDonationCards.length === 0) {
+      // If we're editing a category but no cards loaded yet, keep current state
+      // Don't clear cards immediately
+    } else if (!category) {
+      // Only clear cards when creating new category
+      setDonationCards([]);
     }
   }, [category, existingDonationCards]);
 
@@ -508,7 +517,11 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
                     </div>
                   </CardHeader>
                   <CardContent>
-                    {donationCards.length === 0 ? (
+                    {category && existingDonationCards.length === 0 && donationCards.length === 0 ? (
+                      <div className="text-center py-8 text-gray-500">
+                        <div className="animate-pulse">Loading donation cards...</div>
+                      </div>
+                    ) : donationCards.length === 0 ? (
                       <div className="text-center py-8 text-gray-500">
                         <p>No donation cards added yet. Click "Add Card" to create predefined donation options.</p>
                       </div>
