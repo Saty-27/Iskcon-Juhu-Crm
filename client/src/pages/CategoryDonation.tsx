@@ -60,7 +60,7 @@ export default function CategoryDonation() {
     setSelectedPrice(value === '' ? '' : value);
   };
 
-  // Handle donation card click - open payment modal directly
+  // Handle donation card click - open payment modal directly (no auth check)
   const handleDonateClick = (card: DonationCard) => {
     setPaymentModal({
       isOpen: true,
@@ -68,7 +68,7 @@ export default function CategoryDonation() {
     });
   };
 
-  // Handle custom amount donation
+  // Handle custom amount donation (no auth check)
   const handleCustomDonation = () => {
     const amount = parseInt(customAmount);
     if (amount && amount > 0) {
