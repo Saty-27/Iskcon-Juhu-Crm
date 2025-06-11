@@ -1,27 +1,39 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AdminLayout from "@/components/admin/Layout";
-import { DonationCategory, insertDonationCategorySchema } from "@shared/schema";
+import { DonationCategory, DonationCard, insertDonationCategorySchema, insertDonationCardSchema } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Switch } from "@/components/ui/switch";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { apiRequest } from "@/lib/queryClient";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, CreditCard, ChevronDown, ChevronUp } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const DonationCategoriesPage = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<DonationCategory | null>(null);
+  const [expandedCategories, setExpandedCategories] = useState<Set<number>>(new Set());
+  const [isCardCreateOpen, setIsCardCreateOpen] = useState(false);
+  const [editingCard, setEditingCard] = useState<DonationCard | null>(null);
+  const [selectedCategoryForCard, setSelectedCategoryForCard] = useState<number | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: categories = [], isLoading } = useQuery<DonationCategory[]>({
     queryKey: ['/api/donation-categories'],
+  });
+
+  const { data: donationCards = [] } = useQuery<DonationCard[]>({
+    queryKey: ['/api/donation-cards'],
   });
 
   const createForm = useForm({
@@ -38,6 +50,28 @@ const DonationCategoriesPage = () => {
     defaultValues: {
       name: "",
       description: "",
+      isActive: true,
+    },
+  });
+
+  const cardCreateForm = useForm({
+    resolver: zodResolver(insertDonationCardSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      amount: 0,
+      categoryId: 0,
+      isActive: true,
+    },
+  });
+
+  const cardEditForm = useForm({
+    resolver: zodResolver(insertDonationCardSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      amount: 0,
+      categoryId: 0,
       isActive: true,
     },
   });
@@ -80,6 +114,44 @@ const DonationCategoriesPage = () => {
     },
   });
 
+  const createCardMutation = useMutation({
+    mutationFn: (data: any) => apiRequest('/api/donation-cards', 'POST', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/donation-cards'] });
+      setIsCardCreateOpen(false);
+      cardCreateForm.reset();
+      toast({ title: "Success", description: "Donation card created successfully" });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to create donation card", variant: "destructive" });
+    },
+  });
+
+  const updateCardMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: any }) => 
+      apiRequest(`/api/donation-cards/${id}`, 'PUT', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/donation-cards'] });
+      setEditingCard(null);
+      cardEditForm.reset();
+      toast({ title: "Success", description: "Donation card updated successfully" });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to update donation card", variant: "destructive" });
+    },
+  });
+
+  const deleteCardMutation = useMutation({
+    mutationFn: (id: number) => apiRequest(`/api/donation-cards/${id}`, 'DELETE'),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/donation-cards'] });
+      toast({ title: "Success", description: "Donation card deleted successfully" });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to delete donation card", variant: "destructive" });
+    },
+  });
+
   const handleCreate = (data: any) => {
     createMutation.mutate(data);
   };
@@ -103,6 +175,59 @@ const DonationCategoriesPage = () => {
     if (confirm('Are you sure you want to delete this category?')) {
       deleteMutation.mutate(id);
     }
+  };
+
+  const handleCreateCard = (categoryId: number) => {
+    setSelectedCategoryForCard(categoryId);
+    cardCreateForm.reset({
+      title: "",
+      description: "",
+      amount: 0,
+      categoryId: categoryId,
+      isActive: true,
+    });
+    setIsCardCreateOpen(true);
+  };
+
+  const handleEditCard = (card: DonationCard) => {
+    setEditingCard(card);
+    cardEditForm.reset({
+      title: card.title,
+      description: card.description || "",
+      amount: card.amount,
+      categoryId: card.categoryId,
+      isActive: card.isActive,
+    });
+  };
+
+  const handleSubmitCard = (data: any) => {
+    createCardMutation.mutate(data);
+  };
+
+  const handleUpdateCard = (data: any) => {
+    if (editingCard) {
+      updateCardMutation.mutate({ id: editingCard.id, data });
+    }
+  };
+
+  const handleDeleteCard = (id: number) => {
+    if (confirm('Are you sure you want to delete this donation card?')) {
+      deleteCardMutation.mutate(id);
+    }
+  };
+
+  const toggleCategoryExpansion = (categoryId: number) => {
+    const newExpanded = new Set(expandedCategories);
+    if (newExpanded.has(categoryId)) {
+      newExpanded.delete(categoryId);
+    } else {
+      newExpanded.add(categoryId);
+    }
+    setExpandedCategories(newExpanded);
+  };
+
+  const getCategoryCards = (categoryId: number) => {
+    return donationCards.filter(card => card.categoryId === categoryId);
   };
 
   return (
@@ -159,67 +284,143 @@ const DonationCategoriesPage = () => {
           </Dialog>
         </div>
         
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          {isLoading ? (
-            <div className="p-6">
-              <Skeleton className="h-8 w-full mb-4" />
-              <Skeleton className="h-8 w-full mb-4" />
-              <Skeleton className="h-8 w-full" />
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {categories.map((category) => (
-                    <tr key={category.id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{category.id}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{category.name}</td>
-                      <td className="px-6 py-4 text-sm text-gray-500">{category.description}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          category.isActive 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {category.isActive ? 'Active' : 'Inactive'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex space-x-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEdit(category)}
-                            className="text-blue-600 hover:text-blue-800"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(category.id)}
-                            className="text-red-600 hover:text-red-800"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
+        {isLoading ? (
+          <div className="space-y-4">
+            {[...Array(5)].map((_, i) => (
+              <Skeleton key={i} className="h-32 w-full" />
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {categories.map((category) => {
+              const categoryCards = getCategoryCards(category.id);
+              const isExpanded = expandedCategories.has(category.id);
+              
+              return (
+                <Card key={category.id} className="border border-gray-200">
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <div>
+                          <CardTitle className="text-lg font-semibold">{category.name}</CardTitle>
+                          <p className="text-sm text-gray-600 mt-1">{category.description}</p>
                         </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+                        <Badge variant={category.isActive ? "default" : "secondary"}>
+                          {category.isActive ? 'Active' : 'Inactive'}
+                        </Badge>
+                      </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleCreateCard(category.id)}
+                          className="flex items-center space-x-1"
+                        >
+                          <CreditCard className="w-4 h-4" />
+                          <span>Add Card</span>
+                        </Button>
+                        
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(category)}
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDelete(category.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                        
+                        <Collapsible open={isExpanded} onOpenChange={() => toggleCategoryExpansion(category.id)}>
+                          <CollapsibleTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              {isExpanded ? (
+                                <ChevronUp className="w-4 h-4" />
+                              ) : (
+                                <ChevronDown className="w-4 h-4" />
+                              )}
+                            </Button>
+                          </CollapsibleTrigger>
+                        </Collapsible>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  
+                  <Collapsible open={isExpanded} onOpenChange={() => toggleCategoryExpansion(category.id)}>
+                    <CollapsibleContent>
+                      <CardContent className="pt-0">
+                        <div className="border-t pt-4">
+                          <div className="flex items-center justify-between mb-4">
+                            <h4 className="text-sm font-medium flex items-center">
+                              <CreditCard className="w-4 h-4 mr-2" />
+                              Donation Cards ({categoryCards.length})
+                            </h4>
+                          </div>
+                          
+                          {categoryCards.length === 0 ? (
+                            <div className="text-center py-8 text-gray-500">
+                              <CreditCard className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                              <p>No donation cards created yet</p>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleCreateCard(category.id)}
+                                className="mt-2"
+                              >
+                                Create First Card
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                              {categoryCards.map((card) => (
+                                <Card key={card.id} className="bg-gray-50">
+                                  <CardContent className="p-4">
+                                    <div className="flex justify-between items-start mb-2">
+                                      <h5 className="font-medium text-sm">{card.title}</h5>
+                                      <Badge variant={card.isActive ? "default" : "secondary"} className="text-xs">
+                                        {card.isActive ? 'Active' : 'Inactive'}
+                                      </Badge>
+                                    </div>
+                                    <p className="text-xs text-gray-600 mb-3">{card.description}</p>
+                                    <div className="flex justify-between items-center">
+                                      <span className="font-semibold text-orange-600">₹{card.amount}</span>
+                                      <div className="flex space-x-1">
+                                        <Button
+                                          variant="outline"
+                                          size="sm"
+                                          onClick={() => handleEditCard(card)}
+                                        >
+                                          <Pencil className="w-3 h-3" />
+                                        </Button>
+                                        <Button
+                                          variant="outline"
+                                          size="sm"
+                                          onClick={() => handleDeleteCard(card.id)}
+                                        >
+                                          <Trash2 className="w-3 h-3" />
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </CollapsibleContent>
+                  </Collapsible>
+                </Card>
+              );
+            })}
+          </div>
+        )}
 
         {/* Edit Dialog */}
         <Dialog open={!!editingCategory} onOpenChange={() => setEditingCategory(null)}>
