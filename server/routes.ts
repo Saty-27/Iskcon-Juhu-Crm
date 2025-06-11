@@ -854,6 +854,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/testimonials", async (req, res) => {
     try {
       const testimonials = await storage.getTestimonials();
+      res.json(testimonials.filter(t => t.isActive));
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching testimonials" });
+    }
+  });
+
+  app.get("/api/admin/testimonials", isAdmin, async (req, res) => {
+    try {
+      const testimonials = await storage.getTestimonials();
       res.json(testimonials);
     } catch (error) {
       res.status(500).json({ message: "Error fetching testimonials" });
@@ -1003,6 +1012,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Social link deleted" });
     } catch (error) {
       res.status(500).json({ message: "Error deleting social link" });
+    }
+  });
+
+  // Users API endpoints
+  app.get("/api/admin/users", isAdmin, async (req, res) => {
+    try {
+      const users = await storage.getUsers();
+      res.json(users);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching users" });
+    }
+  });
+
+  app.put("/api/users/:id", isAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const data = insertUserSchema.partial().parse(req.body);
+      const user = await storage.updateUser(id, data);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json(user);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error updating user" });
+    }
+  });
+
+  app.delete("/api/users/:id", isAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteUser(id);
+      if (!success) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json({ message: "User deleted" });
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting user" });
     }
   });
 
