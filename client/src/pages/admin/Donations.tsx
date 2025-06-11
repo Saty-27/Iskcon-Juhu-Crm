@@ -29,7 +29,7 @@ import {
   CheckCircle,
   Clock,
   TrendingUp,
-  DollarSign
+  IndianRupee
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -184,7 +184,7 @@ const DonationsPage = () => {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="p-3 bg-purple-100 rounded-lg">
-                    <DollarSign className="h-6 w-6 text-purple-600" />
+                    <IndianRupee className="h-6 w-6 text-purple-600" />
                   </div>
                   <span className="text-sm font-medium text-purple-600">Revenue</span>
                 </div>
