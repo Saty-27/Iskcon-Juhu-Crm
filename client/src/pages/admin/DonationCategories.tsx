@@ -23,12 +23,24 @@ const DonationCategoriesPage = () => {
 
   const deleteCategoryMutation = useMutation({
     mutationFn: (id: number) => apiRequest(`/api/donation-categories/${id}`, 'DELETE'),
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['/api/donation-categories'] });
-      toast({ title: 'Success', description: 'Category deleted successfully' });
+      queryClient.invalidateQueries({ queryKey: ['/api/donation-cards'] });
+      const deletedCards = data?.deletedCards || 0;
+      const message = deletedCards > 0 
+        ? `Category and ${deletedCards} related donation card(s) deleted successfully`
+        : 'Category deleted successfully';
+      toast({ title: 'Success', description: message });
     },
-    onError: () => {
-      toast({ title: 'Error', description: 'Failed to delete category', variant: 'destructive' });
+    onError: (error: any) => {
+      const errorMessage = error?.message || 'Failed to delete category';
+      toast({ 
+        title: 'Error', 
+        description: errorMessage.includes('Cannot delete category') 
+          ? 'Cannot delete category with existing donation cards. Please delete the cards first.'
+          : errorMessage, 
+        variant: 'destructive' 
+      });
     },
   });
 
@@ -36,9 +48,30 @@ const DonationCategoriesPage = () => {
     setEditingCategory(category);
   };
 
-  const handleDelete = (id: number) => {
-    if (confirm('Are you sure you want to delete this category?')) {
-      deleteCategoryMutation.mutate(id);
+  const handleDelete = async (id: number) => {
+    // Check if category has donation cards
+    try {
+      const response = await fetch(`/api/donation-categories/${id}/donation-cards`);
+      const cards = await response.json();
+      
+      if (cards.length > 0) {
+        const confirmed = confirm(
+          `This category has ${cards.length} donation card(s). Deleting the category will also delete all its donation cards. Are you sure you want to continue?`
+        );
+        if (confirmed) {
+          deleteCategoryMutation.mutate(id);
+        }
+      } else {
+        const confirmed = confirm('Are you sure you want to delete this category?');
+        if (confirmed) {
+          deleteCategoryMutation.mutate(id);
+        }
+      }
+    } catch (error) {
+      const confirmed = confirm('Are you sure you want to delete this category?');
+      if (confirmed) {
+        deleteCategoryMutation.mutate(id);
+      }
     }
   };
 

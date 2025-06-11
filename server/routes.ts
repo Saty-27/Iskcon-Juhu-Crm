@@ -335,23 +335,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Donation category not found" });
       }
       
-      // Check if there are any related donation cards
+      // Get all related donation cards
       const relatedCards = await storage.getDonationCardsByCategory(id);
+      
+      // Delete all related donation cards first
       if (relatedCards.length > 0) {
-        console.log('Cannot delete category - has related donation cards:', relatedCards.length);
-        return res.status(400).json({ 
-          message: "Cannot delete category with existing donation cards. Please delete the cards first." 
-        });
+        console.log(`Deleting ${relatedCards.length} related donation cards for category ${id}`);
+        for (const card of relatedCards) {
+          await storage.deleteDonationCard(card.id);
+        }
       }
       
+      // Now delete the category
       const success = await storage.deleteDonationCategory(id);
       if (!success) {
         console.log('Delete operation failed for ID:', id);
         return res.status(404).json({ message: "Donation category not found" });
       }
       
-      console.log('Successfully deleted donation category:', id);
-      res.json({ message: "Donation category deleted" });
+      console.log(`Successfully deleted donation category ${id} and ${relatedCards.length} related cards`);
+      res.json({ 
+        message: "Donation category deleted", 
+        deletedCards: relatedCards.length 
+      });
     } catch (error) {
       console.error('Error deleting donation category:', error);
       res.status(500).json({ 
