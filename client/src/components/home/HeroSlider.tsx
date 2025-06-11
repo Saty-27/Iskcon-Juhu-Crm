@@ -51,7 +51,7 @@ const HeroSlider = () => {
             className="object-cover w-full h-full"
           />
         </div>
-        <div className="absolute inset-0 z-20 flex items-center justify-center">
+        <div className="absolute inset-0 z-20 flex items-end justify-center pb-32">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div className="bg-black bg-opacity-40 rounded-2xl p-6 sm:p-8 lg:p-12 backdrop-blur-sm">
               <h2 className="text-white font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl mb-4 sm:mb-6 lg:mb-8 leading-tight drop-shadow-lg">
@@ -88,7 +88,7 @@ const HeroSlider = () => {
               console.log('Image loaded successfully:', banners[0].imageUrl);
             }}
           />
-          <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black bg-opacity-40 flex items-end justify-center pb-32">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
               <div className="backdrop-blur-sm rounded-2xl p-6 sm:p-8 lg:p-12">
                 <h2 className="text-white font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl mb-4 sm:mb-6 lg:mb-8 leading-tight drop-shadow-lg">
