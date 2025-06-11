@@ -329,6 +329,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/admin/quotes", isAdmin, async (req, res) => {
+    try {
+      const quotes = await storage.getQuotes();
+      res.json(quotes);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching quotes" });
+    }
+  });
+
   app.post("/api/quotes", isAdmin, async (req, res) => {
     try {
       const data = insertQuoteSchema.parse(req.body);
