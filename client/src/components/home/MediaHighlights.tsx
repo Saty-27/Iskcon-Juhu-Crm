@@ -86,18 +86,40 @@ const MediaHighlights = () => {
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {galleryItems.slice(0, 6).map((item) => (
-                <Link key={item.id} href="/gallery" className="overflow-hidden rounded-lg h-24 md:h-32 block relative group">
-                  <img 
-                    src={item.imageUrl} 
-                    alt={item.title} 
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-primary bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center">
-                    <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity">View</span>
-                  </div>
-                </Link>
-              ))}
+              {galleryItems.length === 0 ? (
+                <div className="col-span-2 md:col-span-3 text-center py-8 text-gray-500">
+                  <p>No gallery images available</p>
+                </div>
+              ) : (
+                galleryItems.slice(0, 6).map((item) => (
+                  <Link key={item.id} href="/gallery" className="overflow-hidden rounded-lg h-24 md:h-32 block relative group bg-gray-100">
+                    <img 
+                      src={item.imageUrl} 
+                      alt={item.title} 
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                      loading="lazy"
+                      onLoad={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.parentElement?.classList.remove('bg-gray-100');
+                      }}
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        target.parentElement?.classList.add('bg-red-100');
+                        if (!target.parentElement?.querySelector('.fallback-text')) {
+                          const fallback = document.createElement('div');
+                          fallback.className = 'fallback-text w-full h-full flex items-center justify-center text-gray-400 text-xs';
+                          fallback.textContent = 'Image unavailable';
+                          target.parentElement?.appendChild(fallback);
+                        }
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-primary bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center">
+                      <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity">View</span>
+                    </div>
+                  </Link>
+                ))
+              )}
             </div>
           </div>
 
