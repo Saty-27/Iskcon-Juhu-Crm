@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
-import { DonationCategory, DonationCard, BankDetails } from '@shared/schema';
+import { DonationCategory, BankDetails } from '@shared/schema';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -10,16 +10,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import PaymentModal from '@/components/payment/PaymentModal';
-import useAuth from '@/hooks/useAuth';
-import { useToast } from '@/hooks/use-toast';
+
 
 const Donate = () => {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const { toast } = useToast();
-  
   const [paymentModal, setPaymentModal] = useState<{
     isOpen: boolean;
-    donationCard?: DonationCard;
     customAmount?: number;
     donationCategory?: DonationCategory;
   }>({
@@ -32,41 +27,20 @@ const Donate = () => {
     queryKey: ['/api/donation-categories'],
   });
 
-  const { data: donationCards = [], isLoading: cardsLoading } = useQuery<DonationCard[]>({
-    queryKey: ['/api/donation-cards'],
-  });
-
   const { data: bankDetails = [] } = useQuery<BankDetails[]>({
     queryKey: ['/api/bank-details'],
   });
 
-  const isLoading = categoriesLoading || cardsLoading;
+  const isLoading = categoriesLoading;
 
-  // Check authentication before allowing donation
-  const checkAuthAndProceed = (callback: () => void) => {
-    if (!authLoading && !isAuthenticated) {
-      toast({
-        title: "Login Required",
-        description: "You need to login to make a donation. Redirecting to login page...",
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
-      }, 1500);
-      return;
-    }
-    callback();
-  };
+  // No authentication checks - allow donations without login
 
-  // Handle donation card click - open payment modal
-  const handleDonateClick = (card: DonationCard) => {
-    checkAuthAndProceed(() => {
-      const category = categories.find(cat => cat.id === card.categoryId);
-      setPaymentModal({
-        isOpen: true,
-        donationCard: card,
-        donationCategory: category
-      });
+  // Handle category-based custom donation
+  const handleCategoryDonation = (category: DonationCategory, amount: number) => {
+    setPaymentModal({
+      isOpen: true,
+      customAmount: amount,
+      donationCategory: category
     });
   };
 
@@ -74,11 +48,9 @@ const Donate = () => {
   const handleCustomDonation = () => {
     const amount = parseInt(customAmount);
     if (amount && amount > 0) {
-      checkAuthAndProceed(() => {
-        setPaymentModal({
-          isOpen: true,
-          customAmount: amount
-        });
+      setPaymentModal({
+        isOpen: true,
+        customAmount: amount
       });
     }
   };
@@ -114,27 +86,26 @@ const Donate = () => {
           </div>
         </section>
         
-        {/* Dynamic Donation Cards */}
+        {/* Donation Categories */}
         <section className="py-16">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="font-poppins font-bold text-3xl md:text-4xl text-primary mb-4">
-                Support Our Divine Mission
+                Choose a Donation Category
               </h2>
               <p className="font-opensans text-lg max-w-2xl mx-auto text-dark">
-                Choose from various donation opportunities to contribute to our sacred cause.
+                Select from our various donation categories to support different aspects of our mission.
               </p>
             </div>
             
             {isLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {[1, 2, 3, 4, 5, 6].map((i) => (
+                {[1, 2, 3].map((i) => (
                   <div key={i} className="bg-white rounded-xl overflow-hidden shadow-lg">
                     <Skeleton className="w-full h-48" />
                     <div className="p-6">
                       <Skeleton className="h-6 w-3/4 mb-2" />
                       <Skeleton className="h-4 w-full mb-4" />
-                      <Skeleton className="h-8 w-24 mb-4" />
                       <Skeleton className="h-10 w-full rounded-lg" />
                     </div>
                   </div>
@@ -142,56 +113,51 @@ const Donate = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {donationCards
-                  .filter(card => card.isActive)
+                {categories
+                  .filter(category => category.isActive)
                   .sort((a, b) => a.order - b.order)
-                  .map((card) => {
-                    const category = categories.find(cat => cat.id === card.categoryId);
-                    return (
-                      <div 
-                        key={card.id}
-                        className="bg-white rounded-xl overflow-hidden shadow-lg transition-transform hover:transform hover:scale-105"
-                      >
+                  .map((category) => (
+                    <Link key={category.id} href={`/donate/${category.id}`}>
+                      <div className="bg-white rounded-xl overflow-hidden shadow-lg transition-transform hover:transform hover:scale-105 cursor-pointer">
+                        {/* Category Image */}
+                        {category.imageUrl && (
+                          <img 
+                            src={category.imageUrl} 
+                            alt={category.name}
+                            className="w-full h-48 object-cover"
+                          />
+                        )}
+                        
                         <div className="p-6 text-center">
-                          {/* Title */}
-                          <h3 className="font-poppins font-semibold text-xl text-primary mb-4">
-                            {card.title}
+                          {/* Category Name */}
+                          <h3 className="font-poppins font-semibold text-xl text-primary mb-3">
+                            {category.name}
                           </h3>
                           
-                          {/* Card Image */}
-                          {card.imageUrl && (
-                            <img 
-                              src={card.imageUrl} 
-                              alt={card.title}
-                              className="w-full h-48 object-cover rounded-lg mb-4"
-                            />
+                          {/* Category Description */}
+                          {category.description && (
+                            <p className="font-opensans text-gray-600 text-sm mb-4 line-clamp-3">
+                              {category.description}
+                            </p>
                           )}
                           
-                          {/* Amount */}
-                          <div className="text-2xl font-bold text-primary mb-4">
-                            ₹{card.amount.toLocaleString('en-IN')}
-                          </div>
-                          
                           {/* Donate Button */}
-                          <Button 
-                            onClick={() => handleDonateClick(card)}
-                            className="w-full bg-primary text-white font-poppins font-medium py-3 rounded-lg hover:bg-opacity-90 transition-colors"
-                          >
-                            Donate Now
+                          <Button className="w-full bg-primary text-white font-poppins font-medium py-3 rounded-lg hover:bg-opacity-90 transition-colors">
+                            View Donation Options
                           </Button>
                         </div>
                       </div>
-                    );
-                  })}
+                    </Link>
+                  ))}
               </div>
             )}
           </div>
         </section>
 
-        {/* Custom Amount Donation Section */}
+        {/* Custom Amount Donation Section - Full Width */}
         <section className="py-16 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="max-w-md mx-auto bg-orange-50 p-8 rounded-xl border-2 border-primary">
+          <div className="w-full px-4">
+            <div className="max-w-6xl mx-auto bg-orange-50 p-8 rounded-xl border-2 border-primary">
               <h2 className="font-poppins font-bold text-2xl md:text-3xl text-primary mb-6 text-center">
                 Custom Donation Amount
               </h2>
@@ -199,7 +165,7 @@ const Donate = () => {
                 Enter any amount you wish to donate for our temple services and community programs.
               </p>
               
-              <div className="space-y-4">
+              <div className="max-w-md mx-auto space-y-4">
                 <div>
                   <Label htmlFor="customAmount" className="text-primary font-semibold">
                     Enter Amount (₹)
