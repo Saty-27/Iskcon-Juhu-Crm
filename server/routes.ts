@@ -1048,6 +1048,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin donations management endpoint
+  app.get("/api/admin/donations", isAdmin, async (req, res) => {
+    try {
+      const donations = await storage.getAllDonations();
+      res.json(donations);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching donations" });
+    }
+  });
+
   app.get("/api/user/donations", isAuthenticated, async (req, res) => {
     try {
       if (!req.session.userId) {

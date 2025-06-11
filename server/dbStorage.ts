@@ -368,6 +368,32 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(donations);
   }
 
+  async getAllDonations(): Promise<any[]> {
+    return await db
+      .select({
+        id: donations.id,
+        amount: donations.amount,
+        name: donations.name,
+        email: donations.email,
+        phone: donations.phone,
+        address: donations.address,
+        panCard: donations.panCard,
+        message: donations.message,
+        paymentId: donations.paymentId,
+        status: donations.status,
+        createdAt: donations.createdAt,
+        categoryName: donationCategories.name,
+        eventTitle: events.title,
+        invoiceNumber: donations.invoiceNumber,
+        receiptSent: donations.receiptSent,
+        notificationSent: donations.notificationSent
+      })
+      .from(donations)
+      .leftJoin(donationCategories, eq(donations.categoryId, donationCategories.id))
+      .leftJoin(events, eq(donations.eventId, events.id))
+      .orderBy(donations.createdAt);
+  }
+
   async getDonation(id: number): Promise<Donation | undefined> {
     const [donation] = await db.select().from(donations).where(eq(donations.id, id));
     return donation;
