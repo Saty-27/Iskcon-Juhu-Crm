@@ -280,14 +280,21 @@ const VideosPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {videos.map((video) => (
                   <div key={video.id} className="border rounded-lg overflow-hidden">
-                    <div className="h-48 overflow-hidden bg-gray-100">
-                      <iframe 
-                        src={getYouTubeEmbedUrl(video.youtubeUrl)}
-                        title={video.title}
-                        className="w-full h-full"
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
+                    <div className="h-48 overflow-hidden bg-white border">
+                      <img 
+                        src={video.thumbnailUrl} 
+                        alt={video.title} 
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          if (!target.parentElement?.querySelector('.fallback-text')) {
+                            const fallback = document.createElement('div');
+                            fallback.className = 'fallback-text w-full h-full flex items-center justify-center text-gray-400 text-sm bg-gray-50';
+                            fallback.textContent = video.title;
+                            target.parentElement?.appendChild(fallback);
+                          }
+                        }}
                       />
                     </div>
                     <div className="p-4">
