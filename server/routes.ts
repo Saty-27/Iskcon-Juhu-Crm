@@ -323,16 +323,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/donation-categories/:id", isAdmin, async (req, res) => {
+  app.delete("/api/donation-categories/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const success = await storage.deleteDonationCategory(id);
-      if (!success) {
+      console.log('Attempting to delete donation category with ID:', id);
+      
+      // First check if category exists
+      const existingCategory = await storage.getDonationCategory(id);
+      if (!existingCategory) {
+        console.log('Category not found for ID:', id);
         return res.status(404).json({ message: "Donation category not found" });
       }
+      
+      // Check if there are any related donation cards
+      const relatedCards = await storage.getDonationCardsByCategory(id);
+      if (relatedCards.length > 0) {
+        console.log('Cannot delete category - has related donation cards:', relatedCards.length);
+        return res.status(400).json({ 
+          message: "Cannot delete category with existing donation cards. Please delete the cards first." 
+        });
+      }
+      
+      const success = await storage.deleteDonationCategory(id);
+      if (!success) {
+        console.log('Delete operation failed for ID:', id);
+        return res.status(404).json({ message: "Donation category not found" });
+      }
+      
+      console.log('Successfully deleted donation category:', id);
       res.json({ message: "Donation category deleted" });
     } catch (error) {
-      res.status(500).json({ message: "Error deleting donation category" });
+      console.error('Error deleting donation category:', error);
+      res.status(500).json({ 
+        message: "Error deleting donation category", 
+        error: error instanceof Error ? error.message : String(error) 
+      });
     }
   });
 
