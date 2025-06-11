@@ -7,6 +7,20 @@ import { Skeleton } from '@/components/ui/skeleton';
 const TempleSchedule: React.FC = () => {
   const [isModalOpen, setModalOpen] = useState(false);
 
+  // Add/remove body class when modal opens/closes
+  React.useEffect(() => {
+    if (isModalOpen) {
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+    
+    // Cleanup on unmount
+    return () => {
+      document.body.classList.remove('modal-open');
+    };
+  }, [isModalOpen]);
+
   const { data: schedules = [], isLoading } = useQuery<Schedule[]>({
     queryKey: ['/api/schedules'],
   });
