@@ -62,21 +62,7 @@ const PaymentModal = ({
     message: ''
   });
 
-  // Check authentication and redirect if not logged in
-  useEffect(() => {
-    if (isOpen && !authLoading && !isAuthenticated) {
-      onClose(); // Close modal immediately
-      toast({
-        title: "Login Required",
-        description: "You need to login to make a donation. Redirecting to login page...",
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
-      }, 1500);
-      return;
-    }
-  }, [isOpen, isAuthenticated, authLoading, toast, onClose]);
+  // No authentication check - allow donations without login
 
   // Auto-populate form with user data when available
   useEffect(() => {
