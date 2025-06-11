@@ -117,6 +117,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/uploads/banners', express.static(bannersDir));
   app.use('/uploads/cards', express.static(cardsDir));
   app.use('/uploads/qr-codes', express.static(qrCodesDir));
+  app.use('/uploads/gallery', express.static(galleryDir));
+  app.use('/uploads/videos', express.static(videosDir));
 
   // Generic upload endpoint
   app.post("/api/upload", upload.single('file'), async (req, res) => {
@@ -156,6 +158,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ imageUrl });
     } catch (error) {
       res.status(500).json({ message: "Error uploading file", error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
+  // Gallery image upload endpoint
+  app.post("/api/upload/gallery", isAdmin, (req, res, next) => {
+    req.body.type = 'gallery';
+    next();
+  }, upload.single('image'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      
+      const imageUrl = `/uploads/gallery/${req.file.filename}`;
+      res.json({ imageUrl });
+    } catch (error) {
+      res.status(500).json({ message: "Error uploading gallery image", error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
+  // Video thumbnail upload endpoint
+  app.post("/api/upload/videos", isAdmin, (req, res, next) => {
+    req.body.type = 'video';
+    next();
+  }, upload.single('image'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      
+      const imageUrl = `/uploads/videos/${req.file.filename}`;
+      res.json({ imageUrl });
+    } catch (error) {
+      res.status(500).json({ message: "Error uploading video thumbnail", error: error instanceof Error ? error.message : String(error) });
     }
   });
 

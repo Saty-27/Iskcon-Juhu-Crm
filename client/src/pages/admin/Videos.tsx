@@ -362,9 +362,47 @@ const VideosPage = () => {
                   name="thumbnailUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Thumbnail URL</FormLabel>
+                      <FormLabel>Thumbnail</FormLabel>
                       <FormControl>
-                        <Input placeholder="https://example.com/thumbnail.jpg" {...field} />
+                        <Tabs defaultValue="url" className="w-full">
+                          <TabsList className="grid w-full grid-cols-2">
+                            <TabsTrigger value="url" className="flex items-center gap-2">
+                              <Link className="w-4 h-4" />
+                              URL
+                            </TabsTrigger>
+                            <TabsTrigger value="upload" className="flex items-center gap-2">
+                              <Upload className="w-4 h-4" />
+                              Upload
+                            </TabsTrigger>
+                          </TabsList>
+                          <TabsContent value="url">
+                            <Input 
+                              placeholder="https://example.com/thumbnail.jpg" 
+                              {...field} 
+                            />
+                          </TabsContent>
+                          <TabsContent value="upload">
+                            <div className="space-y-2">
+                              <Input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    handleFileUpload(file, editForm);
+                                  }
+                                }}
+                                disabled={uploadingFile}
+                              />
+                              {uploadingFile && (
+                                <p className="text-sm text-muted-foreground">Uploading...</p>
+                              )}
+                              {field.value && field.value.includes('/uploads/') && (
+                                <p className="text-sm text-green-600">File uploaded successfully</p>
+                              )}
+                            </div>
+                          </TabsContent>
+                        </Tabs>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
