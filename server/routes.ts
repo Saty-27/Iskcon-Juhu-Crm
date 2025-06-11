@@ -162,10 +162,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Gallery image upload endpoint
-  app.post("/api/upload/gallery", isAdmin, (req, res, next) => {
-    req.body.type = 'gallery';
-    next();
-  }, upload.single('image'), async (req, res) => {
+  const galleryUpload = multer({
+    storage: multer.diskStorage({
+      destination: function (req, file, cb) {
+        cb(null, galleryDir);
+      },
+      filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, 'gallery-' + uniqueSuffix + path.extname(file.originalname));
+      }
+    }),
+    limits: {
+      fileSize: 5 * 1024 * 1024 // 5MB limit
+    },
+    fileFilter: function (req, file, cb) {
+      if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only image files are allowed!'));
+      }
+    }
+  });
+
+  app.post("/api/upload/gallery", isAdmin, galleryUpload.single('image'), async (req, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
@@ -179,10 +198,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Video thumbnail upload endpoint
-  app.post("/api/upload/videos", isAdmin, (req, res, next) => {
-    req.body.type = 'video';
-    next();
-  }, upload.single('image'), async (req, res) => {
+  const videoUpload = multer({
+    storage: multer.diskStorage({
+      destination: function (req, file, cb) {
+        cb(null, videosDir);
+      },
+      filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, 'video-' + uniqueSuffix + path.extname(file.originalname));
+      }
+    }),
+    limits: {
+      fileSize: 5 * 1024 * 1024 // 5MB limit
+    },
+    fileFilter: function (req, file, cb) {
+      if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only image files are allowed!'));
+      }
+    }
+  });
+
+  app.post("/api/upload/videos", isAdmin, videoUpload.single('image'), async (req, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
