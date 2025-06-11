@@ -141,6 +141,32 @@ export default function Donations() {
           </Button>
         </div>
 
+        {/* Summary Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-green-50 p-4 rounded-lg">
+            <div className="text-sm text-green-600 font-medium">Total Donations</div>
+            <div className="text-2xl font-bold text-green-900">{donations.length}</div>
+          </div>
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <div className="text-sm text-blue-600 font-medium">Completed</div>
+            <div className="text-2xl font-bold text-blue-900">
+              {donations.filter(d => d.status === 'success').length}
+            </div>
+          </div>
+          <div className="bg-yellow-50 p-4 rounded-lg">
+            <div className="text-sm text-yellow-600 font-medium">Pending</div>
+            <div className="text-2xl font-bold text-yellow-900">
+              {donations.filter(d => d.status === 'pending').length}
+            </div>
+          </div>
+          <div className="bg-purple-50 p-4 rounded-lg">
+            <div className="text-sm text-purple-600 font-medium">Total Amount</div>
+            <div className="text-2xl font-bold text-purple-900">
+              ₹{donations.reduce((sum, d) => sum + d.amount, 0).toLocaleString()}
+            </div>
+          </div>
+        </div>
+
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-lg font-semibold mb-4">All Donations</h2>
@@ -238,32 +264,6 @@ export default function Donations() {
                 )}
               </TableBody>
             </Table>
-          </div>
-
-          {/* Summary Stats */}
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-green-50 p-4 rounded-lg">
-              <div className="text-sm text-green-600 font-medium">Total Donations</div>
-              <div className="text-2xl font-bold text-green-900">{donations.length}</div>
-            </div>
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <div className="text-sm text-blue-600 font-medium">Completed</div>
-              <div className="text-2xl font-bold text-blue-900">
-                {donations.filter(d => d.status === 'success').length}
-              </div>
-            </div>
-            <div className="bg-yellow-50 p-4 rounded-lg">
-              <div className="text-sm text-yellow-600 font-medium">Pending</div>
-              <div className="text-2xl font-bold text-yellow-900">
-                {donations.filter(d => d.status === 'pending').length}
-              </div>
-            </div>
-            <div className="bg-purple-50 p-4 rounded-lg">
-              <div className="text-sm text-purple-600 font-medium">Total Amount</div>
-              <div className="text-2xl font-bold text-purple-900">
-                ₹{donations.reduce((sum, d) => sum + d.amount, 0).toLocaleString()}
-              </div>
-            </div>
           </div>
         </div>
       </div>
