@@ -160,7 +160,7 @@ const DonationCategoriesPage = () => {
     setEditingCategory(category);
     editForm.reset({
       name: category.name,
-      description: category.description,
+      description: category.description || "",
       isActive: category.isActive,
     });
   };
@@ -422,7 +422,7 @@ const DonationCategoriesPage = () => {
           </div>
         )}
 
-        {/* Edit Dialog */}
+        {/* Edit Category Dialog */}
         <Dialog open={!!editingCategory} onOpenChange={() => setEditingCategory(null)}>
           <DialogContent>
             <DialogHeader>
@@ -458,6 +458,166 @@ const DonationCategoriesPage = () => {
                 />
                 <Button type="submit" disabled={updateMutation.isPending}>
                   {updateMutation.isPending ? "Updating..." : "Update Category"}
+                </Button>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Create Donation Card Dialog */}
+        <Dialog open={isCardCreateOpen} onOpenChange={setIsCardCreateOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create Donation Card</DialogTitle>
+            </DialogHeader>
+            <Form {...cardCreateForm}>
+              <form onSubmit={cardCreateForm.handleSubmit(handleSubmitCard)} className="space-y-4">
+                <FormField
+                  control={cardCreateForm.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Title</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Card title" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={cardCreateForm.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea placeholder="Card description" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={cardCreateForm.control}
+                  name="amount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Amount (₹)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          placeholder="0" 
+                          {...field}
+                          onChange={(e) => field.onChange(Number(e.target.value))}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={cardCreateForm.control}
+                  name="isActive"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">Active</FormLabel>
+                        <div className="text-sm text-muted-foreground">
+                          Make this card available for donations
+                        </div>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" disabled={createCardMutation.isPending}>
+                  {createCardMutation.isPending ? "Creating..." : "Create Card"}
+                </Button>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Donation Card Dialog */}
+        <Dialog open={!!editingCard} onOpenChange={() => setEditingCard(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Donation Card</DialogTitle>
+            </DialogHeader>
+            <Form {...cardEditForm}>
+              <form onSubmit={cardEditForm.handleSubmit(handleUpdateCard)} className="space-y-4">
+                <FormField
+                  control={cardEditForm.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Title</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Card title" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={cardEditForm.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea placeholder="Card description" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={cardEditForm.control}
+                  name="amount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Amount (₹)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          placeholder="0" 
+                          {...field}
+                          onChange={(e) => field.onChange(Number(e.target.value))}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={cardEditForm.control}
+                  name="isActive"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">Active</FormLabel>
+                        <div className="text-sm text-muted-foreground">
+                          Make this card available for donations
+                        </div>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" disabled={updateCardMutation.isPending}>
+                  {updateCardMutation.isPending ? "Updating..." : "Update Card"}
                 </Button>
               </form>
             </Form>
