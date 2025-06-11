@@ -61,18 +61,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
   );
 
   // Configure multer for file uploads
-  const uploadDir = path.join(process.cwd(), 'uploads', 'banners');
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-  }
+  const uploadsDir = path.join(process.cwd(), 'uploads');
+  const bannersDir = path.join(uploadsDir, 'banners');
+  const cardsDir = path.join(uploadsDir, 'cards');
+  const qrCodesDir = path.join(uploadsDir, 'qr-codes');
+  
+  // Create directories if they don't exist
+  [uploadsDir, bannersDir, cardsDir, qrCodesDir].forEach(dir => {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+  });
 
   const storage_multer = multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, uploadDir);
+      const type = req.body.type || 'banner';
+      let destDir = bannersDir;
+      
+      if (type === 'card') {
+        destDir = cardsDir;
+      } else if (type === 'qr') {
+        destDir = qrCodesDir;
+      }
+      
+      cb(null, destDir);
     },
     filename: function (req, file, cb) {
+      const type = req.body.type || 'banner';
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      cb(null, 'banner-' + uniqueSuffix + path.extname(file.originalname));
+      cb(null, type + '-' + uniqueSuffix + path.extname(file.originalname));
     }
   });
 
@@ -90,10 +107,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Serve uploaded banner images
-  app.use('/uploads/banners', express.static(uploadDir));
+  // Serve uploaded images
+  app.use('/uploads/banners', express.static(bannersDir));
+  app.use('/uploads/cards', express.static(cardsDir));
+  app.use('/uploads/qr-codes', express.static(qrCodesDir));
 
-  // Banner upload endpoint
+  // Generic upload endpoint
+  app.post("/api/upload", upload.single('file'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      
+      const type = req.body.type || 'banner';
+      let folder = 'banners';
+      
+      if (type === 'card') {
+        folder = 'cards';
+      } else if (type === 'qr') {
+        folder = 'qr-codes';
+      }
+      
+      const imageUrl = `/uploads/${folder}/${req.file.filename}`;
+      res.json({ url: imageUrl });
+    } catch (error) {
+      res.status(500).json({ message: "Error uploading file", error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
+  // Banner upload endpoint (legacy)
   app.post("/api/upload/banner", isAdmin, upload.single('image'), async (req, res) => {
     try {
       if (!req.file) {
