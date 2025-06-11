@@ -777,6 +777,36 @@ export class MemStorage implements IStorage {
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 
+  async getAllDonations(): Promise<any[]> {
+    const donations = Array.from(this.donationsData.values());
+    const categories = Array.from(this.donationCategoriesData.values());
+    const events = Array.from(this.eventsData.values());
+    
+    return donations.map(donation => {
+      const category = categories.find(c => c.id === donation.categoryId);
+      const event = events.find(e => e.id === donation.eventId);
+      
+      return {
+        id: donation.id,
+        amount: donation.amount,
+        name: donation.name,
+        email: donation.email,
+        phone: donation.phone,
+        address: donation.address,
+        panCard: donation.panCard,
+        message: donation.message,
+        paymentId: donation.paymentId,
+        status: donation.status,
+        createdAt: donation.createdAt,
+        categoryName: category?.name || null,
+        eventTitle: event?.title || null,
+        invoiceNumber: donation.invoiceNumber,
+        receiptSent: donation.receiptSent,
+        notificationSent: donation.notificationSent
+      };
+    }).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
   async getDonation(id: number): Promise<Donation | undefined> {
     return this.donationsData.get(id);
   }
