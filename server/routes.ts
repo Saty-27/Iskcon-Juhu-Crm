@@ -113,12 +113,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Serve uploaded images
-  app.use('/uploads/banners', express.static(bannersDir));
-  app.use('/uploads/cards', express.static(cardsDir));
-  app.use('/uploads/qr-codes', express.static(qrCodesDir));
-  app.use('/uploads/gallery', express.static(galleryDir));
-  app.use('/uploads/videos', express.static(videosDir));
+  // Serve uploaded images with proper MIME types
+  app.use('/uploads/banners', express.static(bannersDir, {
+    setHeaders: (res, path) => {
+      if (path.endsWith('.svg')) {
+        res.setHeader('Content-Type', 'image/svg+xml');
+      }
+    }
+  }));
+  app.use('/uploads/cards', express.static(cardsDir, {
+    setHeaders: (res, path) => {
+      if (path.endsWith('.svg')) {
+        res.setHeader('Content-Type', 'image/svg+xml');
+      }
+    }
+  }));
+  app.use('/uploads/qr-codes', express.static(qrCodesDir, {
+    setHeaders: (res, path) => {
+      if (path.endsWith('.svg')) {
+        res.setHeader('Content-Type', 'image/svg+xml');
+      }
+    }
+  }));
+  app.use('/uploads/gallery', express.static(galleryDir, {
+    setHeaders: (res, path) => {
+      if (path.endsWith('.svg')) {
+        res.setHeader('Content-Type', 'image/svg+xml');
+      }
+    }
+  }));
+  app.use('/uploads/videos', express.static(videosDir, {
+    setHeaders: (res, path) => {
+      if (path.endsWith('.svg')) {
+        res.setHeader('Content-Type', 'image/svg+xml');
+      }
+    }
+  }));
 
   // Generic upload endpoint
   app.post("/api/upload", upload.single('file'), async (req, res) => {
