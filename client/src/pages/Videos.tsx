@@ -110,7 +110,12 @@ const Videos = () => {
       
       {/* Video Player Dialog */}
       <Dialog open={!!selectedVideo} onOpenChange={(open) => !open && closeVideoPlayer()}>
-        <DialogContent className="sm:max-w-[800px] p-0 overflow-hidden bg-black" hideClose>
+        <DialogContent className="sm:max-w-[800px] p-0 overflow-hidden bg-black">
+          <DialogHeader>
+            <DialogTitle className="sr-only">
+              {selectedVideo ? selectedVideo.title : "Video Player"}
+            </DialogTitle>
+          </DialogHeader>
           <div className="relative">
             {selectedVideo && (
               <div className="aspect-video w-full">

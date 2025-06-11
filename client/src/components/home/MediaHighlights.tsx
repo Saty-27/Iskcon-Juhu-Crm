@@ -140,6 +140,9 @@ const MediaHighlights = () => {
       <Dialog open={!!selectedVideo} onOpenChange={(open) => !open && setSelectedVideo(null)}>
         <DialogContent className="sm:max-w-[800px] p-0 overflow-hidden bg-black">
           <DialogHeader className="p-4 absolute top-0 right-0 z-10">
+            <DialogTitle className="sr-only">
+              {selectedVideo ? selectedVideo.title : "Video Player"}
+            </DialogTitle>
             <DialogClose className="text-white hover:text-gray-300">
               <X size={24} />
             </DialogClose>
