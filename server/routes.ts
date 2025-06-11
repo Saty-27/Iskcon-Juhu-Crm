@@ -949,6 +949,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/contact-messages/:id/read", isAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const message = await storage.markContactMessageAsRead(id);
+      if (!message) {
+        return res.status(404).json({ message: "Contact message not found" });
+      }
+      res.json(message);
+    } catch (error) {
+      res.status(500).json({ message: "Error marking message as read" });
+    }
+  });
+
   app.delete("/api/contact-messages/:id", isAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);

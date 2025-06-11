@@ -104,6 +104,7 @@ export interface IStorage {
   getContactMessage(id: number): Promise<ContactMessage | undefined>;
   createContactMessage(message: InsertContactMessage): Promise<ContactMessage>;
   updateContactMessage(id: number, messageData: Partial<ContactMessage>): Promise<ContactMessage | undefined>;
+  markContactMessageAsRead(id: number): Promise<ContactMessage | undefined>;
   deleteContactMessage(id: number): Promise<boolean>;
   
   // Social link management
@@ -1099,6 +1100,15 @@ export class MemStorage implements IStorage {
     if (!message) return undefined;
     
     const updatedMessage = { ...message, ...messageData };
+    this.contactMessagesData.set(id, updatedMessage);
+    return updatedMessage;
+  }
+
+  async markContactMessageAsRead(id: number): Promise<ContactMessage | undefined> {
+    const message = this.contactMessagesData.get(id);
+    if (!message) return undefined;
+    
+    const updatedMessage = { ...message, isRead: true };
     this.contactMessagesData.set(id, updatedMessage);
     return updatedMessage;
   }

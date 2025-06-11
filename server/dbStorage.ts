@@ -333,6 +333,14 @@ export class DatabaseStorage implements IStorage {
     return message;
   }
 
+  async markContactMessageAsRead(id: number): Promise<ContactMessage | undefined> {
+    const [message] = await db.update(contactMessages)
+      .set({ isRead: true })
+      .where(eq(contactMessages.id, id))
+      .returning();
+    return message;
+  }
+
   async deleteContactMessage(id: number): Promise<boolean> {
     const result = await db.delete(contactMessages).where(eq(contactMessages.id, id));
     return result.rowCount > 0;
