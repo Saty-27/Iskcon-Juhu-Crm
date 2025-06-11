@@ -37,59 +37,71 @@ const AdminDashboard = () => {
             <p className="text-gray-600">Monitor and manage your temple's digital presence</p>
           </div>
 
-          {/* Real-time Donation Statistics Grid */}
+          {/* Real-time Donation Statistics Grid - Modern Gradient Design */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <Card className="rounded-xl shadow-sm border-0 bg-white hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
+            {/* Total Donations Card */}
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500 via-purple-600 to-purple-700 p-6 text-white shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="absolute top-0 right-0 -mt-4 -mr-4 h-16 w-16 rounded-full bg-white/10"></div>
+              <div className="absolute bottom-0 left-0 -mb-4 -ml-4 h-12 w-12 rounded-full bg-white/5"></div>
+              <div className="relative">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="p-3 bg-green-100 rounded-lg">
-                    <TrendingUp className="h-6 w-6 text-green-600" />
+                  <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <TrendingUp className="h-6 w-6 text-white" />
                   </div>
-                  <span className="text-sm font-medium text-green-600">Total</span>
+                  <span className="text-sm font-medium bg-white/20 px-3 py-1 rounded-full">Total</span>
                 </div>
-                <div className="text-3xl font-bold text-gray-900 mb-1">{donations.length}</div>
-                <p className="text-sm text-gray-600">Total Donations</p>
-              </CardContent>
-            </Card>
+                <div className="text-4xl font-bold mb-2">{donations.length}</div>
+                <p className="text-purple-100 text-sm">Total Donations</p>
+              </div>
+            </div>
 
-            <Card className="rounded-xl shadow-sm border-0 bg-white hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
+            {/* Completed Donations Card */}
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-400 via-emerald-500 to-emerald-600 p-6 text-white shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="absolute top-0 right-0 -mt-4 -mr-4 h-16 w-16 rounded-full bg-white/10"></div>
+              <div className="absolute bottom-0 left-0 -mb-4 -ml-4 h-12 w-12 rounded-full bg-white/5"></div>
+              <div className="relative">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="p-3 bg-blue-100 rounded-lg">
-                    <CheckCircle className="h-6 w-6 text-blue-600" />
+                  <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <CheckCircle className="h-6 w-6 text-white" />
                   </div>
-                  <span className="text-sm font-medium text-blue-600">Success</span>
+                  <span className="text-sm font-medium bg-white/20 px-3 py-1 rounded-full">Success</span>
                 </div>
-                <div className="text-3xl font-bold text-gray-900 mb-1">{completedDonations.length}</div>
-                <p className="text-sm text-gray-600">Completed</p>
-              </CardContent>
-            </Card>
+                <div className="text-4xl font-bold mb-2">{completedDonations.length}</div>
+                <p className="text-emerald-100 text-sm">Completed</p>
+              </div>
+            </div>
 
-            <Card className="rounded-xl shadow-sm border-0 bg-white hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
+            {/* Pending Donations Card */}
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-400 via-orange-500 to-orange-600 p-6 text-white shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="absolute top-0 right-0 -mt-4 -mr-4 h-16 w-16 rounded-full bg-white/10"></div>
+              <div className="absolute bottom-0 left-0 -mb-4 -ml-4 h-12 w-12 rounded-full bg-white/5"></div>
+              <div className="relative">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="p-3 bg-yellow-100 rounded-lg">
-                    <Clock className="h-6 w-6 text-yellow-600" />
+                  <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <Clock className="h-6 w-6 text-white" />
                   </div>
-                  <span className="text-sm font-medium text-yellow-600">Waiting</span>
+                  <span className="text-sm font-medium bg-white/20 px-3 py-1 rounded-full">Waiting</span>
                 </div>
-                <div className="text-3xl font-bold text-gray-900 mb-1">{pendingDonations.length}</div>
-                <p className="text-sm text-gray-600">Pending</p>
-              </CardContent>
-            </Card>
+                <div className="text-4xl font-bold mb-2">{pendingDonations.length}</div>
+                <p className="text-orange-100 text-sm">Pending</p>
+              </div>
+            </div>
 
-            <Card className="rounded-xl shadow-sm border-0 bg-white hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
+            {/* Revenue Card */}
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-700 p-6 text-white shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="absolute top-0 right-0 -mt-4 -mr-4 h-16 w-16 rounded-full bg-white/10"></div>
+              <div className="absolute bottom-0 left-0 -mb-4 -ml-4 h-12 w-12 rounded-full bg-white/5"></div>
+              <div className="relative">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="p-3 bg-purple-100 rounded-lg">
-                    <IndianRupee className="h-6 w-6 text-purple-600" />
+                  <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <IndianRupee className="h-6 w-6 text-white" />
                   </div>
-                  <span className="text-sm font-medium text-purple-600">Revenue</span>
+                  <span className="text-sm font-medium bg-white/20 px-3 py-1 rounded-full">Revenue</span>
                 </div>
-                <div className="text-3xl font-bold text-gray-900 mb-1">₹{totalAmount.toLocaleString()}</div>
-                <p className="text-sm text-gray-600">Total Amount</p>
-              </CardContent>
-            </Card>
+                <div className="text-4xl font-bold mb-2">₹{totalAmount.toLocaleString()}</div>
+                <p className="text-blue-100 text-sm">Total Amount</p>
+              </div>
+            </div>
           </div>
 
           {/* Recent Donations Table */}
