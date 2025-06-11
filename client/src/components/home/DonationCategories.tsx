@@ -53,7 +53,11 @@ const DonationCategories = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {categories.map((category) => (
+          {categories
+            .filter(category => category.isActive)
+            .sort((a, b) => a.order - b.order)
+            .slice(0, 6)
+            .map((category) => (
             <div 
               key={category.id}
               className="bg-white rounded-xl overflow-hidden shadow-lg transition-transform hover:transform hover:scale-105"
@@ -76,6 +80,18 @@ const DonationCategories = () => {
             </div>
           ))}
         </div>
+
+        {/* View All Button */}
+        {categories.filter(category => category.isActive).length > 6 && (
+          <div className="text-center mt-12">
+            <Link 
+              href="/donate"
+              className="inline-block bg-secondary text-white font-poppins font-medium py-3 px-8 rounded-lg hover:bg-opacity-90 transition-colors"
+            >
+              View All Donation Categories
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );

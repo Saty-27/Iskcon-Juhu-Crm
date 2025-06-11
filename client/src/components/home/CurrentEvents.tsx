@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
-import { useLocation } from 'wouter';
+import { useLocation, Link } from 'wouter';
 import { Event } from '@shared/schema';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -58,7 +58,11 @@ const CurrentEvents = () => {
 
         {/* Events Grid */}
         <div className="current-events-grid">
-          {events.map((event) => (
+          {events
+            .filter(event => event.isActive)
+            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+            .slice(0, 2)
+            .map((event) => (
             <div key={event.id} className="current-event-card">
               {/* Event Image */}
               <div className="event-image-container">
@@ -123,6 +127,18 @@ const CurrentEvents = () => {
             </div>
           ))}
         </div>
+
+        {/* View All Events Button */}
+        {events.filter(event => event.isActive).length > 2 && (
+          <div className="text-center mt-12">
+            <Link 
+              href="/events"
+              className="inline-block bg-secondary text-white font-poppins font-medium py-3 px-8 rounded-lg hover:bg-opacity-90 transition-colors"
+            >
+              View All Events
+            </Link>
+          </div>
+        )}
 
         {/* Receipt Information */}
         <div className="receipt-info">
