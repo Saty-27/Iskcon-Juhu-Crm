@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, GripVertical } from "lucide-react";
+import { Plus, Trash2, GripVertical, Upload, Image } from "lucide-react";
 import type { DonationCategory, DonationCard, BankDetails } from "@shared/schema";
 
 const categoryFormSchema = z.object({
@@ -40,6 +40,7 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
   const [donationCards, setDonationCards] = useState<any[]>([]);
   const [bankDetails, setBankDetails] = useState<any>(null);
   const [suggestedAmountsInput, setSuggestedAmountsInput] = useState("");
+  const [uploadingImage, setUploadingImage] = useState<string | null>(null);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -242,6 +243,59 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
     setDonationCards(updated);
   };
 
+  const handleFileUpload = async (file: File, type: string, cardIndex?: number) => {
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', type);
+
+    setUploadingImage(type + (cardIndex !== undefined ? `-${cardIndex}` : ''));
+
+    try {
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+
+      const result = await response.json();
+      const imageUrl = result.url;
+
+      if (type === 'banner') {
+        form.setValue('imageUrl', imageUrl);
+      } else if (type === 'card' && cardIndex !== undefined) {
+        updateDonationCard(cardIndex, 'imageUrl', imageUrl);
+      } else if (type === 'qr') {
+        setBankDetails((prev: any) => ({
+          ...prev,
+          qrCodeUrl: imageUrl,
+          accountName: prev?.accountName || '',
+          accountNumber: prev?.accountNumber || '',
+          bankName: prev?.bankName || '',
+          ifscCode: prev?.ifscCode || '',
+          swiftCode: prev?.swiftCode || '',
+        }));
+      }
+
+      toast({
+        title: 'Success',
+        description: 'Image uploaded successfully',
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to upload image',
+        variant: 'destructive',
+      });
+    } finally {
+      setUploadingImage(null);
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -347,12 +401,57 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
                       name="imageUrl"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Banner Image URL</FormLabel>
+                          <FormLabel>Banner Image</FormLabel>
                           <FormControl>
-                            <Input 
-                              placeholder="https://example.com/banner-image.jpg"
-                              {...field}
-                            />
+                            <div className="space-y-2">
+                              <Input 
+                                placeholder="https://example.com/banner-image.jpg"
+                                {...field}
+                              />
+                              <div className="flex items-center space-x-2">
+                                <span className="text-sm text-gray-500">or</span>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    const input = document.createElement('input');
+                                    input.type = 'file';
+                                    input.accept = 'image/*';
+                                    input.onchange = (e) => {
+                                      const file = (e.target as HTMLInputElement).files?.[0];
+                                      if (file) handleFileUpload(file, 'banner');
+                                    };
+                                    input.click();
+                                  }}
+                                  disabled={uploadingImage === 'banner'}
+                                >
+                                  {uploadingImage === 'banner' ? (
+                                    <>
+                                      <div className="animate-spin w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full mr-2" />
+                                      Uploading...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Upload className="w-4 h-4 mr-2" />
+                                      Upload Image
+                                    </>
+                                  )}
+                                </Button>
+                              </div>
+                              {field.value && (
+                                <div className="mt-2">
+                                  <img 
+                                    src={field.value} 
+                                    alt="Banner preview" 
+                                    className="w-32 h-20 object-cover rounded border"
+                                    onError={(e) => {
+                                      (e.target as HTMLImageElement).style.display = 'none';
+                                    }}
+                                  />
+                                </div>
+                              )}
+                            </div>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -456,6 +555,60 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
                                     value={card.description}
                                     onChange={(e) => updateDonationCard(index, 'description', e.target.value)}
                                   />
+                                </div>
+                              </div>
+                              
+                              <div className="mt-4">
+                                <Label>Card Image</Label>
+                                <div className="space-y-2">
+                                  <Input
+                                    placeholder="https://example.com/card-image.jpg"
+                                    value={card.imageUrl || ''}
+                                    onChange={(e) => updateDonationCard(index, 'imageUrl', e.target.value)}
+                                  />
+                                  <div className="flex items-center space-x-2">
+                                    <span className="text-sm text-gray-500">or</span>
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => {
+                                        const input = document.createElement('input');
+                                        input.type = 'file';
+                                        input.accept = 'image/*';
+                                        input.onchange = (e) => {
+                                          const file = (e.target as HTMLInputElement).files?.[0];
+                                          if (file) handleFileUpload(file, 'card', index);
+                                        };
+                                        input.click();
+                                      }}
+                                      disabled={uploadingImage === `card-${index}`}
+                                    >
+                                      {uploadingImage === `card-${index}` ? (
+                                        <>
+                                          <div className="animate-spin w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full mr-2" />
+                                          Uploading...
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Image className="w-4 h-4 mr-2" />
+                                          Upload Image
+                                        </>
+                                      )}
+                                    </Button>
+                                  </div>
+                                  {card.imageUrl && (
+                                    <div className="mt-2">
+                                      <img 
+                                        src={card.imageUrl} 
+                                        alt={`Card ${index + 1} preview`} 
+                                        className="w-24 h-16 object-cover rounded border"
+                                        onError={(e) => {
+                                          (e.target as HTMLImageElement).style.display = 'none';
+                                        }}
+                                      />
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             </CardContent>
@@ -592,20 +745,65 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
                         />
                       </div>
                       <div>
-                        <Label>UPI QR Code URL</Label>
-                        <Input
-                          placeholder="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=iskcon@ybl&pn=ISKCON"
-                          value={bankDetails?.qrCodeUrl || ''}
-                          onChange={(e) => setBankDetails((prev: any) => ({
-                            ...prev,
-                            qrCodeUrl: e.target.value,
-                            accountName: prev?.accountName || '',
-                            accountNumber: prev?.accountNumber || '',
-                            bankName: prev?.bankName || '',
-                            ifscCode: prev?.ifscCode || '',
-                            swiftCode: prev?.swiftCode || '',
-                          }))}
-                        />
+                        <Label>UPI QR Code</Label>
+                        <div className="space-y-2">
+                          <Input
+                            placeholder="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=iskcon@ybl&pn=ISKCON"
+                            value={bankDetails?.qrCodeUrl || ''}
+                            onChange={(e) => setBankDetails((prev: any) => ({
+                              ...prev,
+                              qrCodeUrl: e.target.value,
+                              accountName: prev?.accountName || '',
+                              accountNumber: prev?.accountNumber || '',
+                              bankName: prev?.bankName || '',
+                              ifscCode: prev?.ifscCode || '',
+                              swiftCode: prev?.swiftCode || '',
+                            }))}
+                          />
+                          <div className="flex items-center space-x-2">
+                            <span className="text-sm text-gray-500">or</span>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const input = document.createElement('input');
+                                input.type = 'file';
+                                input.accept = 'image/*';
+                                input.onchange = (e) => {
+                                  const file = (e.target as HTMLInputElement).files?.[0];
+                                  if (file) handleFileUpload(file, 'qr');
+                                };
+                                input.click();
+                              }}
+                              disabled={uploadingImage === 'qr'}
+                            >
+                              {uploadingImage === 'qr' ? (
+                                <>
+                                  <div className="animate-spin w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full mr-2" />
+                                  Uploading...
+                                </>
+                              ) : (
+                                <>
+                                  <Upload className="w-4 h-4 mr-2" />
+                                  Upload QR Code
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                          {bankDetails?.qrCodeUrl && (
+                            <div className="mt-2">
+                              <img 
+                                src={bankDetails.qrCodeUrl} 
+                                alt="QR Code preview" 
+                                className="w-24 h-24 object-cover rounded border"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).style.display = 'none';
+                                }}
+                              />
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
 
