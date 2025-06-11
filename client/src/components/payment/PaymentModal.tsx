@@ -40,6 +40,19 @@ const PaymentModal = ({
   const { toast } = useToast();
   const { user: authUser, isAuthenticated, isLoading: authLoading } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
+
+  // Debug authentication state
+  useEffect(() => {
+    if (isOpen) {
+      console.log('PaymentModal Auth Debug:', {
+        isOpen,
+        authLoading,
+        isAuthenticated,
+        authUser: authUser ? 'User exists' : 'No user',
+        userId: authUser?.id
+      });
+    }
+  }, [isOpen, authLoading, isAuthenticated, authUser]);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
