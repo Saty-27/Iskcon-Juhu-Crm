@@ -5,6 +5,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from '@/components/ui/dialog';
 import { X } from 'lucide-react';
+import ReactPlayer from 'react-player';
 
 const MediaHighlights = () => {
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
@@ -195,13 +196,21 @@ const MediaHighlights = () => {
           </DialogHeader>
           {selectedVideo && (
             <div className="aspect-video w-full">
-              <iframe 
-                src={selectedVideo.youtubeUrl.replace('watch?v=', 'embed/')} 
-                title={selectedVideo.title}
-                className="w-full h-full" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                allowFullScreen
-              ></iframe>
+              <ReactPlayer 
+                url={selectedVideo.youtubeUrl} 
+                width="100%"
+                height="100%"
+                controls
+                playing
+                config={{
+                  youtube: {
+                    playerVars: {
+                      showinfo: 1,
+                      modestbranding: 1
+                    }
+                  }
+                }}
+              />
             </div>
           )}
         </DialogContent>
