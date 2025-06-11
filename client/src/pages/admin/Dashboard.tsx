@@ -4,50 +4,25 @@ import Layout from '@/components/admin/Layout';
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from '@/components/ui/card';
 import {
-  Users,
-  Calendar,
-  DollarSign,
-  Mail,
-  MessageSquare,
-  Image
+  CheckCircle,
+  Clock,
+  TrendingUp,
+  DollarSign
 } from 'lucide-react';
 
 const AdminDashboard = () => {
-  // Fetch summary data from API
-  const { data: users = [] } = useQuery({ 
-    queryKey: ['/api/users'],
-    retry: false
-  });
-  
-  const { data: events = [] } = useQuery({ 
-    queryKey: ['/api/events'],
-    retry: false
-  });
-  
+  // Fetch real donation data from API
   const { data: donations = [] } = useQuery({ 
-    queryKey: ['/api/donations'],
+    queryKey: ['/api/admin/donations'],
     retry: false
   });
-  
-  const { data: messages = [] } = useQuery({ 
-    queryKey: ['/api/contact-messages'],
-    retry: false
-  });
-  
-  const { data: testimonials = [] } = useQuery({ 
-    queryKey: ['/api/testimonials'],
-    retry: false
-  });
-  
-  const { data: gallery = [] } = useQuery({ 
-    queryKey: ['/api/gallery'],
-    retry: false
-  });
+
+  // Calculate real donation statistics
+  const completedDonations = donations.filter(d => d.status === 'success');
+  const pendingDonations = donations.filter(d => d.status === 'pending');
+  const totalAmount = completedDonations.reduce((sum, d) => sum + d.amount, 0);
 
   return (
     <Layout>
@@ -55,117 +30,126 @@ const AdminDashboard = () => {
         <title>Admin Dashboard - ISKCON Juhu</title>
       </Helmet>
       
-      <div className="p-6">
-        <h1 className="text-3xl font-bold text-primary mb-8">Welcome to ISKCON Juhu Admin Dashboard</h1>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{Array.isArray(users) ? users.length : 0}</div>
-              <p className="text-xs text-muted-foreground">
-                {Array.isArray(users) && users.length > 0 ? '+1 from last month' : 'No users yet'}
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Upcoming Events</CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{Array.isArray(events) ? events.length : 0}</div>
-              <p className="text-xs text-muted-foreground">
-                {Array.isArray(events) && events.length > 0 ? '+2 from last month' : 'No events yet'}
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Donations</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {Array.isArray(donations) ? 
-                  `₹${donations.reduce((sum, donation) => sum + (donation.amount || 0), 0).toLocaleString('en-IN')}` : 
-                  '₹0'}
-              </div>
-              <div className="flex justify-between items-center">
-                <p className="text-xs text-muted-foreground">
-                  {Array.isArray(donations) && donations.length > 0 ? 
-                    `${donations.length} donations received` : 
-                    'No donations yet'}
-                </p>
-                <a 
-                  href="/admin/donation-stats"
-                  className="text-xs text-primary hover:underline"
-                >
-                  View Statistics →
+      <div className="bg-gray-50 min-h-screen">
+        <div className="p-6">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
+            <p className="text-gray-600">Monitor and manage your temple's digital presence</p>
+          </div>
+
+          {/* Real-time Donation Statistics Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <Card className="rounded-xl shadow-sm border-0 bg-white hover:shadow-md transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 bg-green-100 rounded-lg">
+                    <TrendingUp className="h-6 w-6 text-green-600" />
+                  </div>
+                  <span className="text-sm font-medium text-green-600">Total</span>
+                </div>
+                <div className="text-3xl font-bold text-gray-900 mb-1">{donations.length}</div>
+                <p className="text-sm text-gray-600">Total Donations</p>
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-xl shadow-sm border-0 bg-white hover:shadow-md transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 bg-blue-100 rounded-lg">
+                    <CheckCircle className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <span className="text-sm font-medium text-blue-600">Success</span>
+                </div>
+                <div className="text-3xl font-bold text-gray-900 mb-1">{completedDonations.length}</div>
+                <p className="text-sm text-gray-600">Completed</p>
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-xl shadow-sm border-0 bg-white hover:shadow-md transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 bg-yellow-100 rounded-lg">
+                    <Clock className="h-6 w-6 text-yellow-600" />
+                  </div>
+                  <span className="text-sm font-medium text-yellow-600">Waiting</span>
+                </div>
+                <div className="text-3xl font-bold text-gray-900 mb-1">{pendingDonations.length}</div>
+                <p className="text-sm text-gray-600">Pending</p>
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-xl shadow-sm border-0 bg-white hover:shadow-md transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 bg-purple-100 rounded-lg">
+                    <DollarSign className="h-6 w-6 text-purple-600" />
+                  </div>
+                  <span className="text-sm font-medium text-purple-600">Revenue</span>
+                </div>
+                <div className="text-3xl font-bold text-gray-900 mb-1">₹{totalAmount.toLocaleString()}</div>
+                <p className="text-sm text-gray-600">Total Amount</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Recent Donations Table */}
+          <Card className="rounded-xl shadow-sm border-0 bg-white">
+            <CardContent className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-gray-900">Recent Donations</h2>
+                <a href="/admin/donations" className="text-purple-600 hover:text-purple-700 font-medium">
+                  View All →
                 </a>
               </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Contact Messages</CardTitle>
-              <Mail className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{Array.isArray(messages) ? messages.length : 0}</div>
-              <p className="text-xs text-muted-foreground">
-                {Array.isArray(messages) && messages.length > 0 ? 
-                  `${messages.filter(m => !m.isRead).length} unread messages` : 
-                  'No messages yet'}
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Testimonials</CardTitle>
-              <MessageSquare className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{Array.isArray(testimonials) ? testimonials.length : 0}</div>
-              <p className="text-xs text-muted-foreground">
-                {Array.isArray(testimonials) && testimonials.length > 0 ? 
-                  'Active testimonials' : 
-                  'No testimonials yet'}
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Gallery Items</CardTitle>
-              <Image className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{Array.isArray(gallery) ? gallery.length : 0}</div>
-              <p className="text-xs text-muted-foreground">
-                {Array.isArray(gallery) && gallery.length > 0 ? 
-                  'Images in gallery' : 
-                  'No gallery items yet'}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-        
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
-          <Card>
-            <CardContent className="p-0">
-              <div className="rounded-md border">
-                <div className="py-6 px-4 text-center">
-                  <p className="text-sm text-muted-foreground">No recent activity to display</p>
-                </div>
+              
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-100">
+                      <th className="text-left py-3 px-4 font-semibold text-gray-700">ID</th>
+                      <th className="text-left py-3 px-4 font-semibold text-gray-700">Donor</th>
+                      <th className="text-left py-3 px-4 font-semibold text-gray-700">Amount</th>
+                      <th className="text-left py-3 px-4 font-semibold text-gray-700">Date</th>
+                      <th className="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {donations.slice(0, 5).map((donation) => (
+                      <tr key={donation.id} className="border-b border-gray-50 hover:bg-gray-50">
+                        <td className="py-3 px-4 text-sm text-gray-900">#{donation.id}</td>
+                        <td className="py-3 px-4">
+                          <div>
+                            <div className="font-medium text-gray-900">{donation.name}</div>
+                            <div className="text-sm text-gray-500">{donation.email}</div>
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 font-semibold text-gray-900">₹{donation.amount.toLocaleString()}</td>
+                        <td className="py-3 px-4 text-sm text-gray-600">
+                          {new Date(donation.createdAt).toLocaleDateString()}
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                            donation.status === 'success'
+                              ? 'bg-green-100 text-green-700'
+                              : donation.status === 'pending'
+                              ? 'bg-yellow-100 text-yellow-700'
+                              : 'bg-red-100 text-red-700'
+                          }`}>
+                            {donation.status === 'success' ? 'Completed' : 
+                             donation.status === 'pending' ? 'Pending' : 'Failed'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                    {donations.length === 0 && (
+                      <tr>
+                        <td colSpan={5} className="py-8 px-4 text-center text-gray-500">
+                          No donations found
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
             </CardContent>
           </Card>
