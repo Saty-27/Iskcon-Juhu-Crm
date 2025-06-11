@@ -68,7 +68,7 @@ const QuotesPage = () => {
 
   const createQuoteMutation = useMutation({
     mutationFn: async (data: QuoteFormData) => {
-      return await apiRequest("POST", "/api/quotes", data);
+      return await apiRequest("/api/quotes", "POST", data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/quotes'] });
@@ -83,7 +83,7 @@ const QuotesPage = () => {
 
   const updateQuoteMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: Partial<QuoteFormData> }) => {
-      return await apiRequest("PUT", `/api/quotes/${id}`, data);
+      return await apiRequest(`/api/quotes/${id}`, "PUT", data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/quotes'] });
@@ -99,7 +99,7 @@ const QuotesPage = () => {
 
   const deleteQuoteMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest("DELETE", `/api/quotes/${id}`);
+      return await apiRequest(`/api/quotes/${id}`, "DELETE");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/quotes'] });
