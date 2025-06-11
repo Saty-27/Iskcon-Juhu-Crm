@@ -14,7 +14,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Eye, Download, Search, Filter } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Eye, Download, Search, Filter, X } from "lucide-react";
 
 interface DonationRecord {
   id: number;
@@ -36,6 +37,7 @@ export default function Donations() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
+  const [selectedDonation, setSelectedDonation] = useState<DonationRecord | null>(null);
 
   const { data: donations = [], isLoading, error } = useQuery<DonationRecord[]>({
     queryKey: ['/api/admin/donations'],
@@ -250,10 +252,95 @@ export default function Donations() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Button variant="outline" size="sm">
-                            <Eye size={14} />
-                            View
-                          </Button>
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button variant="outline" size="sm" onClick={() => setSelectedDonation(donation)}>
+                                <Eye size={14} />
+                                View
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                              <DialogHeader>
+                                <DialogTitle>Donation Details</DialogTitle>
+                              </DialogHeader>
+                              {selectedDonation && (
+                                <div className="space-y-6">
+                                  {/* Donor Information */}
+                                  <div className="bg-gray-50 p-4 rounded-lg">
+                                    <h3 className="text-lg font-semibold mb-3 text-gray-800">Donor Information</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                      <div>
+                                        <label className="text-sm font-medium text-gray-600">Name</label>
+                                        <p className="text-gray-900 font-medium">{selectedDonation.name}</p>
+                                      </div>
+                                      <div>
+                                        <label className="text-sm font-medium text-gray-600">Email</label>
+                                        <p className="text-gray-900">{selectedDonation.email}</p>
+                                      </div>
+                                      <div>
+                                        <label className="text-sm font-medium text-gray-600">Phone</label>
+                                        <p className="text-gray-900">{selectedDonation.phone}</p>
+                                      </div>
+                                      <div>
+                                        <label className="text-sm font-medium text-gray-600">PAN Card</label>
+                                        <p className="text-gray-900">{selectedDonation.panCard || 'Not provided'}</p>
+                                      </div>
+                                    </div>
+                                    {selectedDonation.address && (
+                                      <div className="mt-4">
+                                        <label className="text-sm font-medium text-gray-600">Address</label>
+                                        <p className="text-gray-900">{selectedDonation.address}</p>
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {/* Donation Details */}
+                                  <div className="bg-blue-50 p-4 rounded-lg">
+                                    <h3 className="text-lg font-semibold mb-3 text-blue-800">Donation Details</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                      <div>
+                                        <label className="text-sm font-medium text-blue-600">Amount</label>
+                                        <p className="text-blue-900 font-bold text-xl">₹{selectedDonation.amount.toLocaleString()}</p>
+                                      </div>
+                                      <div>
+                                        <label className="text-sm font-medium text-blue-600">Status</label>
+                                        <Badge 
+                                          variant={getStatusBadgeVariant(selectedDonation.status)}
+                                          className="mt-1"
+                                        >
+                                          {selectedDonation.status.charAt(0).toUpperCase() + selectedDonation.status.slice(1)}
+                                        </Badge>
+                                      </div>
+                                      <div>
+                                        <label className="text-sm font-medium text-blue-600">Category</label>
+                                        <p className="text-blue-900">{selectedDonation.categoryName || 'N/A'}</p>
+                                      </div>
+                                      <div>
+                                        <label className="text-sm font-medium text-blue-600">Event</label>
+                                        <p className="text-blue-900">{selectedDonation.eventTitle || 'N/A'}</p>
+                                      </div>
+                                      <div>
+                                        <label className="text-sm font-medium text-blue-600">Date</label>
+                                        <p className="text-blue-900">{format(new Date(selectedDonation.createdAt), 'PPP p')}</p>
+                                      </div>
+                                      <div>
+                                        <label className="text-sm font-medium text-blue-600">Payment ID</label>
+                                        <p className="text-blue-900 font-mono text-sm">{selectedDonation.paymentId || 'N/A'}</p>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  {/* Message */}
+                                  {selectedDonation.message && (
+                                    <div className="bg-green-50 p-4 rounded-lg">
+                                      <h3 className="text-lg font-semibold mb-3 text-green-800">Message</h3>
+                                      <p className="text-green-900 italic">"{selectedDonation.message}"</p>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </DialogContent>
+                          </Dialog>
                           <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
                             Delete
                           </Button>
