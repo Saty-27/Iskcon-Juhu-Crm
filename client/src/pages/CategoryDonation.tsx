@@ -255,12 +255,9 @@ export default function CategoryDonation() {
         <PaymentModal
           isOpen={isPaymentModalOpen}
           onClose={() => setIsPaymentModalOpen(false)}
-          amount={selectedAmount}
-          eventTitle={selectedCard ? selectedCard.title : category.name}
-          eventId={selectedCard ? selectedCard.id : undefined}
-          categoryId={parseInt(categoryId || "0")}
-          donationType="category"
-          user={user}
+          donationCard={selectedCard || undefined}
+          customAmount={selectedCard ? undefined : selectedAmount}
+          donationCategory={category}
         />
       )}
 
