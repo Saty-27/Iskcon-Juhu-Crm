@@ -394,10 +394,16 @@ export const insertBlogPostSchema = createInsertSchema(blogPosts, {
   slug: z.string().min(1).max(255),
   excerpt: z.string().min(1),
   content: z.string().min(1),
-  imageUrl: z.string().url(),
+  imageUrl: z.string().min(1), // Allow any non-empty string for relative URLs
   imageAlt: z.string().min(1).max(125).optional(),
   author: z.string().min(1).max(100),
   readTime: z.number().min(1),
+  publishedAt: z.union([z.string(), z.date()]).optional().transform((val) => {
+    if (typeof val === 'string') {
+      return new Date(val);
+    }
+    return val;
+  }),
   seoTitle: z.string().min(1).max(60).optional(),
   seoDescription: z.string().min(1).max(160).optional(),
   seoKeywords: z.string().optional(),

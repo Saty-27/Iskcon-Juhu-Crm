@@ -1245,10 +1245,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = parseInt(req.params.id);
       console.log('Server received blog update request for ID:', id);
       console.log('Request body:', JSON.stringify(req.body, null, 2));
-      console.log('ImageUrl from request:', req.body.imageUrl);
-      console.log('ImageUrl type:', typeof req.body.imageUrl);
       
-      const data = insertBlogPostSchema.partial().parse(req.body);
+      // Handle publishedAt date conversion manually if it exists
+      const requestBody = { ...req.body };
+      if (requestBody.publishedAt && typeof requestBody.publishedAt === 'string') {
+        requestBody.publishedAt = new Date(requestBody.publishedAt);
+      }
+      
+      const data = insertBlogPostSchema.partial().parse(requestBody);
+      console.log('Parsed data successfully:', Object.keys(data));
+      
       const post = await storage.updateBlogPost(id, data);
       if (!post) {
         return res.status(404).json({ message: "Blog post not found" });
