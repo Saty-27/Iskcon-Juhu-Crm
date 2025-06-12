@@ -90,6 +90,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         destDir = galleryDir;
       } else if (type === 'video') {
         destDir = videosDir;
+      } else if (type === 'blog') {
+        destDir = blogDir;
       }
       
       cb(null, destDir);
