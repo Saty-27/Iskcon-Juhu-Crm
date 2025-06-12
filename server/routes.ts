@@ -153,6 +153,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     }
   }));
+  app.use('/uploads/blog', express.static(blogDir, {
+    setHeaders: (res, path) => {
+      if (path.endsWith('.svg')) {
+        res.setHeader('Content-Type', 'image/svg+xml');
+      }
+    }
+  }));
 
   // Generic upload endpoint
   app.post("/api/upload", (req, res) => {
