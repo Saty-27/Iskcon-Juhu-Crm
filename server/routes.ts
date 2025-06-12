@@ -1226,6 +1226,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/admin/blog-posts/:id", isAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
+      console.log('Server received blog update request for ID:', id);
+      console.log('Request body:', JSON.stringify(req.body, null, 2));
+      console.log('ImageUrl from request:', req.body.imageUrl);
+      console.log('ImageUrl type:', typeof req.body.imageUrl);
+      
       const data = insertBlogPostSchema.partial().parse(req.body);
       const post = await storage.updateBlogPost(id, data);
       if (!post) {
@@ -1234,8 +1239,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(post);
     } catch (error) {
       if (error instanceof z.ZodError) {
+        console.log('Validation errors:', error.errors);
         return res.status(400).json({ message: "Invalid data", errors: error.errors });
       }
+      console.log('Server error updating blog post:', error);
       res.status(500).json({ message: "Error updating blog post" });
     }
   });

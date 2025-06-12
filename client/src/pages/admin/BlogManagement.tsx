@@ -86,12 +86,26 @@ export default function BlogManagement() {
         imageUrl = uploadData.url;
       }
 
+      // Ensure we have a valid imageUrl
+      if (!imageUrl) {
+        throw new Error('Image is required for blog post');
+      }
+
       const blogData = {
-        ...data,
-        imageUrl,
+        title: data.title,
+        slug: data.slug,
+        excerpt: data.excerpt,
+        content: data.content,
+        imageUrl: imageUrl,
+        imageAlt: data.imageAlt || '',
+        author: data.author,
+        readTime: data.readTime,
+        isPublished: data.isPublished,
         publishedAt: data.isPublished ? new Date().toISOString() : null,
+        seoTitle: data.seoTitle || '',
+        seoDescription: data.seoDescription || '',
+        seoKeywords: data.seoKeywords || '',
       };
-      delete blogData.imageFile;
 
       await apiRequest("/api/admin/blog-posts", "POST", blogData);
     },
@@ -128,14 +142,33 @@ export default function BlogManagement() {
         imageUrl = uploadData.url;
       }
 
+      // Ensure we have a valid imageUrl
+      const finalImageUrl = imageUrl || editingBlog?.imageUrl;
+      if (!finalImageUrl) {
+        throw new Error('Image is required for blog post');
+      }
+
       const blogData = {
-        ...data,
-        imageUrl,
+        title: data.title,
+        slug: data.slug,
+        excerpt: data.excerpt,
+        content: data.content,
+        imageUrl: finalImageUrl,
+        imageAlt: data.imageAlt || '',
+        author: data.author,
+        readTime: data.readTime,
+        isPublished: data.isPublished,
         publishedAt: data.isPublished ? new Date().toISOString() : editingBlog?.publishedAt,
+        seoTitle: data.seoTitle || '',
+        seoDescription: data.seoDescription || '',
+        seoKeywords: data.seoKeywords || '',
       };
-      delete blogData.imageFile;
 
       console.log('Updating blog post:', editingBlog?.id, 'with data:', blogData);
+      console.log('ImageUrl being sent:', finalImageUrl);
+      console.log('ImageUrl type:', typeof finalImageUrl);
+      console.log('ImageUrl length:', finalImageUrl?.length);
+      
       await apiRequest(`/api/admin/blog-posts/${editingBlog?.id}`, "PUT", blogData);
     },
     onSuccess: () => {
