@@ -106,7 +106,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const upload = multer({ 
     storage: storage_multer,
     limits: {
-      fileSize: 5 * 1024 * 1024 // 5MB limit
+      fileSize: 20 * 1024 * 1024 // 20MB limit
     },
     fileFilter: function (req, file, cb) {
       if (file.mimetype.startsWith('image/')) {
@@ -155,30 +155,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }));
 
   // Generic upload endpoint
-  app.post("/api/upload", upload.single('file'), async (req, res) => {
-    try {
-      if (!req.file) {
-        return res.status(400).json({ message: "No file uploaded" });
+  app.post("/api/upload", (req, res) => {
+    upload.single('file')(req, res, (err) => {
+      if (err) {
+        console.log('Upload error:', err);
+        if (err.code === 'LIMIT_FILE_SIZE') {
+          return res.status(400).json({ message: "File too large. Maximum size is 20MB." });
+        }
+        if (err.message === 'Only image files are allowed!') {
+          return res.status(400).json({ message: "Only image files are allowed" });
+        }
+        return res.status(500).json({ message: "Error uploading file", error: err.message });
       }
-      
-      const type = req.body.type || 'banner';
-      let folder = 'banners';
-      
-      if (type === 'card') {
-        folder = 'cards';
-      } else if (type === 'qr') {
-        folder = 'qr-codes';
-      } else if (type === 'gallery') {
-        folder = 'gallery';
-      } else if (type === 'video') {
-        folder = 'videos';
+
+      try {
+        if (!req.file) {
+          return res.status(400).json({ message: "No file uploaded" });
+        }
+        
+        const type = req.body.type || 'banner';
+        let folder = 'banners';
+        
+        if (type === 'card') {
+          folder = 'cards';
+        } else if (type === 'qr') {
+          folder = 'qr-codes';
+        } else if (type === 'gallery') {
+          folder = 'gallery';
+        } else if (type === 'video') {
+          folder = 'videos';
+        } else if (type === 'blog') {
+          folder = 'blog';
+        }
+        
+        const imageUrl = `/uploads/${folder}/${req.file.filename}`;
+        console.log('File uploaded successfully:', imageUrl);
+        res.json({ url: imageUrl });
+      } catch (error) {
+        console.log('Error processing upload:', error);
+        res.status(500).json({ message: "Error processing uploaded file", error: error instanceof Error ? error.message : String(error) });
       }
-      
-      const imageUrl = `/uploads/${folder}/${req.file.filename}`;
-      res.json({ url: imageUrl });
-    } catch (error) {
-      res.status(500).json({ message: "Error uploading file", error: error instanceof Error ? error.message : String(error) });
-    }
+    });
   });
 
   // Banner upload endpoint (legacy)
@@ -207,7 +224,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     }),
     limits: {
-      fileSize: 5 * 1024 * 1024 // 5MB limit
+      fileSize: 20 * 1024 * 1024 // 20MB limit
     },
     fileFilter: function (req, file, cb) {
       if (file.mimetype.startsWith('image/')) {
@@ -243,7 +260,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     }),
     limits: {
-      fileSize: 5 * 1024 * 1024 // 5MB limit
+      fileSize: 20 * 1024 * 1024 // 20MB limit
     },
     fileFilter: function (req, file, cb) {
       if (file.mimetype.startsWith('image/')) {
