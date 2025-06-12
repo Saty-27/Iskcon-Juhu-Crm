@@ -2,6 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useRoute, Link } from "wouter";
 import { Clock, Calendar, User, ArrowLeft, Share2 } from "lucide-react";
 import { type BlogPost } from "@shared/schema";
+import Header from "../components/layout/Header";
+import Footer from "../components/layout/Footer";
 
 const BlogPostPage = () => {
   const [match, params] = useRoute("/blog/:slug");
