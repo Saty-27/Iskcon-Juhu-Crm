@@ -67,7 +67,7 @@ export default function BlogManagement() {
   });
 
   // Fetch blog posts
-  const { data: blogPosts = [], isLoading } = useQuery({
+  const { data: blogPosts = [], isLoading } = useQuery<BlogPost[]>({
     queryKey: ["/api/admin/blog-posts"],
   });
 
