@@ -373,6 +373,9 @@ export const blogPosts = pgTable("blog_posts", {
   readTime: integer("read_time").notNull(), // in minutes
   isPublished: boolean("is_published").default(false).notNull(),
   publishedAt: timestamp("published_at"),
+  seoTitle: text("seo_title"), // SEO meta title
+  seoDescription: text("seo_description"), // SEO meta description
+  seoKeywords: text("seo_keywords"), // SEO keywords
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -388,6 +391,9 @@ export const insertBlogPostSchema = createInsertSchema(blogPosts, {
   imageUrl: z.string().url(),
   author: z.string().min(1).max(100),
   readTime: z.number().min(1),
+  seoTitle: z.string().min(1).max(60).optional(),
+  seoDescription: z.string().min(1).max(160).optional(),
+  seoKeywords: z.string().optional(),
 }).omit({
   id: true,
   createdAt: true,
