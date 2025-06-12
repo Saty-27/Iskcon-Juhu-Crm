@@ -174,6 +174,7 @@ export class MemStorage implements IStorage {
   private subscriptionsData: Map<number, Subscription>;
   private statsData: Map<number, Stat>;
   private schedulesData: Map<number, Schedule>;
+  private blogPostsData: Map<number, BlogPost>;
   
   private userIdCounter: number;
   private bannerIdCounter: number;
@@ -192,6 +193,7 @@ export class MemStorage implements IStorage {
   private subscriptionIdCounter: number;
   private statIdCounter: number;
   private scheduleIdCounter: number;
+  private blogPostIdCounter: number;
 
   constructor() {
     this.usersData = new Map();
@@ -211,6 +213,7 @@ export class MemStorage implements IStorage {
     this.subscriptionsData = new Map();
     this.statsData = new Map();
     this.schedulesData = new Map();
+    this.blogPostsData = new Map();
     
     this.userIdCounter = 1;
     this.bannerIdCounter = 1;
@@ -229,6 +232,7 @@ export class MemStorage implements IStorage {
     this.subscriptionIdCounter = 1;
     this.statIdCounter = 1;
     this.scheduleIdCounter = 1;
+    this.blogPostIdCounter = 1;
     
     this.initializeData();
   }
@@ -1153,6 +1157,46 @@ export class MemStorage implements IStorage {
 
   async deleteEventDonationCard(id: number): Promise<boolean> {
     return this.eventDonationCardsData.delete(id);
+  }
+
+  // Blog post operations
+  async getBlogPosts(): Promise<BlogPost[]> {
+    return Array.from(this.blogPostsData.values());
+  }
+
+  async getBlogPost(id: number): Promise<BlogPost | undefined> {
+    return this.blogPostsData.get(id);
+  }
+
+  async getBlogPostBySlug(slug: string): Promise<BlogPost | undefined> {
+    return Array.from(this.blogPostsData.values()).find(post => post.slug === slug);
+  }
+
+  async createBlogPost(post: InsertBlogPost): Promise<BlogPost> {
+    const id = this.blogPostIdCounter++;
+    const newPost: BlogPost = { 
+      ...post, 
+      id,
+      isPublished: post.isPublished ?? true,
+      publishedAt: post.publishedAt ?? new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.blogPostsData.set(id, newPost);
+    return newPost;
+  }
+
+  async updateBlogPost(id: number, postData: Partial<BlogPost>): Promise<BlogPost | undefined> {
+    const post = this.blogPostsData.get(id);
+    if (!post) return undefined;
+    
+    const updatedPost = { ...post, ...postData, updatedAt: new Date() };
+    this.blogPostsData.set(id, updatedPost);
+    return updatedPost;
+  }
+
+  async deleteBlogPost(id: number): Promise<boolean> {
+    return this.blogPostsData.delete(id);
   }
 }
 
