@@ -103,7 +103,7 @@ const EventManagement = () => {
   // Mutations
   const updateEventMutation = useMutation({
     mutationFn: (data: Partial<Event>) => 
-      apiRequest('PATCH', `/api/events/${eventId}`, data),
+      apiRequest(`/api/events/${eventId}`, 'PATCH', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/events/${eventId}`] });
       setIsEditingEvent(false);
@@ -113,7 +113,7 @@ const EventManagement = () => {
 
   const addDonationCardMutation = useMutation({
     mutationFn: (data: any) => 
-      apiRequest('POST', '/api/donation-cards', data),
+      apiRequest('/api/donation-cards', 'POST', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/donation-cards'] });
       setIsDonationCardDialogOpen(false);
@@ -124,7 +124,7 @@ const EventManagement = () => {
 
   const updateDonationCardMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: any }) => 
-      apiRequest('PATCH', `/api/donation-cards/${id}`, data),
+      apiRequest(`/api/donation-cards/${id}`, 'PATCH', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/donation-cards'] });
       setEditingDonationCard(null);
@@ -135,7 +135,7 @@ const EventManagement = () => {
 
   const deleteDonationCardMutation = useMutation({
     mutationFn: (id: number) => 
-      apiRequest('DELETE', `/api/donation-cards/${id}`),
+      apiRequest(`/api/donation-cards/${id}`, 'DELETE'),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/donation-cards'] });
       toast({ title: 'Success', description: 'Donation card deleted successfully' });
@@ -144,7 +144,7 @@ const EventManagement = () => {
 
   const addBankDetailsMutation = useMutation({
     mutationFn: (data: any) => 
-      apiRequest('POST', '/api/bank-details', data),
+      apiRequest('/api/bank-details', 'POST', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/bank-details'] });
       setIsBankDetailsDialogOpen(false);

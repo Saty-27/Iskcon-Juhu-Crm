@@ -135,6 +135,7 @@ export default function BlogManagement() {
       };
       delete blogData.imageFile;
 
+      console.log('Updating blog post:', editingBlog?.id, 'with data:', blogData);
       await apiRequest(`/api/admin/blog-posts/${editingBlog?.id}`, "PUT", blogData);
     },
     onSuccess: () => {

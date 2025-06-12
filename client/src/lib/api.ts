@@ -10,7 +10,7 @@ export interface ApiResponse<T = any> {
 // Generic CRUD operations
 export const fetchData = async <T>(endpoint: string): Promise<T> => {
   try {
-    const response = await apiRequest('GET', endpoint, undefined);
+    const response = await apiRequest(endpoint, 'GET', undefined);
     return await response.json();
   } catch (error) {
     throw error;
@@ -19,7 +19,7 @@ export const fetchData = async <T>(endpoint: string): Promise<T> => {
 
 export const createData = async <T>(endpoint: string, data: any): Promise<T> => {
   try {
-    const response = await apiRequest('POST', endpoint, data);
+    const response = await apiRequest(endpoint, 'POST', data);
     return await response.json();
   } catch (error) {
     throw error;
@@ -28,7 +28,7 @@ export const createData = async <T>(endpoint: string, data: any): Promise<T> => 
 
 export const updateData = async <T>(endpoint: string, data: any): Promise<T> => {
   try {
-    const response = await apiRequest('PUT', endpoint, data);
+    const response = await apiRequest(endpoint, 'PUT', data);
     return await response.json();
   } catch (error) {
     throw error;
@@ -37,7 +37,7 @@ export const updateData = async <T>(endpoint: string, data: any): Promise<T> => 
 
 export const deleteData = async <T>(endpoint: string): Promise<T> => {
   try {
-    const response = await apiRequest('DELETE', endpoint, undefined);
+    const response = await apiRequest(endpoint, 'DELETE', undefined);
     return await response.json();
   } catch (error) {
     throw error;
@@ -53,7 +53,7 @@ export const authApi = {
     createData('/api/auth/register', data),
   
   logout: () => 
-    apiRequest('POST', '/api/auth/logout', {}),
+    apiRequest('/api/auth/logout', 'POST', {}),
   
   getProfile: () => 
     fetchData('/api/user/profile'),
