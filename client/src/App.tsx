@@ -17,6 +17,8 @@ import PaymentSuccess from "@/pages/PaymentSuccess";
 import PaymentFailure from "@/pages/PaymentFailure";
 import Gallery from "@/pages/Gallery";
 import Videos from "@/pages/Videos";
+import Blog from "@/pages/Blog";
+import BlogPost from "@/pages/BlogPost";
 import Contact from "@/pages/Contact";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
@@ -59,6 +61,8 @@ function Router() {
       <Route path="/payment/failure" component={PaymentFailure} />
       <Route path="/gallery" component={Gallery} />
       <Route path="/videos" component={Videos} />
+      <Route path="/blog" component={Blog} />
+      <Route path="/blog/:slug" component={BlogPost} />
       <Route path="/contact" component={Contact} />
       
       {/* Authentication routes */}

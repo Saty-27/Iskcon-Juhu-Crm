@@ -59,6 +59,9 @@ const Header = () => {
             <Link href="/videos" className="font-poppins font-medium text-dark hover:text-secondary transition-colors">
               Videos
             </Link>
+            <Link href="/blog" className="font-poppins font-medium text-dark hover:text-secondary transition-colors">
+              Blog
+            </Link>
             <Link href="/contact" className="font-poppins font-medium text-dark hover:text-secondary transition-colors">
               Contact
             </Link>
@@ -132,6 +135,13 @@ const Header = () => {
               onClick={closeMobileMenu}
             >
               Videos
+            </Link>
+            <Link 
+              href="/blog"
+              className="font-poppins font-medium text-dark hover:text-secondary transition-colors"
+              onClick={closeMobileMenu}
+            >
+              Blog
             </Link>
             <Link 
               href="/contact"
