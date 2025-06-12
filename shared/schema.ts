@@ -185,6 +185,7 @@ export const videos = pgTable("videos", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   thumbnailUrl: text("thumbnail_url").notNull(),
+  thumbnailAlt: text("thumbnail_alt"), // SEO alt text for video thumbnail
   youtubeUrl: text("youtube_url").notNull(),
   order: integer("order").notNull(),
 });

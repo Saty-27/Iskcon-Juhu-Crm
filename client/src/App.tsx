@@ -41,6 +41,7 @@ import AdminUsers from "@/pages/admin/Users";
 import AdminMessages from "@/pages/admin/Messages";
 import AdminTestimonials from "@/pages/admin/Testimonials";
 import AdminSocialLinks from "@/pages/admin/SocialLinks";
+import BlogManagement from "@/pages/admin/BlogManagement";
 
 function Router() {
   return (
@@ -166,6 +167,13 @@ function Router() {
         {() => (
           <AdminRoute>
             <AdminSocialLinks />
+          </AdminRoute>
+        )}
+      </Route>
+      <Route path="/admin/blog">
+        {() => (
+          <AdminRoute>
+            <BlogManagement />
           </AdminRoute>
         )}
       </Route>

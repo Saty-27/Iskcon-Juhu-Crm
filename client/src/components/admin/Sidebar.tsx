@@ -7,6 +7,7 @@ import {
   DollarSign, 
   Target, 
   Quote, 
+  FileText,
   Users, 
   Mail, 
   MessageSquare,
@@ -109,6 +110,16 @@ const Sidebar = () => {
             }`}>
               <Quote className="mr-3 h-5 w-5" />
               <span className="font-medium">Quotes</span>
+            </Link>
+          </li>
+          <li>
+            <Link href="/admin/blog" className={`flex items-center p-3 rounded-lg text-gray-700 transition-all duration-200 ${
+              isActive('/admin/blog') 
+                ? 'bg-purple-100 text-purple-700 border-l-4 border-purple-600' 
+                : 'hover:bg-gray-100'
+            }`}>
+              <FileText className="mr-3 h-5 w-5" />
+              <span className="font-medium">Blog Management</span>
             </Link>
           </li>
           <li>
