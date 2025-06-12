@@ -26,6 +26,7 @@ export const banners = pgTable("banners", {
   title: text("title").notNull(),
   description: text("description"),
   imageUrl: text("image_url").notNull(),
+  imageAlt: text("image_alt"), // SEO alt text for banner image
   buttonText: text("button_text"),
   buttonLink: text("button_link"),
   isActive: boolean("is_active").default(true).notNull(),
@@ -55,6 +56,7 @@ export const donationCategories = pgTable("donation_categories", {
   name: text("name").notNull(),
   description: text("description"),
   imageUrl: text("image_url").notNull(),
+  imageAlt: text("image_alt"), // SEO alt text for category image
   heading: text("heading"),
   isActive: boolean("is_active").default(true).notNull(),
   order: integer("order").notNull(),
@@ -104,6 +106,7 @@ export const events = pgTable("events", {
   description: text("description"),
   date: timestamp("date").notNull(),
   imageUrl: text("image_url").default("").notNull(),
+  imageAlt: text("image_alt"), // SEO alt text for event image
   readMoreUrl: text("read_more_url"),
   isActive: boolean("is_active").default(true).notNull(),
   suggestedAmounts: json("suggested_amounts").$type<number[] | null>(),
@@ -169,6 +172,7 @@ export const gallery = pgTable("gallery", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   imageUrl: text("image_url").notNull(),
+  imageAlt: text("image_alt"), // SEO alt text for gallery image
   order: integer("order").notNull(),
 });
 
@@ -369,6 +373,7 @@ export const blogPosts = pgTable("blog_posts", {
   excerpt: text("excerpt").notNull(),
   content: text("content").notNull(),
   imageUrl: text("image_url").notNull(),
+  imageAlt: text("image_alt"), // SEO alt text for main image
   author: text("author").notNull(),
   readTime: integer("read_time").notNull(), // in minutes
   isPublished: boolean("is_published").default(false).notNull(),
@@ -389,6 +394,7 @@ export const insertBlogPostSchema = createInsertSchema(blogPosts, {
   excerpt: z.string().min(1),
   content: z.string().min(1),
   imageUrl: z.string().url(),
+  imageAlt: z.string().min(1).max(125).optional(),
   author: z.string().min(1).max(100),
   readTime: z.number().min(1),
   seoTitle: z.string().min(1).max(60).optional(),
