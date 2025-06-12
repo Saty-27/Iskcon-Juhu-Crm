@@ -81,7 +81,7 @@ export default function BlogManagement() {
         const formData = new FormData();
         formData.append("file", data.imageFile[0]);
         formData.append("type", "blog");
-        const uploadResponse = await apiRequest("POST", "/api/upload", formData);
+        const uploadResponse = await apiRequest("/api/upload", "POST", formData);
         const uploadData = await uploadResponse.json();
         imageUrl = uploadData.url;
       }
@@ -93,7 +93,7 @@ export default function BlogManagement() {
       };
       delete blogData.imageFile;
 
-      await apiRequest("POST", "/api/admin/blog-posts", blogData);
+      await apiRequest("/api/admin/blog-posts", "POST", blogData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/blog-posts"] });
@@ -123,7 +123,7 @@ export default function BlogManagement() {
         const formData = new FormData();
         formData.append("file", data.imageFile[0]);
         formData.append("type", "blog");
-        const uploadResponse = await apiRequest("POST", "/api/upload", formData);
+        const uploadResponse = await apiRequest("/api/upload", "POST", formData);
         const uploadData = await uploadResponse.json();
         imageUrl = uploadData.url;
       }
@@ -135,7 +135,7 @@ export default function BlogManagement() {
       };
       delete blogData.imageFile;
 
-      await apiRequest("PUT", `/api/admin/blog-posts/${editingBlog?.id}`, blogData);
+      await apiRequest(`/api/admin/blog-posts/${editingBlog?.id}`, "PUT", blogData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/blog-posts"] });
@@ -159,7 +159,7 @@ export default function BlogManagement() {
   // Delete blog post mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      await apiRequest("DELETE", `/api/admin/blog-posts/${id}`);
+      await apiRequest(`/api/admin/blog-posts/${id}`, "DELETE");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/blog-posts"] });
