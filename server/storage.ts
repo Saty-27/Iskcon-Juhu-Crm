@@ -15,7 +15,8 @@ import {
   Donation, InsertDonation, donations,
   Subscription, InsertSubscription, subscriptions,
   Stat, InsertStat, stats,
-  Schedule, InsertSchedule, schedules
+  Schedule, InsertSchedule, schedules,
+  BlogPost, InsertBlogPost, blogPosts
 } from "@shared/schema";
 
 export interface IStorage {
@@ -145,6 +146,14 @@ export interface IStorage {
   createSchedule(schedule: InsertSchedule): Promise<Schedule>;
   updateSchedule(id: number, scheduleData: Partial<Schedule>): Promise<Schedule | undefined>;
   deleteSchedule(id: number): Promise<boolean>;
+  
+  // Blog post management
+  getBlogPosts(): Promise<BlogPost[]>;
+  getBlogPost(id: number): Promise<BlogPost | undefined>;
+  getBlogPostBySlug(slug: string): Promise<BlogPost | undefined>;
+  createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
+  updateBlogPost(id: number, postData: Partial<BlogPost>): Promise<BlogPost | undefined>;
+  deleteBlogPost(id: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {

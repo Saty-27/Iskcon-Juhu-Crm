@@ -360,3 +360,36 @@ export const insertScheduleSchema = createInsertSchema(schedules, {
   createdAt: true,
   updatedAt: true,
 });
+
+// Blog posts table
+export const blogPosts = pgTable("blog_posts", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  slug: text("slug").notNull().unique(),
+  excerpt: text("excerpt").notNull(),
+  content: text("content").notNull(),
+  imageUrl: text("image_url").notNull(),
+  author: text("author").notNull(),
+  readTime: integer("read_time").notNull(), // in minutes
+  isPublished: boolean("is_published").default(false).notNull(),
+  publishedAt: timestamp("published_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type BlogPost = typeof blogPosts.$inferSelect;
+export type InsertBlogPost = typeof blogPosts.$inferInsert;
+
+export const insertBlogPostSchema = createInsertSchema(blogPosts, {
+  title: z.string().min(1).max(255),
+  slug: z.string().min(1).max(255),
+  excerpt: z.string().min(1),
+  content: z.string().min(1),
+  imageUrl: z.string().url(),
+  author: z.string().min(1).max(100),
+  readTime: z.number().min(1),
+}).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});

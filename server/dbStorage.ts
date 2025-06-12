@@ -3,7 +3,7 @@ import { db } from "./db";
 import { 
   users, banners, quotes, donationCategories, donationCards, eventDonationCards, bankDetails, events, gallery, videos, 
   testimonials, contactMessages, socialLinks, donations, subscriptions,
-  stats, schedules,
+  stats, schedules, blogPosts,
   type User, type InsertUser, type Banner, type InsertBanner,
   type Quote, type InsertQuote, type DonationCategory, type InsertDonationCategory,
   type DonationCard, type InsertDonationCard, type EventDonationCard, type InsertEventDonationCard,
@@ -12,7 +12,8 @@ import {
   type Video, type InsertVideo, type Testimonial, type InsertTestimonial,
   type ContactMessage, type InsertContactMessage, type SocialLink, type InsertSocialLink,
   type Donation, type InsertDonation, type Subscription, type InsertSubscription,
-  type Stat, type InsertStat, type Schedule, type InsertSchedule
+  type Stat, type InsertStat, type Schedule, type InsertSchedule,
+  type BlogPost, type InsertBlogPost
 } from "@shared/schema";
 import type { IStorage } from "./storage";
 

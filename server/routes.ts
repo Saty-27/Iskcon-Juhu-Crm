@@ -20,7 +20,8 @@ import {
   insertContactMessageSchema,
   insertSocialLinkSchema,
   insertDonationSchema,
-  insertSubscriptionSchema
+  insertSubscriptionSchema,
+  insertBlogPostSchema
 } from "@shared/schema";
 
 import express from "express";
@@ -1168,6 +1169,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Payment status updated" });
     } catch (error) {
       res.status(500).json({ message: "Error processing payment webhook" });
+    }
+  });
+
+  // Blog posts API endpoints
+  app.get("/api/blog-posts", async (req, res) => {
+    try {
+      const posts = await storage.getBlogPosts();
+      res.json(posts.filter(post => post.isPublished));
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching blog posts" });
+    }
+  });
+
+  app.get("/api/blog-posts/:slug", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const post = await storage.getBlogPostBySlug(slug);
+      if (!post) {
+        return res.status(404).json({ message: "Blog post not found" });
+      }
+      if (!post.isPublished) {
+        return res.status(404).json({ message: "Blog post not found" });
+      }
+      res.json(post);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching blog post" });
+    }
+  });
+
+  app.get("/api/admin/blog-posts", isAdmin, async (req, res) => {
+    try {
+      const posts = await storage.getBlogPosts();
+      res.json(posts);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching blog posts" });
+    }
+  });
+
+  app.post("/api/admin/blog-posts", isAdmin, async (req, res) => {
+    try {
+      const data = insertBlogPostSchema.parse(req.body);
+      const post = await storage.createBlogPost(data);
+      res.status(201).json(post);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error creating blog post" });
+    }
+  });
+
+  app.put("/api/admin/blog-posts/:id", isAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const data = insertBlogPostSchema.partial().parse(req.body);
+      const post = await storage.updateBlogPost(id, data);
+      if (!post) {
+        return res.status(404).json({ message: "Blog post not found" });
+      }
+      res.json(post);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error updating blog post" });
+    }
+  });
+
+  app.delete("/api/admin/blog-posts/:id", isAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteBlogPost(id);
+      if (!success) {
+        return res.status(404).json({ message: "Blog post not found" });
+      }
+      res.json({ message: "Blog post deleted" });
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting blog post" });
     }
   });
 
