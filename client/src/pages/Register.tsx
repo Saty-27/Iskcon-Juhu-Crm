@@ -43,7 +43,7 @@ const Register = () => {
     setIsSubmitting(true);
     
     try {
-      const response = await apiRequest('POST', '/api/auth/register', data);
+      const response = await apiRequest('/api/auth/register', 'POST', data);
       
       // User successfully registered
       toast({

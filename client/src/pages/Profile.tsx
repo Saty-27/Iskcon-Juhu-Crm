@@ -38,7 +38,7 @@ const Profile = () => {
     setIsLoggingOut(true);
     
     try {
-      await apiRequest('POST', '/api/auth/logout', {});
+      await apiRequest('/api/auth/logout', 'POST', {});
       
       // Clear user data from cache
       queryClient.invalidateQueries({ queryKey: ['/api/user/profile'] });

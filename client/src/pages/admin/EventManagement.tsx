@@ -155,7 +155,7 @@ const EventManagement = () => {
 
   const updateBankDetailsMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: any }) => 
-      apiRequest('PATCH', `/api/bank-details/${id}`, data),
+      apiRequest(`/api/bank-details/${id}`, 'PATCH', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/bank-details'] });
       setEditingBankDetails(null);
@@ -166,7 +166,7 @@ const EventManagement = () => {
 
   const deleteBankDetailsMutation = useMutation({
     mutationFn: (id: number) => 
-      apiRequest('DELETE', `/api/bank-details/${id}`),
+      apiRequest(`/api/bank-details/${id}`, 'DELETE'),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/bank-details'] });
       toast({ title: 'Success', description: 'Bank details deleted successfully' });

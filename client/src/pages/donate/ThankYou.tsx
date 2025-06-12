@@ -107,7 +107,7 @@ const ThankYou = () => {
     
     setIsSendingEmail(true);
     try {
-      const response = await apiRequest('POST', '/api/payments/send-receipt', {
+      const response = await apiRequest('/api/payments/send-receipt', 'POST', {
         txnid: paymentDetails.txnid
       });
       

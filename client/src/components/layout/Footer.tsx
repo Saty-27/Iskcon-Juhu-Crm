@@ -17,7 +17,7 @@ const Footer = () => {
     e.preventDefault();
     
     try {
-      await apiRequest('POST', '/api/subscribe', { email });
+      await apiRequest('/api/subscribe', 'POST', { email });
       toast({
         title: "Subscription Successful",
         description: "Thank you for subscribing to our newsletter!",
