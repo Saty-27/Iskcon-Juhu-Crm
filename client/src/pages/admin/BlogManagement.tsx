@@ -252,28 +252,28 @@ export default function BlogManagement() {
     <AdminLayout>
       <div className="bg-gray-50 min-h-screen p-6">
         <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Blog Management</h1>
-        <Dialog open={isCreateDialogOpen || !!editingBlog} onOpenChange={(open) => {
-          if (!open) resetForm();
-          else setIsCreateDialogOpen(true);
-        }}>
-          <DialogTrigger asChild>
-            <Button className="bg-purple-600 hover:bg-purple-700">
-              <Plus className="h-4 w-4 mr-2" />
-              Create Blog Post
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                {editingBlog ? "Edit Blog Post" : "Create New Blog Post"}
-              </DialogTitle>
-            </DialogHeader>
-            
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h1 className="text-3xl font-bold text-gray-900">Blog Management</h1>
+            <Dialog open={isCreateDialogOpen || !!editingBlog} onOpenChange={(open) => {
+              if (!open) resetForm();
+              else setIsCreateDialogOpen(true);
+            }}>
+              <DialogTrigger asChild>
+                <Button className="bg-purple-600 hover:bg-purple-700">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Blog Post
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    {editingBlog ? "Edit Blog Post" : "Create New Blog Post"}
+                  </DialogTitle>
+                </DialogHeader>
+                
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 {/* Basic Information */}
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
