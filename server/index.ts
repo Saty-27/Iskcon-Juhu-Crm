@@ -8,6 +8,7 @@ import paymentRoutes from "./routes/payment";
 import receiptRoutes from "./routes/receipt";
 import { validatePaymentConfig } from "./paymentConfig";
 import { initializeStatsAndSchedules } from "./initializeData";
+import { initializeBlogData } from "./initializeBlogData";
 
 const app = express();
 app.use(express.json());
@@ -63,6 +64,9 @@ app.use((req, res, next) => {
   
   // Initialize stats and schedules data
   await initializeStatsAndSchedules();
+  
+  // Initialize blog data
+  await initializeBlogData();
   
   // Create a new admin user with known credentials
   try {
