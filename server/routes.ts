@@ -68,9 +68,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const qrCodesDir = path.join(uploadsDir, 'qr-codes');
   const galleryDir = path.join(uploadsDir, 'gallery');
   const videosDir = path.join(uploadsDir, 'videos');
+  const blogDir = path.join(uploadsDir, 'blog');
   
   // Create directories if they don't exist
-  [uploadsDir, bannersDir, cardsDir, qrCodesDir, galleryDir, videosDir].forEach(dir => {
+  [uploadsDir, bannersDir, cardsDir, qrCodesDir, galleryDir, videosDir, blogDir].forEach(dir => {
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }

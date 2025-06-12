@@ -79,7 +79,8 @@ export default function BlogManagement() {
       
       if (data.imageFile && data.imageFile[0]) {
         const formData = new FormData();
-        formData.append("image", data.imageFile[0]);
+        formData.append("file", data.imageFile[0]);
+        formData.append("type", "blog");
         const uploadResponse = await apiRequest("POST", "/api/upload", formData);
         const uploadData = await uploadResponse.json();
         imageUrl = uploadData.url;
@@ -120,7 +121,8 @@ export default function BlogManagement() {
       
       if (data.imageFile && data.imageFile[0]) {
         const formData = new FormData();
-        formData.append("image", data.imageFile[0]);
+        formData.append("file", data.imageFile[0]);
+        formData.append("type", "blog");
         const uploadResponse = await apiRequest("POST", "/api/upload", formData);
         const uploadData = await uploadResponse.json();
         imageUrl = uploadData.url;
