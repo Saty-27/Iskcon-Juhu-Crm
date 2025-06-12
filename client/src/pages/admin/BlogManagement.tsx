@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import AdminLayout from "@/components/admin/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -225,26 +226,32 @@ export default function BlogManagement() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900">Blog Management</h1>
+      <AdminLayout>
+        <div className="bg-gray-50 min-h-screen p-6">
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h1 className="text-3xl font-bold text-gray-900">Blog Management</h1>
+            </div>
+            <div className="grid gap-4">
+              {[...Array(3)].map((_, i) => (
+                <Card key={i} className="animate-pulse">
+                  <CardContent className="p-6">
+                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
         </div>
-        <div className="grid gap-4">
-          {[...Array(3)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <CardContent className="p-6">
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <AdminLayout>
+      <div className="bg-gray-50 min-h-screen p-6">
+        <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Blog Management</h1>
         <Dialog open={isCreateDialogOpen || !!editingBlog} onOpenChange={(open) => {
@@ -644,6 +651,8 @@ export default function BlogManagement() {
           ))
         )}
       </div>
-    </div>
+        </div>
+      </div>
+    </AdminLayout>
   );
 }
