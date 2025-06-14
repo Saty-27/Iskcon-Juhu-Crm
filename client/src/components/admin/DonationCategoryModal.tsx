@@ -111,7 +111,6 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
         title: card.title,
         description: card.description || "",
         amount: card.amount,
-        imageUrl: card.imageUrl || "",
         isActive: card.isActive,
       })));
     } else if (category && existingDonationCards.length === 0) {

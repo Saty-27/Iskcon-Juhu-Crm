@@ -228,20 +228,7 @@ export default function CategoryDonation() {
                 minWidth: '250px',
                 textAlign: 'center'
               }}>
-                {/* Card Image - positioned first */}
-                {card.imageUrl && (
-                  <img 
-                    src={card.imageUrl} 
-                    alt={card.title}
-                    style={{
-                      width: '100%',
-                      height: '150px',
-                      objectFit: 'cover',
-                      borderRadius: '5px',
-                      marginBottom: '15px'
-                    }}
-                  />
-                )}
+
 
                 {/* Title */}
                 <p style={{ 
