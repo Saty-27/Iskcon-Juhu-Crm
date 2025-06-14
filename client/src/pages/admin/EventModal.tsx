@@ -63,6 +63,7 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
   const [bankDetails, setBankDetails] = useState<BankDetailsFormData | null>(null);
   const [suggestedAmountsInput, setSuggestedAmountsInput] = useState("");
   const [uploadingBanner, setUploadingBanner] = useState(false);
+  const [uploadingQrCode, setUploadingQrCode] = useState(false);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -310,7 +311,41 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
     }
   };
 
+  const handleQrCodeUpload = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', 'qr');
 
+    setUploadingQrCode(true);
+
+    try {
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Upload failed');
+      }
+
+      const result = await response.json();
+      setBankDetails(prev => prev ? {...prev, qrCodeUrl: result.url} : prev);
+
+      toast({
+        title: 'Success',
+        description: 'QR code uploaded successfully',
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to upload QR code',
+        variant: 'destructive',
+      });
+    } finally {
+      setUploadingQrCode(false);
+    }
+  };
 
   const onSubmit = async (data: EventFormData) => {
     await saveEventMutation.mutateAsync(data);
@@ -689,12 +724,80 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
                             />
                           </div>
                           <div>
-                            <Label>UPI QR Code URL</Label>
-                            <Input
-                              placeholder="https://example.com/qr-code.jpg"
-                              value={bankDetails.qrCodeUrl}
-                              onChange={(e) => setBankDetails({...bankDetails, qrCodeUrl: e.target.value})}
-                            />
+                            <Label>UPI QR Code</Label>
+                            <div className="space-y-2">
+                              <Input
+                                placeholder="https://example.com/qr-code.jpg"
+                                value={bankDetails.qrCodeUrl}
+                                onChange={(e) => setBankDetails({...bankDetails, qrCodeUrl: e.target.value})}
+                              />
+                              <div className="flex items-center space-x-2">
+                                <span className="text-sm text-gray-500">or</span>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    const input = document.createElement('input');
+                                    input.type = 'file';
+                                    input.accept = 'image/*';
+                                    input.onchange = (e) => {
+                                      const file = (e.target as HTMLInputElement).files?.[0];
+                                      if (file) {
+                                        // Validate file size (1MB limit)
+                                        if (file.size > 1024 * 1024) {
+                                          toast({
+                                            title: 'File too large',
+                                            description: 'Please select an image smaller than 1MB',
+                                            variant: 'destructive',
+                                          });
+                                          return;
+                                        }
+                                        handleQrCodeUpload(file);
+                                      }
+                                    };
+                                    input.click();
+                                  }}
+                                  disabled={uploadingQrCode}
+                                >
+                                  {uploadingQrCode ? (
+                                    <>
+                                      <div className="animate-spin w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full mr-2" />
+                                      Uploading...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Upload className="w-4 h-4 mr-2" />
+                                      Upload QR Code
+                                    </>
+                                  )}
+                                </Button>
+                              </div>
+                              {bankDetails.qrCodeUrl && (
+                                <div className="mt-2 relative">
+                                  <div className="text-xs text-gray-600 mb-1">QR Code Preview:</div>
+                                  <img 
+                                    src={bankDetails.qrCodeUrl} 
+                                    alt="QR Code preview" 
+                                    className="w-32 h-32 object-contain rounded border border-gray-300 bg-white p-2"
+                                    onLoad={() => console.log('QR image loaded:', bankDetails.qrCodeUrl)}
+                                    onError={(e) => {
+                                      console.log('QR image failed to load:', bankDetails.qrCodeUrl);
+                                      (e.target as HTMLImageElement).style.display = 'none';
+                                    }}
+                                  />
+                                  <Button
+                                    type="button"
+                                    variant="destructive"
+                                    size="sm"
+                                    className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                                    onClick={() => setBankDetails({...bankDetails, qrCodeUrl: ''})}
+                                  >
+                                    ×
+                                  </Button>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
                         
