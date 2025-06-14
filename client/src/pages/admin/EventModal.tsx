@@ -62,6 +62,7 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
   const [donationCards, setDonationCards] = useState<DonationCardFormData[]>([]);
   const [bankDetails, setBankDetails] = useState<BankDetailsFormData | null>(null);
   const [suggestedAmountsInput, setSuggestedAmountsInput] = useState("");
+  const [uploadingBanner, setUploadingBanner] = useState(false);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -262,6 +263,55 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
     ));
   };
 
+  const handleBannerFileUpload = async (file: File) => {
+    if (!file) return;
+
+    // Check file size (1MB limit)
+    const maxSize = 1 * 1024 * 1024; // 1MB in bytes
+    if (file.size > maxSize) {
+      toast({
+        title: 'Error',
+        description: 'Image file size must be less than 1MB',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', 'banner');
+
+    setUploadingBanner(true);
+
+    try {
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Upload failed');
+      }
+
+      const result = await response.json();
+      form.setValue('imageUrl', result.url);
+
+      toast({
+        title: 'Success',
+        description: 'Banner image uploaded successfully',
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to upload image',
+        variant: 'destructive',
+      });
+    } finally {
+      setUploadingBanner(false);
+    }
+  };
+
   const onSubmit = async (data: EventFormData) => {
     await saveEventMutation.mutateAsync(data);
   };
@@ -359,19 +409,76 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
                       />
                     </div>
 
-                    <FormField
-                      control={form.control}
-                      name="imageUrl"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Banner Image URL</FormLabel>
-                          <FormControl>
-                            <Input placeholder="https://example.com/banner-image.jpg" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="imageUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Banner Image</FormLabel>
+                            <div className="space-y-4">
+                              {/* File Upload Option */}
+                              <div>
+                                <Label className="text-sm font-medium">Upload from Computer</Label>
+                                <div className="mt-1">
+                                  <Input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0];
+                                      if (file) {
+                                        handleBannerFileUpload(file);
+                                      }
+                                    }}
+                                    disabled={uploadingBanner}
+                                    className="cursor-pointer"
+                                  />
+                                  {uploadingBanner && (
+                                    <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
+                                      <div className="animate-spin w-4 h-4 border-2 border-primary border-t-transparent rounded-full" />
+                                      Uploading image...
+                                    </div>
+                                  )}
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    Maximum file size: 1MB. Supported formats: JPG, PNG, GIF
+                                  </p>
+                                </div>
+                              </div>
+
+                              {/* URL Input Option */}
+                              <div>
+                                <Label className="text-sm font-medium">Or Enter Image URL</Label>
+                                <FormControl>
+                                  <Input 
+                                    placeholder="https://example.com/banner-image.jpg" 
+                                    {...field} 
+                                    className="mt-1"
+                                  />
+                                </FormControl>
+                              </div>
+
+                              {/* Image Preview */}
+                              {field.value && (
+                                <div className="mt-2">
+                                  <Label className="text-sm font-medium">Preview</Label>
+                                  <div className="mt-1 border rounded-lg overflow-hidden">
+                                    <img 
+                                      src={field.value} 
+                                      alt="Banner preview" 
+                                      className="w-full h-32 object-cover"
+                                      onError={(e) => {
+                                        e.currentTarget.style.display = 'none';
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
 
                     <FormField
                       control={form.control}
