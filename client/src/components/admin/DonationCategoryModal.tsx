@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, GripVertical, Upload, Image } from "lucide-react";
+import { Plus, Trash2, GripVertical, Upload, Image, X } from "lucide-react";
 import type { DonationCategory, DonationCard, BankDetails } from "@shared/schema";
 
 const categoryFormSchema = z.object({
@@ -197,26 +197,42 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
       return category.id;
     },
     onSuccess: async (categoryId) => {
-      const existingCards = existingDonationCards.filter(card => card.categoryId === categoryId);
-      for (const card of existingCards) {
-        await apiRequest(`/api/donation-cards/${card.id}`, 'DELETE');
-      }
+      try {
+        const existingCards = existingDonationCards.filter(card => card.categoryId === categoryId);
+        for (const card of existingCards) {
+          try {
+            await apiRequest(`/api/donation-cards/${card.id}`, 'DELETE');
+          } catch (error) {
+            console.log('Card already deleted or not found:', card.id);
+          }
+        }
 
-      if (donationCards.length > 0) {
-        for (const card of donationCards) {
-          await apiRequest('/api/donation-cards', 'POST', {
-            ...card,
-            categoryId,
+        if (donationCards.length > 0) {
+          for (const card of donationCards) {
+            await apiRequest('/api/donation-cards', 'POST', {
+              ...card,
+              categoryId,
+              isActive: true,
+              order: 0,
+            });
+          }
+        }
+
+        if (bankDetails && existingBankDetails.length > 0) {
+          const activeBankDetails = existingBankDetails.find(bd => bd.isActive) || existingBankDetails[0];
+          await apiRequest(`/api/bank-details/${activeBankDetails.id}`, 'PUT', {
+            ...bankDetails,
             isActive: true,
-            order: 0,
+          });
+        } else if (bankDetails) {
+          await apiRequest('/api/bank-details', 'POST', {
+            ...bankDetails,
+            isActive: true,
           });
         }
-      }
-
-      if (bankDetails && existingBankDetails.length > 0) {
-        await apiRequest(`/api/bank-details/${existingBankDetails[0].id}`, 'PUT', bankDetails);
-      } else if (bankDetails) {
-        await apiRequest('/api/bank-details', 'POST', bankDetails);
+      } catch (error) {
+        console.error('Error in success handler:', error);
+        throw error;
       }
 
       queryClient.invalidateQueries({ queryKey: ['/api/donation-categories'] });
@@ -623,7 +639,7 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
                                     </Button>
                                   </div>
                                   {card.imageUrl && (
-                                    <div className="mt-2">
+                                    <div className="mt-2 relative">
                                       <img 
                                         src={card.imageUrl} 
                                         alt={`Card ${index + 1} preview`} 
@@ -632,6 +648,15 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
                                           (e.target as HTMLImageElement).style.display = 'none';
                                         }}
                                       />
+                                      <Button
+                                        type="button"
+                                        variant="destructive"
+                                        size="sm"
+                                        onClick={() => updateDonationCard(index, 'imageUrl', '')}
+                                        className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full"
+                                      >
+                                        ×
+                                      </Button>
                                     </div>
                                   )}
                                 </div>
@@ -817,7 +842,7 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
                             </Button>
                           </div>
                           {bankDetails?.qrCodeUrl && (
-                            <div className="mt-2">
+                            <div className="mt-2 relative">
                               <img 
                                 src={bankDetails.qrCodeUrl} 
                                 alt="QR Code preview" 
@@ -826,6 +851,23 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
                                   (e.target as HTMLImageElement).style.display = 'none';
                                 }}
                               />
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => setBankDetails((prev: any) => ({
+                                  ...prev,
+                                  qrCodeUrl: '',
+                                  accountName: prev?.accountName || '',
+                                  accountNumber: prev?.accountNumber || '',
+                                  bankName: prev?.bankName || '',
+                                  ifscCode: prev?.ifscCode || '',
+                                  swiftCode: prev?.swiftCode || '',
+                                }))}
+                                className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full"
+                              >
+                                ×
+                              </Button>
                             </div>
                           )}
                         </div>
