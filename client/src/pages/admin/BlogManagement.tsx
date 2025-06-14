@@ -18,8 +18,15 @@ import { useToast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2, Eye, FileText, Clock, Globe, Image } from "lucide-react";
 import { z } from "zod";
 
-const blogFormSchema = insertBlogPostSchema.extend({
+const blogFormSchema = insertBlogPostSchema.omit({ imageUrl: true }).extend({
   imageFile: z.any().optional(),
+  imageUrl: z.string().optional(),
+}).refine((data) => {
+  // Either imageFile or imageUrl must be provided
+  return (data.imageFile && data.imageFile.length > 0) || (data.imageUrl && data.imageUrl.length > 0);
+}, {
+  message: "Either upload an image file or provide an image URL",
+  path: ["imageUrl"], // Show error on imageUrl field
 });
 
 type BlogFormData = z.infer<typeof blogFormSchema>;
@@ -75,8 +82,9 @@ export default function BlogManagement() {
   // Create blog post mutation
   const createMutation = useMutation({
     mutationFn: async (data: BlogFormData) => {
-      let imageUrl = data.imageUrl;
+      let imageUrl = '';
       
+      // Priority: File upload first, then URL
       if (data.imageFile && data.imageFile[0]) {
         const formData = new FormData();
         formData.append("file", data.imageFile[0]);
@@ -84,6 +92,8 @@ export default function BlogManagement() {
         const uploadResponse = await apiRequest("/api/upload", "POST", formData);
         const uploadData = await uploadResponse.json();
         imageUrl = uploadData.url;
+      } else if (data.imageUrl) {
+        imageUrl = data.imageUrl;
       }
 
       // Ensure we have a valid imageUrl
@@ -131,8 +141,9 @@ export default function BlogManagement() {
   // Update blog post mutation
   const updateMutation = useMutation({
     mutationFn: async (data: BlogFormData) => {
-      let imageUrl = data.imageUrl;
+      let imageUrl = '';
       
+      // Priority: File upload first, then URL, then existing image
       if (data.imageFile && data.imageFile[0]) {
         const formData = new FormData();
         formData.append("file", data.imageFile[0]);
@@ -140,11 +151,14 @@ export default function BlogManagement() {
         const uploadResponse = await apiRequest("/api/upload", "POST", formData);
         const uploadData = await uploadResponse.json();
         imageUrl = uploadData.url;
+      } else if (data.imageUrl) {
+        imageUrl = data.imageUrl;
+      } else if (editingBlog?.imageUrl) {
+        imageUrl = editingBlog.imageUrl;
       }
 
       // Ensure we have a valid imageUrl
-      const finalImageUrl = imageUrl || editingBlog?.imageUrl;
-      if (!finalImageUrl) {
+      if (!imageUrl) {
         throw new Error('Image is required for blog post');
       }
 

@@ -106,7 +106,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const upload = multer({ 
     storage: storage_multer,
     limits: {
-      fileSize: 20 * 1024 * 1024 // 20MB limit
+      fileSize: 1 * 1024 * 1024 // 1MB limit
     },
     fileFilter: function (req, file, cb) {
       if (file.mimetype.startsWith('image/')) {
