@@ -309,6 +309,7 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
 
       if (type === 'banner') {
         form.setValue('imageUrl', imageUrl);
+        form.trigger('imageUrl'); // Force re-validation and re-render
       } else if (type === 'card' && cardIndex !== undefined) {
         updateDonationCard(cardIndex, 'imageUrl', imageUrl);
       } else if (type === 'qr') {
@@ -483,14 +484,18 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
                               </div>
                               {field.value && (
                                 <div className="mt-2">
+                                  <div className="text-xs text-gray-600 mb-1">Preview:</div>
                                   <img 
                                     src={field.value} 
                                     alt="Banner preview" 
                                     className="w-32 h-20 object-cover rounded border"
+                                    onLoad={() => console.log('Image loaded:', field.value)}
                                     onError={(e) => {
+                                      console.log('Image failed to load:', field.value);
                                       (e.target as HTMLImageElement).style.display = 'none';
                                     }}
                                   />
+                                  <div className="text-xs text-gray-500 mt-1">{field.value}</div>
                                 </div>
                               )}
                             </div>
@@ -656,11 +661,14 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
                                   </div>
                                   {card.imageUrl && (
                                     <div className="mt-2 relative">
+                                      <div className="text-xs text-gray-600 mb-1">Card Preview:</div>
                                       <img 
                                         src={card.imageUrl} 
                                         alt={`Card ${index + 1} preview`} 
                                         className="w-24 h-16 object-cover rounded border"
+                                        onLoad={() => console.log('Card image loaded:', card.imageUrl)}
                                         onError={(e) => {
+                                          console.log('Card image failed to load:', card.imageUrl);
                                           (e.target as HTMLImageElement).style.display = 'none';
                                         }}
                                       />
@@ -673,6 +681,7 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
                                       >
                                         ×
                                       </Button>
+                                      <div className="text-xs text-gray-500 mt-1">{card.imageUrl}</div>
                                     </div>
                                   )}
                                 </div>
@@ -870,11 +879,14 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
                           </div>
                           {bankDetails?.qrCodeUrl && (
                             <div className="mt-2 relative">
+                              <div className="text-xs text-gray-600 mb-1">QR Code Preview:</div>
                               <img 
                                 src={bankDetails.qrCodeUrl} 
                                 alt="QR Code preview" 
                                 className="w-24 h-24 object-cover rounded border"
+                                onLoad={() => console.log('QR image loaded:', bankDetails.qrCodeUrl)}
                                 onError={(e) => {
+                                  console.log('QR image failed to load:', bankDetails.qrCodeUrl);
                                   (e.target as HTMLImageElement).style.display = 'none';
                                 }}
                               />
@@ -895,6 +907,7 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
                               >
                                 ×
                               </Button>
+                              <div className="text-xs text-gray-500 mt-1">{bankDetails.qrCodeUrl}</div>
                             </div>
                           )}
                         </div>
