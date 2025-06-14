@@ -451,26 +451,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const requestData = insertDonationCategorySchema.partial().parse(req.body);
       
       // Handle suggestedAmounts separately to ensure correct type
-      let data = { ...requestData };
-      if (requestData.suggestedAmounts && !Array.isArray(requestData.suggestedAmounts)) {
-        data = {
-          ...requestData,
-          suggestedAmounts: Array.isArray(requestData.suggestedAmounts) 
-            ? requestData.suggestedAmounts 
-            : null
-        };
+      const data: any = { ...requestData };
+      if (requestData.suggestedAmounts !== undefined) {
+        if (Array.isArray(requestData.suggestedAmounts)) {
+          data.suggestedAmounts = requestData.suggestedAmounts;
+        } else if (typeof requestData.suggestedAmounts === 'string') {
+          // Parse comma-separated string to number array
+          data.suggestedAmounts = requestData.suggestedAmounts
+            .split(',')
+            .map(s => parseFloat(s.trim()))
+            .filter(n => !isNaN(n));
+        } else {
+          data.suggestedAmounts = null;
+        }
       }
       
-      const category = await storage.updateDonationCategory(id, data);
+      const category = await storage.updateDonationCategory(id, data as any);
       if (!category) {
         return res.status(404).json({ message: "Donation category not found" });
       }
       res.json(category);
     } catch (error) {
+      console.error('Error updating donation category:', error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid data", errors: error.errors });
       }
-      res.status(500).json({ message: "Error updating donation category" });
+      res.status(500).json({ message: "Error updating donation category", error: error instanceof Error ? error.message : String(error) });
     }
   });
 
@@ -700,7 +706,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         };
       }
       
-      const event = await storage.updateEvent(id, data);
+      const event = await storage.updateEvent(id, data as any);
       if (!event) {
         return res.status(404).json({ message: "Event not found" });
       }

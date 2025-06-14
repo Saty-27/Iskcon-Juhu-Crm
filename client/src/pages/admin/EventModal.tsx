@@ -312,6 +312,51 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
     }
   };
 
+  const handleCardFileUpload = async (file: File, cardIndex: number) => {
+    if (!file) return;
+
+    // Check file size (1MB limit)
+    const maxSize = 1 * 1024 * 1024; // 1MB in bytes
+    if (file.size > maxSize) {
+      toast({
+        title: 'Error',
+        description: 'Image file size must be less than 1MB',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', 'card');
+
+    try {
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Upload failed');
+      }
+
+      const result = await response.json();
+      updateDonationCard(cardIndex, 'imageUrl', result.url);
+
+      toast({
+        title: 'Success',
+        description: 'Card image uploaded successfully',
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to upload image',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const onSubmit = async (data: EventFormData) => {
     await saveEventMutation.mutateAsync(data);
   };
@@ -578,14 +623,55 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
                                 className="min-h-[60px] text-sm resize-none"
                               />
                             </div>
-                            <div className="space-y-1">
-                              <Label className="text-xs font-medium">Image URL (Optional)</Label>
-                              <Input
-                                placeholder="https://example.com/card-image.jpg"
-                                value={card.imageUrl}
-                                onChange={(e) => updateDonationCard(index, 'imageUrl', e.target.value)}
-                                className="h-8 text-sm"
-                              />
+                            <div className="space-y-3">
+                              <Label className="text-xs font-medium">Card Image</Label>
+                              
+                              {/* File Upload Option */}
+                              <div>
+                                <Label className="text-xs text-muted-foreground">Upload from Computer</Label>
+                                <Input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                      handleCardFileUpload(file, index);
+                                    }
+                                  }}
+                                  className="h-8 text-xs cursor-pointer mt-1"
+                                />
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  Max 1MB. JPG, PNG, GIF
+                                </p>
+                              </div>
+
+                              {/* URL Input Option */}
+                              <div>
+                                <Label className="text-xs text-muted-foreground">Or Enter Image URL</Label>
+                                <Input
+                                  placeholder="https://example.com/card-image.jpg"
+                                  value={card.imageUrl}
+                                  onChange={(e) => updateDonationCard(index, 'imageUrl', e.target.value)}
+                                  className="h-8 text-sm mt-1"
+                                />
+                              </div>
+
+                              {/* Image Preview */}
+                              {card.imageUrl && (
+                                <div>
+                                  <Label className="text-xs text-muted-foreground">Preview</Label>
+                                  <div className="mt-1 border rounded overflow-hidden">
+                                    <img 
+                                      src={card.imageUrl} 
+                                      alt="Card preview" 
+                                      className="w-full h-20 object-cover"
+                                      onError={(e) => {
+                                        e.currentTarget.style.display = 'none';
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           </CardContent>
                         </Card>
