@@ -21,12 +21,6 @@ import { z } from "zod";
 const blogFormSchema = insertBlogPostSchema.omit({ imageUrl: true }).extend({
   imageFile: z.any().optional(),
   imageUrl: z.string().optional(),
-}).refine((data) => {
-  // Either imageFile or imageUrl must be provided
-  return (data.imageFile && data.imageFile.length > 0) || (data.imageUrl && data.imageUrl.length > 0);
-}, {
-  message: "Either upload an image file or provide an image URL",
-  path: ["imageUrl"], // Show error on imageUrl field
 });
 
 type BlogFormData = z.infer<typeof blogFormSchema>;

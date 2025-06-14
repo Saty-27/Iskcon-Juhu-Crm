@@ -21,8 +21,8 @@ const eventFormSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
   date: z.string().min(1, "Date is required"),
-  imageUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-  readMoreUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  imageUrl: z.string().optional(),
+  readMoreUrl: z.string().optional(),
   isActive: z.boolean(),
   customDonationEnabled: z.boolean(),
   customDonationTitle: z.string().min(1, "Custom donation title is required"),
@@ -33,7 +33,7 @@ const donationCardSchema = z.object({
   title: z.string().min(1, "Title is required"),
   amount: z.number().min(1, "Amount must be greater than 0"),
   description: z.string().optional(),
-  imageUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  imageUrl: z.string().optional(),
   order: z.number(),
 });
 
@@ -43,7 +43,7 @@ const bankDetailsSchema = z.object({
   accountNumber: z.string().min(1, "Account number is required"),
   ifscCode: z.string().min(1, "IFSC code is required"),
   swiftCode: z.string().optional(),
-  qrCodeUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  qrCodeUrl: z.string().optional(),
   isActive: z.boolean(),
 });
 
