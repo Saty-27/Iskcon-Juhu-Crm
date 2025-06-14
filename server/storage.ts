@@ -628,8 +628,24 @@ export class MemStorage implements IStorage {
     return updatedCategory;
   }
 
-  async deleteDonationCategory(id: number): Promise<boolean> {
-    return this.donationCategoriesData.delete(id);
+  async deleteDonationCategory(id: number): Promise<{ success: boolean; message?: string; deletedCards?: number }> {
+    // In memory storage doesn't have foreign key constraints, so we can delete directly
+    const success = this.donationCategoriesData.delete(id);
+    
+    // Also delete related donation cards
+    const relatedCards = Array.from(this.donationCardsData.values()).filter(card => card.categoryId === id);
+    let deletedCards = 0;
+    
+    for (const card of relatedCards) {
+      if (this.donationCardsData.delete(card.id)) {
+        deletedCards++;
+      }
+    }
+    
+    return {
+      success,
+      deletedCards
+    };
   }
 
   // Event methods
