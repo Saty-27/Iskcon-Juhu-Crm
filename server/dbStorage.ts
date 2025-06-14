@@ -123,9 +123,36 @@ export class DatabaseStorage implements IStorage {
     return category;
   }
 
-  async deleteDonationCategory(id: number): Promise<boolean> {
-    const result = await db.delete(donationCategories).where(eq(donationCategories.id, id));
-    return result.rowCount > 0;
+  async deleteDonationCategory(id: number): Promise<{ success: boolean; message?: string; deletedCards?: number }> {
+    try {
+      // First check if there are any donations referencing this category
+      const existingDonations = await db.select().from(donations).where(eq(donations.categoryId, id));
+      
+      if (existingDonations.length > 0) {
+        return {
+          success: false,
+          message: `Cannot delete category with ${existingDonations.length} existing donation(s). Please contact administrator to handle existing donations first.`
+        };
+      }
+
+      // Delete related donation cards first
+      const deletedCards = await db.delete(donationCards).where(eq(donationCards.categoryId, id));
+      const deletedCardsCount = deletedCards.rowCount || 0;
+
+      // Then delete the category
+      const result = await db.delete(donationCategories).where(eq(donationCategories.id, id));
+      
+      return {
+        success: result.rowCount > 0,
+        deletedCards: deletedCardsCount
+      };
+    } catch (error) {
+      console.error('Error in deleteDonationCategory:', error);
+      return {
+        success: false,
+        message: 'Database error occurred while deleting category'
+      };
+    }
   }
 
   // Donation card operations

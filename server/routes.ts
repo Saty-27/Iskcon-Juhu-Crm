@@ -485,35 +485,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = parseInt(req.params.id);
       console.log('Attempting to delete donation category with ID:', id);
       
-      // First check if category exists
-      const existingCategory = await storage.getDonationCategory(id);
-      if (!existingCategory) {
-        console.log('Category not found for ID:', id);
-        return res.status(404).json({ message: "Donation category not found" });
+      // Call the updated deletion method
+      const result = await storage.deleteDonationCategory(id);
+      
+      if (!result.success) {
+        console.log('Delete operation failed:', result.message);
+        return res.status(400).json({ 
+          message: result.message || "Cannot delete donation category" 
+        });
       }
       
-      // Get all related donation cards
-      const relatedCards = await storage.getDonationCardsByCategory(id);
-      
-      // Delete all related donation cards first
-      if (relatedCards.length > 0) {
-        console.log(`Deleting ${relatedCards.length} related donation cards for category ${id}`);
-        for (const card of relatedCards) {
-          await storage.deleteDonationCard(card.id);
-        }
-      }
-      
-      // Now delete the category
-      const success = await storage.deleteDonationCategory(id);
-      if (!success) {
-        console.log('Delete operation failed for ID:', id);
-        return res.status(404).json({ message: "Donation category not found" });
-      }
-      
-      console.log(`Successfully deleted donation category ${id} and ${relatedCards.length} related cards`);
+      console.log(`Successfully deleted donation category ${id} and ${result.deletedCards || 0} related cards`);
       res.json({ 
-        message: "Donation category deleted", 
-        deletedCards: relatedCards.length 
+        message: "Donation category deleted successfully", 
+        deletedCards: result.deletedCards || 0
       });
     } catch (error) {
       console.error('Error deleting donation category:', error);

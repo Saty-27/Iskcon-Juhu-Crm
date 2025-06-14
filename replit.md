@@ -115,6 +115,7 @@ This is a comprehensive donation management system for ISKCON Juhu temple built 
 
 ## Changelog
 - June 14, 2025. Initial setup
+- June 14, 2025. Fixed donation category deletion error - Added proper foreign key constraint handling and enhanced error messages for categories with existing donations
 
 ## User Preferences
 

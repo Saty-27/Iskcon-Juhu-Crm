@@ -48,7 +48,7 @@ export interface IStorage {
   getDonationCategory(id: number): Promise<DonationCategory | undefined>;
   createDonationCategory(category: InsertDonationCategory): Promise<DonationCategory>;
   updateDonationCategory(id: number, categoryData: Partial<DonationCategory>): Promise<DonationCategory | undefined>;
-  deleteDonationCategory(id: number): Promise<boolean>;
+  deleteDonationCategory(id: number): Promise<{ success: boolean; message?: string; deletedCards?: number }>;
   
   // Donation card management
   getDonationCards(): Promise<DonationCard[]>;
