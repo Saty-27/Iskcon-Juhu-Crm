@@ -241,8 +241,13 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
       onClose();
       toast({ title: 'Success', description: 'Category updated successfully' });
     },
-    onError: () => {
-      toast({ title: 'Error', description: 'Failed to update category', variant: 'destructive' });
+    onError: (error) => {
+      console.error('Update error:', error);
+      toast({ 
+        title: 'Update Failed', 
+        description: error instanceof Error ? error.message : 'Failed to update category and cards',
+        variant: 'destructive' 
+      });
     },
   });
 
@@ -619,7 +624,18 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
                                         input.accept = 'image/*';
                                         input.onchange = (e) => {
                                           const file = (e.target as HTMLInputElement).files?.[0];
-                                          if (file) handleFileUpload(file, 'card', index);
+                                          if (file) {
+                                            // Validate file size (1MB limit)
+                                            if (file.size > 1024 * 1024) {
+                                              toast({
+                                                title: 'File too large',
+                                                description: 'Please select an image smaller than 1MB',
+                                                variant: 'destructive',
+                                              });
+                                              return;
+                                            }
+                                            handleFileUpload(file, 'card', index);
+                                          }
                                         };
                                         input.click();
                                       }}
@@ -822,7 +838,18 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
                                 input.accept = 'image/*';
                                 input.onchange = (e) => {
                                   const file = (e.target as HTMLInputElement).files?.[0];
-                                  if (file) handleFileUpload(file, 'qr');
+                                  if (file) {
+                                    // Validate file size (1MB limit)
+                                    if (file.size > 1024 * 1024) {
+                                      toast({
+                                        title: 'File too large',
+                                        description: 'Please select an image smaller than 1MB',
+                                        variant: 'destructive',
+                                      });
+                                      return;
+                                    }
+                                    handleFileUpload(file, 'qr');
+                                  }
                                 };
                                 input.click();
                               }}
