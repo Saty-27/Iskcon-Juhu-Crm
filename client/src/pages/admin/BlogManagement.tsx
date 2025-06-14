@@ -86,8 +86,16 @@ export default function BlogManagement() {
       
       // Priority: File upload first, then URL
       if (data.imageFile && data.imageFile[0]) {
+        const file = data.imageFile[0];
+        
+        // Check file size (1MB limit)
+        const maxSize = 1 * 1024 * 1024; // 1MB in bytes
+        if (file.size > maxSize) {
+          throw new Error('Image file size must be less than 1MB');
+        }
+        
         const formData = new FormData();
-        formData.append("file", data.imageFile[0]);
+        formData.append("file", file);
         formData.append("type", "blog");
         const uploadResponse = await apiRequest("/api/upload", "POST", formData);
         const uploadData = await uploadResponse.json();
@@ -145,8 +153,16 @@ export default function BlogManagement() {
       
       // Priority: File upload first, then URL, then existing image
       if (data.imageFile && data.imageFile[0]) {
+        const file = data.imageFile[0];
+        
+        // Check file size (1MB limit)
+        const maxSize = 1 * 1024 * 1024; // 1MB in bytes
+        if (file.size > maxSize) {
+          throw new Error('Image file size must be less than 1MB');
+        }
+        
         const formData = new FormData();
-        formData.append("file", data.imageFile[0]);
+        formData.append("file", file);
         formData.append("type", "blog");
         const uploadResponse = await apiRequest("/api/upload", "POST", formData);
         const uploadData = await uploadResponse.json();
