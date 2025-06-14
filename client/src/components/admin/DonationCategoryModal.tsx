@@ -487,7 +487,7 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
                                   <img 
                                     src={field.value} 
                                     alt="Banner preview" 
-                                    className="w-32 h-20 object-cover rounded border"
+                                    className="w-48 h-28 object-cover rounded border border-gray-300"
                                     onLoad={() => console.log('Image loaded:', field.value)}
                                     onError={(e) => {
                                       console.log('Image failed to load:', field.value);
@@ -554,11 +554,7 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
                     </div>
                   </CardHeader>
                   <CardContent>
-                    {category && existingDonationCards.length === 0 && donationCards.length === 0 ? (
-                      <div className="text-center py-8 text-gray-500">
-                        <div className="animate-pulse">Loading donation cards...</div>
-                      </div>
-                    ) : donationCards.length === 0 ? (
+                    {donationCards.length === 0 ? (
                       <div className="text-center py-8 text-gray-500">
                         <p>No donation cards added yet. Click "Add Card" to create predefined donation options.</p>
                       </div>
@@ -806,7 +802,7 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
                               <img 
                                 src={bankDetails.qrCodeUrl} 
                                 alt="QR Code preview" 
-                                className="w-24 h-24 object-cover rounded border"
+                                className="w-32 h-32 object-contain rounded border border-gray-300 bg-white p-2"
                                 onLoad={() => console.log('QR image loaded:', bankDetails.qrCodeUrl)}
                                 onError={(e) => {
                                   console.log('QR image failed to load:', bankDetails.qrCodeUrl);
