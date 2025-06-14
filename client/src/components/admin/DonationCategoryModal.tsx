@@ -20,7 +20,7 @@ import type { DonationCategory, DonationCard, BankDetails } from "@shared/schema
 const categoryFormSchema = z.object({
   name: z.string().min(1, "Category name is required"),
   description: z.string().optional(),
-  imageUrl: z.string().optional(),
+  imageUrl: z.string().min(1, "Banner image is required"),
   isActive: z.boolean(),
   order: z.number().min(0),
   heading: z.string().optional(),
@@ -255,6 +255,17 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
   const handleFileUpload = async (file: File, type: string, cardIndex?: number) => {
     if (!file) return;
 
+    // Check file size (1MB limit)
+    const maxSize = 1 * 1024 * 1024; // 1MB in bytes
+    if (file.size > maxSize) {
+      toast({
+        title: 'Error',
+        description: 'Image file size must be less than 1MB',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     const formData = new FormData();
     formData.append('file', file);
     formData.append('type', type);
@@ -268,7 +279,8 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
       });
 
       if (!response.ok) {
-        throw new Error('Upload failed');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Upload failed');
       }
 
       const result = await response.json();

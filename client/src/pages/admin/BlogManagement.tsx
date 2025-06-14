@@ -167,7 +167,7 @@ export default function BlogManagement() {
         slug: data.slug,
         excerpt: data.excerpt,
         content: data.content,
-        imageUrl: finalImageUrl,
+        imageUrl: imageUrl,
         imageAlt: data.imageAlt || '',
         author: data.author,
         readTime: data.readTime,
@@ -179,9 +179,9 @@ export default function BlogManagement() {
       };
 
       console.log('Updating blog post:', editingBlog?.id, 'with data:', blogData);
-      console.log('ImageUrl being sent:', finalImageUrl);
-      console.log('ImageUrl type:', typeof finalImageUrl);
-      console.log('ImageUrl length:', finalImageUrl?.length);
+      console.log('ImageUrl being sent:', imageUrl);
+      console.log('ImageUrl type:', typeof imageUrl);
+      console.log('ImageUrl length:', imageUrl?.length);
       
       await apiRequest(`/api/admin/blog-posts/${editingBlog?.id}`, "PUT", blogData);
     },
