@@ -27,10 +27,12 @@ const Sidebar = () => {
   };
 
   const toggleMobileMenu = () => {
+    console.log('Toggle mobile menu clicked, current state:', isMobileMenuOpen);
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   const closeMobileMenu = () => {
+    console.log('Close mobile menu');
     setIsMobileMenuOpen(false);
   };
 

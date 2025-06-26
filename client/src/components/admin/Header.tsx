@@ -36,15 +36,6 @@ const Header = () => {
   return (
     <header className="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
       <div className="flex items-center">
-        <div className="flex items-center md:hidden mr-4">
-          <button
-            type="button"
-            className="text-gray-500 hover:text-gray-600"
-            onClick={toggleMobileMenu}
-          >
-            <Menu className="h-6 w-6" />
-          </button>
-        </div>
         <h1 className="text-2xl font-bold text-gray-900">{getPageTitle()}</h1>
       </div>
 
