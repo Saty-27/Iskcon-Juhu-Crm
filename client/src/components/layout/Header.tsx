@@ -3,6 +3,7 @@ import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Play } from 'lucide-react';
 import useAuth from '@/hooks/useAuth';
+import logoIskcon from '@/assets/logo-iskcon.png';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -38,9 +39,11 @@ const Header = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            <h1 className="text-primary font-poppins font-bold text-xl md:text-2xl">
-              ISKCON <span className="text-secondary">Juhu</span>
-            </h1>
+            <img 
+              src={logoIskcon} 
+              alt="ISKCON Juhu" 
+              className="h-10 md:h-12 w-auto"
+            />
           </Link>
 
           {/* Desktop Navigation */}
