@@ -8,15 +8,20 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="min-h-screen bg-gray-50">
       <Sidebar />
       
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Header />
-        
-        <div className="flex-1 overflow-auto">
-          {children}
+      {/* Mobile content wrapper with top padding for fixed header */}
+      <div className="md:ml-64 pt-16 md:pt-0">
+        {/* Desktop Header - hidden on mobile since we use mobile header from Sidebar */}
+        <div className="hidden md:block">
+          <Header />
         </div>
+        
+        {/* Main content */}
+        <main className="min-h-screen bg-gray-50">
+          {children}
+        </main>
       </div>
     </div>
   );
