@@ -180,6 +180,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(400).json({ message: "No file uploaded" });
         }
         
+        console.log('Upload request received:', { 
+          hasFile: !!req.file, 
+          type: req.body.type,
+          filename: req.file?.filename,
+          path: req.file?.path,
+          destination: req.file?.destination
+        });
+        
         const type = req.body.type || 'banner';
         let folder = 'banners';
         
@@ -195,8 +203,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
           folder = 'blog';
         }
         
+        // Verify file exists on disk
+        const filePath = req.file.path;
+        console.log('Checking file at path:', filePath);
+        
+        if (!fs.existsSync(filePath)) {
+          console.error('File not found at path:', filePath);
+          return res.status(500).json({ message: "File upload failed - file not saved to disk" });
+        }
+        
         const imageUrl = `/uploads/${folder}/${req.file.filename}`;
-        console.log('File uploaded successfully:', imageUrl);
+        console.log('File uploaded successfully:', imageUrl, 'Size:', fs.statSync(filePath).size, 'bytes');
         res.json({ url: imageUrl });
       } catch (error) {
         console.log('Error processing upload:', error);
