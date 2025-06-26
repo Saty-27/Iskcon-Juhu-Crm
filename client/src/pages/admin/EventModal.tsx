@@ -88,9 +88,10 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
     enabled: !!event?.id,
   });
 
-  const { data: existingBankDetails = [] } = useQuery<BankDetails[]>({
-    queryKey: ['/api/bank-details'],
-    enabled: isOpen,
+  // Get event-specific bank details instead of global ones
+  const { data: existingEventBankDetails = [] } = useQuery<BankDetails[]>({
+    queryKey: [`/api/events/${event?.id}/bank-details`],
+    enabled: !!event?.id && isOpen,
   });
 
   // Initialize form when event ID changes
@@ -142,10 +143,10 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
     }
   }, [event?.id, existingEventDonationCards?.length]);
 
-  // Load bank details when available
+  // Load event-specific bank details when available
   useEffect(() => {
-    if (existingBankDetails && existingBankDetails.length > 0) {
-      const activeBankDetails = existingBankDetails.find(bd => bd.isActive) || existingBankDetails[0];
+    if (existingEventBankDetails && existingEventBankDetails.length > 0) {
+      const activeBankDetails = existingEventBankDetails.find((bd: any) => bd.isActive) || existingEventBankDetails[0];
       setBankDetails({
         accountName: activeBankDetails.accountName,
         bankName: activeBankDetails.bankName,
@@ -155,8 +156,19 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
         qrCodeUrl: activeBankDetails.qrCodeUrl || "",
         isActive: activeBankDetails.isActive,
       });
+    } else if (event?.id) {
+      // Initialize with default bank details for new event
+      setBankDetails({
+        accountName: "ISKCON Juhu",
+        bankName: "HDFC",
+        accountNumber: "",
+        ifscCode: "",
+        swiftCode: "",
+        qrCodeUrl: "",
+        isActive: true,
+      });
     }
-  }, [existingBankDetails?.length]);
+  }, [existingEventBankDetails?.length, event?.id]);
 
   const saveEventMutation = useMutation({
     mutationFn: async (data: EventFormData) => {
@@ -226,20 +238,20 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
   };
 
   const saveBankDetails = async () => {
-    if (!bankDetails) return;
+    if (!bankDetails || !event?.id) return;
     
     try {
-      if (existingBankDetails.length > 0) {
-        const activeBankDetails = existingBankDetails.find(bd => bd.isActive) || existingBankDetails[0];
-        await apiRequest(`/api/bank-details/${activeBankDetails.id}`, 'PUT', bankDetails);
+      if (existingEventBankDetails.length > 0) {
+        const activeBankDetails = existingEventBankDetails.find((bd: any) => bd.isActive) || existingEventBankDetails[0];
+        await apiRequest(`/api/events/${event.id}/bank-details/${activeBankDetails.id}`, 'PUT', bankDetails);
       } else {
-        await apiRequest('/api/bank-details', 'POST', bankDetails);
+        await apiRequest(`/api/events/${event.id}/bank-details`, 'POST', bankDetails);
       }
       
-      queryClient.invalidateQueries({ queryKey: ['/api/bank-details'] });
-      toast({ title: 'Success', description: 'Bank details saved successfully' });
+      queryClient.invalidateQueries({ queryKey: [`/api/events/${event.id}/bank-details`] });
+      toast({ title: 'Success', description: 'Event payment details saved successfully' });
     } catch (error) {
-      toast({ title: 'Error', description: 'Failed to save bank details', variant: 'destructive' });
+      toast({ title: 'Error', description: 'Failed to save event payment details', variant: 'destructive' });
     }
   };
 
