@@ -145,30 +145,35 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
 
   // Load event-specific bank details when available
   useEffect(() => {
-    if (existingEventBankDetails && existingEventBankDetails.length > 0) {
-      const activeBankDetails = existingEventBankDetails.find((bd: any) => bd.isActive) || existingEventBankDetails[0];
-      setBankDetails({
-        accountName: activeBankDetails.accountName,
-        bankName: activeBankDetails.bankName,
-        accountNumber: activeBankDetails.accountNumber,
-        ifscCode: activeBankDetails.ifscCode,
-        swiftCode: activeBankDetails.swiftCode || "",
-        qrCodeUrl: activeBankDetails.qrCodeUrl || "",
-        isActive: activeBankDetails.isActive,
-      });
-    } else if (event?.id) {
-      // Initialize with default bank details for new event
-      setBankDetails({
-        accountName: "ISKCON Juhu",
-        bankName: "HDFC",
-        accountNumber: "",
-        ifscCode: "",
-        swiftCode: "",
-        qrCodeUrl: "",
-        isActive: true,
-      });
+    if (isOpen && event?.id) {
+      if (existingEventBankDetails && existingEventBankDetails.length > 0) {
+        const activeBankDetails = existingEventBankDetails.find((bd: any) => bd.isActive) || existingEventBankDetails[0];
+        setBankDetails({
+          accountName: activeBankDetails.accountName,
+          bankName: activeBankDetails.bankName,
+          accountNumber: activeBankDetails.accountNumber,
+          ifscCode: activeBankDetails.ifscCode,
+          swiftCode: activeBankDetails.swiftCode || "",
+          qrCodeUrl: activeBankDetails.qrCodeUrl || "",
+          isActive: activeBankDetails.isActive,
+        });
+      } else {
+        // Initialize with default bank details for new event
+        setBankDetails({
+          accountName: "ISKCON Juhu",
+          bankName: "HDFC",
+          accountNumber: "",
+          ifscCode: "",
+          swiftCode: "",
+          qrCodeUrl: "",
+          isActive: true,
+        });
+      }
+    } else if (!isOpen) {
+      // Clear bank details when modal is closed
+      setBankDetails(null);
     }
-  }, [existingEventBankDetails?.length, event?.id]);
+  }, [isOpen, existingEventBankDetails, event?.id]);
 
   const saveEventMutation = useMutation({
     mutationFn: async (data: EventFormData) => {

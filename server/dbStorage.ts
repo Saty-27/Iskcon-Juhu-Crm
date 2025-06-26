@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "./db";
 import { 
-  users, banners, quotes, donationCategories, donationCards, eventDonationCards, bankDetails, events, gallery, videos, 
+  users, banners, quotes, donationCategories, donationCards, eventDonationCards, bankDetails, eventBankDetails, events, gallery, videos, 
   testimonials, contactMessages, socialLinks, donations, subscriptions,
   stats, schedules, blogPosts,
   type User, type InsertUser, type Banner, type InsertBanner,
@@ -207,6 +207,31 @@ export class DatabaseStorage implements IStorage {
   async deleteBankDetails(id: number): Promise<boolean> {
     const result = await db.delete(bankDetails).where(eq(bankDetails.id, id));
     return result.rowCount > 0;
+  }
+
+  // Event-specific bank details operations
+  async getEventBankDetails(eventId: number): Promise<BankDetails[]> {
+    return await db.select().from(eventBankDetails).where(eq(eventBankDetails.eventId, eventId));
+  }
+
+  async getEventBankDetail(id: number): Promise<BankDetails | undefined> {
+    const [detail] = await db.select().from(eventBankDetails).where(eq(eventBankDetails.id, id));
+    return detail;
+  }
+
+  async createEventBankDetails(details: any): Promise<BankDetails> {
+    const [newDetails] = await db.insert(eventBankDetails).values(details).returning();
+    return newDetails;
+  }
+
+  async updateEventBankDetails(id: number, detailsData: any): Promise<BankDetails | undefined> {
+    const [details] = await db.update(eventBankDetails).set(detailsData).where(eq(eventBankDetails.id, id)).returning();
+    return details;
+  }
+
+  async deleteEventBankDetails(id: number): Promise<boolean> {
+    const result = await db.delete(eventBankDetails).where(eq(eventBankDetails.id, id));
+    return (result.rowCount || 0) > 0;
   }
 
   // Event operations
