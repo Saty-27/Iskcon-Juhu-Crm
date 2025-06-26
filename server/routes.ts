@@ -782,6 +782,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Event-specific bank details API endpoints
+  app.get("/api/events/:id/bank-details", async (req, res) => {
+    try {
+      const eventId = parseInt(req.params.id);
+      const bankDetails = await storage.getEventBankDetails(eventId);
+      res.json(bankDetails.filter(bd => bd.isActive));
+    } catch (error) {
+      console.error("Event bank details API error:", error);
+      res.status(500).json({ message: "Error fetching event bank details" });
+    }
+  });
+
+  app.post("/api/events/:id/bank-details", isAdmin, async (req, res) => {
+    try {
+      const eventId = parseInt(req.params.id);
+      const data = { ...req.body, eventId };
+      const bankDetails = await storage.createEventBankDetails(data);
+      res.status(201).json(bankDetails);
+    } catch (error) {
+      console.error("Create event bank details error:", error);
+      res.status(500).json({ message: "Error creating event bank details" });
+    }
+  });
+
+  app.put("/api/events/:eventId/bank-details/:id", isAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const eventId = parseInt(req.params.eventId);
+      const data = { ...req.body, eventId };
+      const bankDetails = await storage.updateEventBankDetails(id, data);
+      if (!bankDetails) {
+        return res.status(404).json({ message: "Event bank details not found" });
+      }
+      res.json(bankDetails);
+    } catch (error) {
+      console.error("Update event bank details error:", error);
+      res.status(500).json({ message: "Error updating event bank details" });
+    }
+  });
+
+  app.delete("/api/events/:eventId/bank-details/:id", isAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteEventBankDetails(id);
+      if (!success) {
+        return res.status(404).json({ message: "Event bank details not found" });
+      }
+      res.json({ message: "Event bank details deleted" });
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting event bank details" });
+    }
+  });
+
   // Gallery API endpoints
   app.get("/api/gallery", async (req, res) => {
     try {

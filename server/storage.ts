@@ -79,6 +79,13 @@ export interface IStorage {
   updateEventDonationCard(id: number, cardData: Partial<EventDonationCard>): Promise<EventDonationCard | undefined>;
   deleteEventDonationCard(id: number): Promise<boolean>;
   
+  // Event-specific bank details management
+  getEventBankDetails(eventId: number): Promise<BankDetails[]>;
+  getEventBankDetail(id: number): Promise<BankDetails | undefined>;
+  createEventBankDetails(details: any): Promise<BankDetails>;
+  updateEventBankDetails(id: number, detailsData: any): Promise<BankDetails | undefined>;
+  deleteEventBankDetails(id: number): Promise<boolean>;
+  
   // Gallery management
   getGalleryItems(): Promise<Gallery[]>;
   getGalleryItem(id: number): Promise<Gallery | undefined>;
@@ -1213,6 +1220,42 @@ export class MemStorage implements IStorage {
 
   async deleteBlogPost(id: number): Promise<boolean> {
     return this.blogPostsData.delete(id);
+  }
+
+  // Event-specific bank details methods
+  async getEventBankDetails(eventId: number): Promise<BankDetails[]> {
+    return Array.from(this.bankDetailsData.values())
+      .filter(bd => (bd as any).eventId === eventId);
+  }
+
+  async getEventBankDetail(id: number): Promise<BankDetails | undefined> {
+    return this.bankDetailsData.get(id);
+  }
+
+  async createEventBankDetails(details: any): Promise<BankDetails> {
+    const id = this.bankDetailsIdCounter++;
+    const newDetails: BankDetails = { 
+      ...details, 
+      id,
+      eventId: details.eventId,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.bankDetailsData.set(id, newDetails);
+    return newDetails;
+  }
+
+  async updateEventBankDetails(id: number, detailsData: any): Promise<BankDetails | undefined> {
+    const details = this.bankDetailsData.get(id);
+    if (!details) return undefined;
+    
+    const updatedDetails = { ...details, ...detailsData, updatedAt: new Date() };
+    this.bankDetailsData.set(id, updatedDetails);
+    return updatedDetails;
+  }
+
+  async deleteEventBankDetails(id: number): Promise<boolean> {
+    return this.bankDetailsData.delete(id);
   }
 }
 
