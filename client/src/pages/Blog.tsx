@@ -24,16 +24,17 @@ const BlogPage = () => {
         <Header />
         <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
           {/* Header Section */}
-          <div className="bg-gradient-to-r from-purple-600 to-purple-700 py-16">
-            <div className="container mx-auto px-4 text-center">
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-                ISKCON Juhu Blog
+          <section className="relative py-20 bg-primary">
+            <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+            <div className="container mx-auto px-4 relative z-10 text-center">
+              <h1 className="text-white font-poppins font-bold text-4xl md:text-5xl mb-4">
+                Spiritual Wisdom & Updates
               </h1>
-              <p className="text-xl text-purple-100 max-w-2xl mx-auto">
-                Spiritual insights, temple updates, and divine wisdom for your journey
+              <p className="text-white font-opensans text-lg md:text-xl max-w-3xl mx-auto">
+                Discover divine insights, temple updates, and spiritual knowledge to guide your journey towards Krishna consciousness.
               </p>
             </div>
-          </div>
+          </section>
 
           {/* Loading Cards */}
           <div className="container mx-auto px-4 py-12">
@@ -65,16 +66,17 @@ const BlogPage = () => {
       <Header />
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
         {/* Header Section */}
-        <div className="bg-gradient-to-r from-purple-600 to-purple-700 py-16">
-          <div className="container mx-auto px-4 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              ISKCON Juhu Blog
+        <section className="relative py-20 bg-primary">
+          <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+          <div className="container mx-auto px-4 relative z-10 text-center">
+            <h1 className="text-white font-poppins font-bold text-4xl md:text-5xl mb-4">
+              Spiritual Wisdom & Updates
             </h1>
-            <p className="text-xl text-purple-100 max-w-2xl mx-auto">
-              Spiritual insights, temple updates, and divine wisdom for your journey
+            <p className="text-white font-opensans text-lg md:text-xl max-w-3xl mx-auto">
+              Discover divine insights, temple updates, and spiritual knowledge to guide your journey towards Krishna consciousness.
             </p>
           </div>
-        </div>
+        </section>
 
         {/* Blog Posts Grid */}
         <div className="container mx-auto px-4 py-12">
