@@ -94,12 +94,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         destDir = blogDir;
       }
       
+      console.log('Upload destination for type', type, ':', destDir);
       cb(null, destDir);
     },
     filename: function (req, file, cb) {
       const type = req.body.type || 'banner';
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      cb(null, type + '-' + uniqueSuffix + path.extname(file.originalname));
+      const filename = type + '-' + uniqueSuffix + path.extname(file.originalname);
+      console.log('Generated filename for type', type, ':', filename);
+      cb(null, filename);
     }
   });
 
@@ -161,65 +164,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   }));
 
-  // Generic upload endpoint
-  app.post("/api/upload", (req, res) => {
-    upload.single('file')(req, res, (err) => {
-      if (err) {
-        console.log('Upload error:', err);
-        if (err.code === 'LIMIT_FILE_SIZE') {
-          return res.status(400).json({ message: "File too large. Maximum size is 1MB." });
-        }
-        if (err.message === 'Only image files are allowed!') {
-          return res.status(400).json({ message: "Only image files are allowed" });
-        }
-        return res.status(500).json({ message: "Error uploading file", error: err.message });
+  // Generic upload endpoint - move file to correct directory after upload
+  app.post("/api/upload", upload.single('file'), (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
       }
-
-      try {
-        if (!req.file) {
-          return res.status(400).json({ message: "No file uploaded" });
-        }
-        
-        console.log('Upload request received:', { 
-          hasFile: !!req.file, 
-          type: req.body.type,
-          filename: req.file?.filename,
-          path: req.file?.path,
-          destination: req.file?.destination
-        });
-        
-        const type = req.body.type || 'banner';
-        let folder = 'banners';
-        
-        if (type === 'card') {
-          folder = 'cards';
-        } else if (type === 'qr') {
-          folder = 'qr-codes';
-        } else if (type === 'gallery') {
-          folder = 'gallery';
-        } else if (type === 'video') {
-          folder = 'videos';
-        } else if (type === 'blog') {
-          folder = 'blog';
-        }
-        
-        // Verify file exists on disk
-        const filePath = req.file.path;
-        console.log('Checking file at path:', filePath);
-        
-        if (!fs.existsSync(filePath)) {
-          console.error('File not found at path:', filePath);
-          return res.status(500).json({ message: "File upload failed - file not saved to disk" });
-        }
-        
-        const imageUrl = `/uploads/${folder}/${req.file.filename}`;
-        console.log('File uploaded successfully:', imageUrl, 'Size:', fs.statSync(filePath).size, 'bytes');
-        res.json({ url: imageUrl });
-      } catch (error) {
-        console.log('Error processing upload:', error);
-        res.status(500).json({ message: "Error processing uploaded file", error: error instanceof Error ? error.message : String(error) });
+      
+      const type = req.body.type || 'banner';
+      console.log('Processing upload for type:', type);
+      
+      // Determine target directory and folder name
+      let targetDir = bannersDir;
+      let folder = 'banners';
+      
+      if (type === 'card') {
+        targetDir = cardsDir;
+        folder = 'cards';
+      } else if (type === 'qr') {
+        targetDir = qrCodesDir;
+        folder = 'qr-codes';
+      } else if (type === 'gallery') {
+        targetDir = galleryDir;
+        folder = 'gallery';
+      } else if (type === 'video') {
+        targetDir = videosDir;
+        folder = 'videos';
+      } else if (type === 'blog') {
+        targetDir = blogDir;
+        folder = 'blog';
       }
-    });
+      
+      // If file is not in the correct directory, move it
+      const currentPath = req.file.path;
+      const correctFilename = type + '-' + Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(req.file.originalname);
+      const correctPath = path.join(targetDir, correctFilename);
+      
+      console.log('Moving file from:', currentPath, 'to:', correctPath);
+      
+      // Move file to correct directory
+      if (currentPath !== correctPath) {
+        fs.renameSync(currentPath, correctPath);
+        console.log('File moved successfully to:', correctPath);
+      }
+      
+      // Verify file exists at new location
+      if (!fs.existsSync(correctPath)) {
+        console.error('File not found at target path:', correctPath);
+        return res.status(500).json({ message: "File upload failed - file not moved to correct directory" });
+      }
+      
+      const imageUrl = `/uploads/${folder}/${correctFilename}`;
+      console.log('File uploaded successfully:', imageUrl, 'Size:', fs.statSync(correctPath).size, 'bytes');
+      res.json({ url: imageUrl });
+      
+    } catch (error) {
+      console.log('Error processing upload:', error);
+      res.status(500).json({ message: "Error processing uploaded file", error: error instanceof Error ? error.message : String(error) });
+    }
   });
 
   // Banner upload endpoint (legacy)
