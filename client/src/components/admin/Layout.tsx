@@ -11,15 +11,15 @@ const Layout = ({ children }: LayoutProps) => {
     <div className="min-h-screen bg-gray-50">
       <Sidebar />
       
-      {/* Mobile content wrapper with top padding for fixed header */}
-      <div className="md:ml-64 pt-16 md:pt-0">
+      {/* Content wrapper - different positioning for mobile vs desktop */}
+      <div className="pt-16 md:pt-0 md:ml-64">
         {/* Desktop Header - hidden on mobile since we use mobile header from Sidebar */}
-        <div className="hidden md:block">
+        <div className="hidden md:block bg-white border-b border-gray-200">
           <Header />
         </div>
         
         {/* Main content */}
-        <main className="min-h-screen bg-gray-50">
+        <main className="min-h-screen bg-gray-50 p-6">
           {children}
         </main>
       </div>

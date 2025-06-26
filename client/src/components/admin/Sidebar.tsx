@@ -119,7 +119,7 @@ const Sidebar = () => {
       </aside>
 
       {/* Desktop Sidebar */}
-      <aside className="w-64 bg-white border-r border-gray-200 h-screen flex-shrink-0 hidden md:block flex-col">
+      <aside className="fixed top-0 left-0 w-64 bg-white border-r border-gray-200 h-screen flex-shrink-0 hidden md:flex flex-col z-30">
         <div className="p-6 border-b border-gray-100">
           <Link href="/" className="flex items-center">
             <h1 className="text-gray-900 font-bold text-xl">ISKCON Admin</h1>
