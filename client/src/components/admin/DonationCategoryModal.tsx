@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -45,17 +45,20 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Memoize default values to prevent recreation
+  const defaultValues = useMemo(() => ({
+    name: category?.name || "",
+    description: category?.description || "",
+    imageUrl: category?.imageUrl || "",
+    isActive: category?.isActive ?? true,
+    order: category?.order || 0,
+    heading: category?.heading || "",
+    suggestedAmounts: Array.isArray(category?.suggestedAmounts) ? category.suggestedAmounts : [],
+  }), [category?.id]);
+
   const form = useForm<CategoryFormData>({
     resolver: zodResolver(categoryFormSchema),
-    defaultValues: {
-      name: "",
-      description: "",
-      imageUrl: "",
-      isActive: true,
-      order: 0,
-      heading: "",
-      suggestedAmounts: [],
-    },
+    defaultValues,
   });
 
   const { data: existingDonationCards = [] } = useQuery<DonationCard[]>({
@@ -68,43 +71,26 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
     enabled: isOpen,
   });
 
-  // Reset form when category changes
+  // Initialize state when modal opens - without form reset to prevent loops
   useEffect(() => {
-    if (category) {
-      form.reset({
-        name: category.name,
-        description: category.description || "",
-        imageUrl: category.imageUrl || "",
-        isActive: category.isActive,
-        order: category.order,
-        heading: category.heading || "",
-        suggestedAmounts: Array.isArray(category.suggestedAmounts) ? category.suggestedAmounts : [],
-      });
+    if (isOpen) {
+      setActiveTab("details");
       setSuggestedAmountsInput(
-        Array.isArray(category.suggestedAmounts) 
+        Array.isArray(category?.suggestedAmounts) 
           ? category.suggestedAmounts.join(", ") 
           : ""
       );
-    } else {
-      form.reset({
-        name: "",
-        description: "",
-        imageUrl: "",
-        isActive: true,
-        order: 0,
-        heading: "",
-        suggestedAmounts: [],
-      });
-      setSuggestedAmountsInput("");
-      setDonationCards([]);
+      
+      if (!category) {
+        setDonationCards([]);
+        setBankDetails(null);
+      }
     }
-    setBankDetails(null);
-    setActiveTab("details");
-  }, [category, form]);
+  }, [isOpen, category?.id]);
 
   // Load existing donation cards when editing
   useEffect(() => {
-    if (category && existingDonationCards.length > 0) {
+    if (category?.id && existingDonationCards.length > 0) {
       const categoryCards = existingDonationCards.filter(card => card.categoryId === category.id);
       setDonationCards(categoryCards.map(card => ({
         id: card.id,
@@ -113,14 +99,8 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
         amount: card.amount,
         isActive: card.isActive,
       })));
-    } else if (category && existingDonationCards.length === 0) {
-      // If we're editing a category but no cards loaded yet, keep current state
-      // Don't clear cards immediately
-    } else if (!category) {
-      // Only clear cards when creating new category
-      setDonationCards([]);
     }
-  }, [category, existingDonationCards]);
+  }, [category?.id, existingDonationCards]);
 
   // Load existing bank details
   useEffect(() => {
