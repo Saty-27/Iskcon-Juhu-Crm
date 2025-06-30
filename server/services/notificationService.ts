@@ -6,11 +6,10 @@
 
 import twilio from 'twilio';
 
-// Initialize Twilio client with environment variables
-const twilioClient = twilio(
-  process.env.TWILIO_ACCOUNT_SID,
-  process.env.TWILIO_AUTH_TOKEN
-);
+// Initialize Twilio client with environment variables (only if credentials are available)
+const twilioClient = process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN 
+  ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
+  : null;
 
 /**
  * Sends a notification about failed payment via WhatsApp
@@ -28,6 +27,12 @@ export async function sendFailedPaymentNotification(
   purpose: string
 ): Promise<boolean> {
   try {
+    // Check if Twilio is configured
+    if (!twilioClient) {
+      console.warn('Twilio not configured - Failed payment notification not sent');
+      return false;
+    }
+
     // Format phone number (ensure it has international format with +)
     const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
     
@@ -37,7 +42,7 @@ export async function sendFailedPaymentNotification(
     }
     
     // Send WhatsApp message about failed payment
-    await twilioClient.messages.create({
+    await twilioClient!.messages.create({
       from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
       to: `whatsapp:${formattedPhoneNumber}`,
       body: `Hare Krishna, ${donorName}! 🙏\n\nWe noticed there was an issue with your donation payment of ₹${amount} towards ${purpose}.\n\nPlease try again or contact our support team if you need assistance. You can visit our website at iskconjuhu.in or call us at +91 9876543210.\n\nThank you for your support.`

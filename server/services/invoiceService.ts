@@ -11,11 +11,10 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { nanoid } from 'nanoid';
 
-// Initialize Twilio client with environment variables
-const twilioClient = twilio(
-  process.env.TWILIO_ACCOUNT_SID,
-  process.env.TWILIO_AUTH_TOKEN
-);
+// Initialize Twilio client with environment variables (only if credentials are available)
+const twilioClient = process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN 
+  ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
+  : null;
 
 interface DonationReceipt {
   txnid: string;
@@ -150,6 +149,12 @@ async function setupPDF(doc: PDFKit.PDFDocument, donation: DonationReceipt) {
  */
 export async function sendWhatsAppReceipt(phoneNumber: string, donationData: DonationReceipt): Promise<boolean> {
   try {
+    // Check if Twilio is configured
+    if (!twilioClient) {
+      console.warn('Twilio not configured - WhatsApp receipt not sent');
+      return false;
+    }
+
     // Format phone number (ensure it has international format with +)
     const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
     
@@ -169,7 +174,7 @@ export async function sendWhatsAppReceipt(phoneNumber: string, donationData: Don
     await fs.writeFile(tempFilePath, pdfBuffer);
     
     // Send WhatsApp message with PDF
-    await twilioClient.messages.create({
+    await twilioClient!.messages.create({
       from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
       to: `whatsapp:${formattedPhoneNumber}`,
       body: `Hare Krishna, ${donationData.name}! 🙏\n\nThank you for your donation of ₹${donationData.amount} towards ${donationData.purpose}.\n\nPlease find attached your donation receipt.`,
