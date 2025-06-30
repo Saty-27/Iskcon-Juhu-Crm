@@ -193,7 +193,9 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
     },
     onSuccess: async (response) => {
       const savedEvent = await response.json();
+      // Force refresh of all event-related queries
       queryClient.invalidateQueries({ queryKey: ['/api/events'] });
+      queryClient.removeQueries({ queryKey: ['/api/events'] });
       toast({ title: 'Success', description: `Event ${event ? 'updated' : 'created'} successfully` });
       
       // Save donation cards if any
@@ -235,7 +237,11 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
         });
       }
       
+      // Invalidate both admin and frontend queries
       queryClient.invalidateQueries({ queryKey: [`/api/events/${eventId}/donation-cards`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/events'] });
+      // Force refetch by removing from cache completely
+      queryClient.removeQueries({ queryKey: [`/api/events/${eventId}/donation-cards`] });
       toast({ title: 'Success', description: 'Donation cards saved successfully' });
     } catch (error) {
       toast({ title: 'Error', description: 'Failed to save donation cards', variant: 'destructive' });

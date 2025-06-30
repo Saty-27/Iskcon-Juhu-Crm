@@ -42,9 +42,13 @@ export default function EventDonation() {
     queryKey: ["/api/events"]
   });
 
-  const { data: eventDonationCards = [] } = useQuery<EventDonationCard[]>({
+  const { data: eventDonationCards = [], refetch: refetchEventCards } = useQuery<EventDonationCard[]>({
     queryKey: [`/api/events/${eventId}/donation-cards`],
-    enabled: !!eventId
+    enabled: !!eventId,
+    staleTime: 0, // Always fetch fresh data
+    gcTime: 0, // Don't cache the data (v5 syntax)
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   const { data: bankDetails = [] } = useQuery<BankDetails[]>({
