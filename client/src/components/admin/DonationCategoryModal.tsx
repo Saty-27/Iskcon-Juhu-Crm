@@ -132,12 +132,16 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
     },
     onSuccess: async (newCategory: any) => {
       if (donationCards.length > 0) {
-        for (const card of donationCards) {
+        for (let i = 0; i < donationCards.length; i++) {
+          const card = donationCards[i];
           await apiRequest('/api/donation-cards', 'POST', {
-            ...card,
+            title: card.title,
+            amount: card.amount,
+            description: card.description || "",
+            imageUrl: card.imageUrl || "",
             categoryId: newCategory.id,
             isActive: true,
-            order: 0,
+            order: i,
           });
         }
       }
@@ -187,12 +191,16 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
         }
 
         if (donationCards.length > 0) {
-          for (const card of donationCards) {
+          for (let i = 0; i < donationCards.length; i++) {
+            const card = donationCards[i];
             await apiRequest('/api/donation-cards', 'POST', {
-              ...card,
+              title: card.title,
+              amount: card.amount,
+              description: card.description || "",
+              imageUrl: card.imageUrl || "",
               categoryId,
               isActive: true,
-              order: 0,
+              order: i,
             });
           }
         }
