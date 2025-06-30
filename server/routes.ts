@@ -310,6 +310,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Mount payment routes
+  app.use("/api/payments", paymentRoutes);
+  app.use("/api/receipts", receiptRoutes);
+
   // Banner API endpoints
   app.get("/api/banners", async (req, res) => {
     try {
@@ -1710,8 +1714,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         udf3: eventId?.toString() || '',
         udf4: eventCardId?.toString() || '',
         udf5: isCustomAmount ? 'true' : 'false',
-        surl: `https://${req.get('host')}/payment/success`,
-        furl: `https://${req.get('host')}/payment/failure`,
+        surl: `https://${req.get('host')}/api/payments/success`,
+        furl: `https://${req.get('host')}/api/payments/failure`,
         hash: ''
       };
 
