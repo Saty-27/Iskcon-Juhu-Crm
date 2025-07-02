@@ -131,38 +131,50 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
       return await apiRequest('/api/donation-categories', 'POST', categoryData);
     },
     onSuccess: async (newCategory: any) => {
-      if (donationCards.length > 0) {
-        for (let i = 0; i < donationCards.length; i++) {
-          const card = donationCards[i];
-          // Ensure all required fields are present and valid
-          const cardData = {
-            title: card.title || "",
-            amount: Number(card.amount) || 0,
-            description: card.description || "",
-            imageUrl: card.imageUrl || "",
-            categoryId: newCategory.id,
-            isActive: true,
-            order: i,
-          };
-          
-          // Only create card if it has a valid title and amount
-          if (cardData.title && cardData.amount > 0) {
+      try {
+        // Filter out empty or invalid donation cards before processing
+        const validCards = donationCards.filter(card => 
+          card.title && card.title.trim() && card.amount && Number(card.amount) > 0
+        );
+        
+        if (validCards.length > 0) {
+          for (let i = 0; i < validCards.length; i++) {
+            const card = validCards[i];
+            const cardData = {
+              title: card.title.trim(),
+              amount: Number(card.amount),
+              description: card.description || "",
+              imageUrl: card.imageUrl || "",
+              categoryId: newCategory.id,
+              isActive: true,
+              order: i,
+            };
+            
             await apiRequest('/api/donation-cards', 'POST', cardData);
           }
         }
-      }
 
-      if (bankDetails && existingBankDetails.length > 0) {
-        await apiRequest(`/api/bank-details/${existingBankDetails[0].id}`, 'PUT', bankDetails);
-      } else if (bankDetails) {
-        await apiRequest('/api/bank-details', 'POST', bankDetails);
-      }
+        if (bankDetails && existingBankDetails.length > 0) {
+          await apiRequest(`/api/bank-details/${existingBankDetails[0].id}`, 'PUT', bankDetails);
+        } else if (bankDetails) {
+          await apiRequest('/api/bank-details', 'POST', bankDetails);
+        }
 
-      queryClient.invalidateQueries({ queryKey: ['/api/donation-categories'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/donation-cards'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/bank-details'] });
-      onClose();
-      toast({ title: 'Success', description: 'Category created successfully' });
+        queryClient.invalidateQueries({ queryKey: ['/api/donation-categories'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/donation-cards'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/bank-details'] });
+        onClose();
+        toast({ title: 'Success', description: 'Category created successfully' });
+      } catch (error) {
+        // Category was created but there was an issue with cards/bank details
+        queryClient.invalidateQueries({ queryKey: ['/api/donation-categories'] });
+        onClose();
+        toast({ 
+          title: 'Partial Success', 
+          description: 'Category created, but there may be issues with donation cards or payment details',
+          variant: 'default'
+        });
+      }
     },
     onError: () => {
       toast({ title: 'Error', description: 'Failed to create category', variant: 'destructive' });
@@ -196,13 +208,17 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
           }
         }
 
-        if (donationCards.length > 0) {
-          for (let i = 0; i < donationCards.length; i++) {
-            const card = donationCards[i];
-            // Ensure all required fields are present and valid
+        // Filter out empty or invalid donation cards before processing
+        const validCards = donationCards.filter(card => 
+          card.title && card.title.trim() && card.amount && Number(card.amount) > 0
+        );
+        
+        if (validCards.length > 0) {
+          for (let i = 0; i < validCards.length; i++) {
+            const card = validCards[i];
             const cardData = {
-              title: card.title || "",
-              amount: Number(card.amount) || 0,
+              title: card.title.trim(),
+              amount: Number(card.amount),
               description: card.description || "",
               imageUrl: card.imageUrl || "",
               categoryId,
@@ -210,10 +226,7 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
               order: i,
             };
             
-            // Only create card if it has a valid title and amount
-            if (cardData.title && cardData.amount > 0) {
-              await apiRequest('/api/donation-cards', 'POST', cardData);
-            }
+            await apiRequest('/api/donation-cards', 'POST', cardData);
           }
         }
 
