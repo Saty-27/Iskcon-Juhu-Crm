@@ -176,6 +176,7 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
 
         queryClient.invalidateQueries({ queryKey: ['/api/donation-categories'] });
         queryClient.invalidateQueries({ queryKey: ['/api/donation-cards'] });
+        queryClient.invalidateQueries({ queryKey: [`/api/donation-cards/category/${newCategory.id}`] });
         queryClient.invalidateQueries({ queryKey: ['/api/bank-details'] });
         onClose();
         toast({ title: 'Success', description: 'Category created successfully' });

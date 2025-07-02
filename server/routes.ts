@@ -623,6 +623,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get bank details for a specific category (if it has custom bank details)
+  app.get("/api/categories/:categoryId/bank-details", async (req, res) => {
+    try {
+      const categoryId = parseInt(req.params.categoryId);
+      
+      // For now, we'll use a simple mapping based on category names
+      const category = await storage.getDonationCategory(categoryId);
+      if (!category) {
+        return res.status(404).json({ message: "Category not found" });
+      }
+      
+      // Check if this category has event-specific bank details (e.g., Janmashtami)
+      if (category.name.toLowerCase().includes('janma')) {
+        // Use event-specific bank details for Janmashtami categories
+        const eventBankDetails = await storage.getEventBankDetails(1); // Event ID 1 is Janmashtami
+        if (eventBankDetails.length > 0) {
+          return res.json(eventBankDetails.filter(d => d.isActive));
+        }
+      }
+      
+      // Fall back to generic bank details
+      const details = await storage.getBankDetails();
+      res.json(details.filter(d => d.isActive));
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching category bank details" });
+    }
+  });
+
   app.post("/api/bank-details", isAdmin, async (req, res) => {
     try {
       const data = insertBankDetailsSchema.parse(req.body);

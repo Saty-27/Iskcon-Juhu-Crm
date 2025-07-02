@@ -47,9 +47,10 @@ export default function CategoryDonation() {
     enabled: !!categoryId,
   });
 
-  // Fetch bank details
+  // Fetch category-specific bank details
   const { data: bankDetails = [] } = useQuery<BankDetails[]>({
-    queryKey: ["/api/bank-details"]
+    queryKey: [`/api/categories/${categoryId}/bank-details`],
+    enabled: !!categoryId,
   });
 
   // Filter donation cards to show only active ones
