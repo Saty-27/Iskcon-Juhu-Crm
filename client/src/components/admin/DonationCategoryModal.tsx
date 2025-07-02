@@ -134,15 +134,21 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
       if (donationCards.length > 0) {
         for (let i = 0; i < donationCards.length; i++) {
           const card = donationCards[i];
-          await apiRequest('/api/donation-cards', 'POST', {
-            title: card.title,
-            amount: card.amount,
+          // Ensure all required fields are present and valid
+          const cardData = {
+            title: card.title || "",
+            amount: Number(card.amount) || 0,
             description: card.description || "",
             imageUrl: card.imageUrl || "",
             categoryId: newCategory.id,
             isActive: true,
             order: i,
-          });
+          };
+          
+          // Only create card if it has a valid title and amount
+          if (cardData.title && cardData.amount > 0) {
+            await apiRequest('/api/donation-cards', 'POST', cardData);
+          }
         }
       }
 
@@ -193,15 +199,21 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
         if (donationCards.length > 0) {
           for (let i = 0; i < donationCards.length; i++) {
             const card = donationCards[i];
-            await apiRequest('/api/donation-cards', 'POST', {
-              title: card.title,
-              amount: card.amount,
+            // Ensure all required fields are present and valid
+            const cardData = {
+              title: card.title || "",
+              amount: Number(card.amount) || 0,
               description: card.description || "",
               imageUrl: card.imageUrl || "",
               categoryId,
               isActive: true,
               order: i,
-            });
+            };
+            
+            // Only create card if it has a valid title and amount
+            if (cardData.title && cardData.amount > 0) {
+              await apiRequest('/api/donation-cards', 'POST', cardData);
+            }
           }
         }
 
@@ -247,7 +259,14 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
   };
 
   const addDonationCard = () => {
-    setDonationCards([...donationCards, { title: "", description: "", amount: 0 }]);
+    setDonationCards([...donationCards, { 
+      title: "", 
+      description: "", 
+      amount: 0,
+      imageUrl: "",
+      isActive: true,
+      order: donationCards.length
+    }]);
   };
 
   const removeDonationCard = (index: number) => {
