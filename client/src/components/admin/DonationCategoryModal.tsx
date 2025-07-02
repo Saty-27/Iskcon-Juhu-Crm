@@ -83,7 +83,14 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
       
       if (!category) {
         setDonationCards([]);
-        setBankDetails(null);
+        setBankDetails({
+          accountName: '',
+          accountNumber: '',
+          bankName: '',
+          ifscCode: '',
+          swiftCode: '',
+          qrCodeUrl: '',
+        });
       }
     }
   }, [isOpen, category?.id]);
@@ -97,7 +104,9 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
         title: card.title,
         description: card.description || "",
         amount: card.amount,
+        imageUrl: card.imageUrl || "",
         isActive: card.isActive,
+        order: card.order || 0,
       })));
     }
   }, [category?.id, existingDonationCards]);

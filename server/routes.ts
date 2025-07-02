@@ -567,13 +567,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/donation-cards", isAdmin, async (req, res) => {
     try {
+      console.log('Donation card creation request body:', JSON.stringify(req.body, null, 2));
       const data = insertDonationCardSchema.parse(req.body);
+      console.log('Parsed donation card data:', JSON.stringify(data, null, 2));
       const card = await storage.createDonationCard(data);
+      console.log('Created donation card:', JSON.stringify(card, null, 2));
       res.status(201).json(card);
     } catch (error) {
       if (error instanceof z.ZodError) {
+        console.log('Donation card validation error:', JSON.stringify(error.errors, null, 2));
         return res.status(400).json({ message: "Invalid data", errors: error.errors });
       }
+      console.log('Donation card creation error:', error);
       res.status(500).json({ message: "Error creating donation card" });
     }
   });
