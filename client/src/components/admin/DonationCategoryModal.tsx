@@ -141,10 +141,14 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
     },
     onSuccess: async (newCategory: any) => {
       try {
+        console.log('New category created:', newCategory);
+        
         // Filter out empty or invalid donation cards before processing
         const validCards = donationCards.filter(card => 
           card.title && card.title.trim() && card.amount && Number(card.amount) > 0
         );
+        
+        console.log('Valid cards to create:', validCards);
         
         if (validCards.length > 0) {
           for (let i = 0; i < validCards.length; i++) {
@@ -159,6 +163,7 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
               order: i,
             };
             
+            console.log('Creating card with data:', cardData);
             await apiRequest('/api/donation-cards', 'POST', cardData);
           }
         }
