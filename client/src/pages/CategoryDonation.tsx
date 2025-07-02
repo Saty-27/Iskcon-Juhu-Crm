@@ -380,7 +380,7 @@ export default function CategoryDonation() {
             )}
 
             {/* QR Code */}
-            {category.imageUrl && (
+            {currentBankDetail && currentBankDetail.qrCodeUrl && (
               <div style={{
                 backgroundColor: '#fff',
                 padding: '20px',
@@ -392,8 +392,8 @@ export default function CategoryDonation() {
                   Donate through UPI
                 </h3>
                 <img
-                  src={category.imageUrl}
-                  alt="QR Code"
+                  src={currentBankDetail.qrCodeUrl}
+                  alt="QR Code for UPI Payment"
                   style={{
                     maxWidth: '200px',
                     height: 'auto',
