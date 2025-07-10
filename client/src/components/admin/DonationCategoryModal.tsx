@@ -66,8 +66,11 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
     enabled: !!category?.id,
   });
 
+  // Check if this is a Janmashtami category to decide which bank details to use
+  const isJanmashtamiCategory = category?.name?.toLowerCase().includes('janma');
+  
   const { data: existingBankDetails = [] } = useQuery<BankDetails[]>({
-    queryKey: ['/api/bank-details'],
+    queryKey: isJanmashtamiCategory ? ['/api/events/1/bank-details'] : ['/api/bank-details'],
     enabled: isOpen,
   });
 
@@ -169,15 +172,26 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
         }
 
         if (bankDetails && existingBankDetails.length > 0) {
-          await apiRequest(`/api/bank-details/${existingBankDetails[0].id}`, 'PUT', bankDetails);
+          const bankDetailId = existingBankDetails[0].id;
+          if (isJanmashtamiCategory) {
+            await apiRequest(`/api/events/1/bank-details/${bankDetailId}`, 'PUT', bankDetails);
+          } else {
+            await apiRequest(`/api/bank-details/${bankDetailId}`, 'PUT', bankDetails);
+          }
         } else if (bankDetails) {
-          await apiRequest('/api/bank-details', 'POST', bankDetails);
+          if (isJanmashtamiCategory) {
+            await apiRequest('/api/events/1/bank-details', 'POST', bankDetails);
+          } else {
+            await apiRequest('/api/bank-details', 'POST', bankDetails);
+          }
         }
 
         queryClient.invalidateQueries({ queryKey: ['/api/donation-categories'] });
         queryClient.invalidateQueries({ queryKey: ['/api/donation-cards'] });
         queryClient.invalidateQueries({ queryKey: [`/api/donation-cards/category/${newCategory.id}`] });
         queryClient.invalidateQueries({ queryKey: ['/api/bank-details'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/events/1/bank-details'] });
+        queryClient.invalidateQueries({ queryKey: [`/api/categories/${newCategory.id}/bank-details`] });
         onClose();
         toast({ title: 'Success', description: 'Category created successfully' });
       } catch (error) {
@@ -247,15 +261,29 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
 
         if (bankDetails && existingBankDetails.length > 0) {
           const activeBankDetails = existingBankDetails.find(bd => bd.isActive) || existingBankDetails[0];
-          await apiRequest(`/api/bank-details/${activeBankDetails.id}`, 'PUT', {
-            ...bankDetails,
-            isActive: true,
-          });
+          if (isJanmashtamiCategory) {
+            await apiRequest(`/api/events/1/bank-details/${activeBankDetails.id}`, 'PUT', {
+              ...bankDetails,
+              isActive: true,
+            });
+          } else {
+            await apiRequest(`/api/bank-details/${activeBankDetails.id}`, 'PUT', {
+              ...bankDetails,
+              isActive: true,
+            });
+          }
         } else if (bankDetails) {
-          await apiRequest('/api/bank-details', 'POST', {
-            ...bankDetails,
-            isActive: true,
-          });
+          if (isJanmashtamiCategory) {
+            await apiRequest('/api/events/1/bank-details', 'POST', {
+              ...bankDetails,
+              isActive: true,
+            });
+          } else {
+            await apiRequest('/api/bank-details', 'POST', {
+              ...bankDetails,
+              isActive: true,
+            });
+          }
         }
       } catch (error) {
         console.error('Error in success handler:', error);
@@ -265,6 +293,8 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
       queryClient.invalidateQueries({ queryKey: ['/api/donation-categories'] });
       queryClient.invalidateQueries({ queryKey: ['/api/donation-cards'] });
       queryClient.invalidateQueries({ queryKey: ['/api/bank-details'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/events/1/bank-details'] });
+      queryClient.invalidateQueries({ queryKey: [`/api/categories/${categoryId}/bank-details`] });
       onClose();
       toast({ title: 'Success', description: 'Category updated successfully' });
     },
