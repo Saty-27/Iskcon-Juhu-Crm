@@ -72,7 +72,7 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
     enabled: isOpen && !!category?.id,
   });
 
-  // Initialize state when modal opens - without form reset to prevent loops
+  // Initialize state when modal opens and reset form with category data
   useEffect(() => {
     if (isOpen) {
       setActiveTab("details");
@@ -82,7 +82,29 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
           : ""
       );
       
-      if (!category) {
+      // Reset form with category data when editing
+      if (category) {
+        console.log('Resetting form with category data:', category);
+        form.reset({
+          name: category.name || "",
+          description: category.description || "",
+          imageUrl: category.imageUrl || "",
+          isActive: category.isActive ?? true,
+          order: category.order || 0,
+          heading: category.heading || "",
+          suggestedAmounts: Array.isArray(category.suggestedAmounts) ? category.suggestedAmounts : [],
+        });
+      } else {
+        // Clear form for new category
+        form.reset({
+          name: "",
+          description: "",
+          imageUrl: "",
+          isActive: true,
+          order: 0,
+          heading: "",
+          suggestedAmounts: [],
+        });
         setDonationCards([]);
         setBankDetails({
           accountName: '',
@@ -94,7 +116,7 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
         });
       }
     }
-  }, [isOpen, category?.id]);
+  }, [isOpen, category?.id, form, category]);
 
   // Load existing donation cards when editing
   useEffect(() => {
