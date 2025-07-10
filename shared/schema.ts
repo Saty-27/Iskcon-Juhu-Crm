@@ -167,6 +167,30 @@ export const insertEventBankDetailsSchema = createInsertSchema(eventBankDetails)
   updatedAt: true,
 });
 
+// Category-specific bank details table
+export const categoryBankDetails = pgTable("category_bank_details", {
+  id: serial("id").primaryKey(),
+  categoryId: integer("category_id").references(() => donationCategories.id, { onDelete: 'cascade' }).notNull(),
+  accountName: text("account_name").notNull(),
+  bankName: text("bank_name").notNull(),
+  accountNumber: text("account_number").notNull(),
+  ifscCode: text("ifsc_code").notNull(),
+  swiftCode: text("swift_code"),
+  qrCodeUrl: text("qr_code_url"),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertCategoryBankDetailsSchema = createInsertSchema(categoryBankDetails).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type CategoryBankDetails = typeof categoryBankDetails.$inferSelect;
+export type InsertCategoryBankDetails = typeof categoryBankDetails.$inferInsert;
+
 // Gallery table
 export const gallery = pgTable("gallery", {
   id: serial("id").primaryKey(),

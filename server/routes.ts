@@ -628,26 +628,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const categoryId = parseInt(req.params.categoryId);
       
-      // For now, we'll use a simple mapping based on category names
-      const category = await storage.getDonationCategory(categoryId);
-      if (!category) {
-        return res.status(404).json({ message: "Category not found" });
-      }
+      // First check if category has specific bank details
+      const categoryBankDetails = await storage.getCategoryBankDetails(categoryId);
       
-      // Check if this category has event-specific bank details (e.g., Janmashtami)
-      if (category.name.toLowerCase().includes('janma')) {
-        // Use event-specific bank details for Janmashtami categories
-        const eventBankDetails = await storage.getEventBankDetails(1); // Event ID 1 is Janmashtami
-        if (eventBankDetails.length > 0) {
-          return res.json(eventBankDetails.filter(d => d.isActive));
+      if (categoryBankDetails && categoryBankDetails.length > 0) {
+        res.json(categoryBankDetails.filter(d => d.isActive));
+      } else {
+        // If no category-specific bank details, create default ones based on general bank details
+        const generalBankDetails = await storage.getBankDetails();
+        if (generalBankDetails && generalBankDetails.length > 0) {
+          const defaultBank = generalBankDetails[0];
+          // Create category-specific bank details based on general ones
+          const newCategoryBankDetails = await storage.createCategoryBankDetails({
+            categoryId: categoryId,
+            accountName: defaultBank.accountName,
+            bankName: defaultBank.bankName,
+            accountNumber: defaultBank.accountNumber,
+            ifscCode: defaultBank.ifscCode,
+            swiftCode: defaultBank.swiftCode,
+            qrCodeUrl: defaultBank.qrCodeUrl,
+            isActive: defaultBank.isActive
+          });
+          res.json([newCategoryBankDetails]);
+        } else {
+          res.json([]);
         }
       }
-      
-      // Fall back to generic bank details
-      const details = await storage.getBankDetails();
-      res.json(details.filter(d => d.isActive));
     } catch (error) {
-      res.status(500).json({ message: "Error fetching category bank details" });
+      console.error('Error fetching category bank details:', error);
+      res.status(500).json({ error: 'Failed to fetch category bank details' });
     }
   });
 
@@ -678,6 +687,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid data", errors: error.errors });
       }
       res.status(500).json({ message: "Error updating bank details" });
+    }
+  });
+
+  // Update category-specific bank details
+  app.put("/api/categories/:categoryId/bank-details/:id", isAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const categoryId = parseInt(req.params.categoryId);
+      
+      // Validate that the bank details belong to the specified category
+      const existingDetails = await storage.getCategoryBankDetail(id);
+      if (!existingDetails || existingDetails.categoryId !== categoryId) {
+        return res.status(404).json({ message: "Bank details not found for this category" });
+      }
+      
+      const bankDetails = await storage.updateCategoryBankDetails(id, req.body);
+      if (bankDetails) {
+        res.json(bankDetails);
+      } else {
+        res.status(404).json({ message: "Bank details not found" });
+      }
+    } catch (error) {
+      console.error('Error updating category bank details:', error);
+      res.status(500).json({ message: "Error updating category bank details" });
     }
   });
 

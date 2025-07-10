@@ -66,12 +66,10 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
     enabled: !!category?.id,
   });
 
-  // Check if this is a Janmashtami category to decide which bank details to use
-  const isJanmashtamiCategory = category?.name?.toLowerCase().includes('janma');
-  
+  // Fetch category-specific bank details
   const { data: existingBankDetails = [] } = useQuery<BankDetails[]>({
-    queryKey: isJanmashtamiCategory ? ['/api/events/1/bank-details'] : ['/api/bank-details'],
-    enabled: isOpen,
+    queryKey: [`/api/categories/${category?.id}/bank-details`],
+    enabled: isOpen && !!category?.id,
   });
 
   // Initialize state when modal opens - without form reset to prevent loops
@@ -261,29 +259,10 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
 
         if (bankDetails && existingBankDetails.length > 0) {
           const activeBankDetails = existingBankDetails.find(bd => bd.isActive) || existingBankDetails[0];
-          if (isJanmashtamiCategory) {
-            await apiRequest(`/api/events/1/bank-details/${activeBankDetails.id}`, 'PUT', {
-              ...bankDetails,
-              isActive: true,
-            });
-          } else {
-            await apiRequest(`/api/bank-details/${activeBankDetails.id}`, 'PUT', {
-              ...bankDetails,
-              isActive: true,
-            });
-          }
-        } else if (bankDetails) {
-          if (isJanmashtamiCategory) {
-            await apiRequest('/api/events/1/bank-details', 'POST', {
-              ...bankDetails,
-              isActive: true,
-            });
-          } else {
-            await apiRequest('/api/bank-details', 'POST', {
-              ...bankDetails,
-              isActive: true,
-            });
-          }
+          await apiRequest(`/api/categories/${categoryId}/bank-details/${activeBankDetails.id}`, 'PUT', {
+            ...bankDetails,
+            isActive: true,
+          });
         }
       } catch (error) {
         console.error('Error in success handler:', error);

@@ -6,6 +6,7 @@ import {
   DonationCard, InsertDonationCard, donationCards,
   EventDonationCard, InsertEventDonationCard, eventDonationCards,
   BankDetails, InsertBankDetails, bankDetails,
+  CategoryBankDetails, InsertCategoryBankDetails, categoryBankDetails,
   Event, InsertEvent, events,
   Gallery, InsertGallery, gallery,
   Video, InsertVideo, videos,
@@ -85,6 +86,13 @@ export interface IStorage {
   createEventBankDetails(details: any): Promise<BankDetails>;
   updateEventBankDetails(id: number, detailsData: any): Promise<BankDetails | undefined>;
   deleteEventBankDetails(id: number): Promise<boolean>;
+  
+  // Category-specific bank details management
+  getCategoryBankDetails(categoryId: number): Promise<CategoryBankDetails[]>;
+  getCategoryBankDetail(id: number): Promise<CategoryBankDetails | undefined>;
+  createCategoryBankDetails(details: InsertCategoryBankDetails): Promise<CategoryBankDetails>;
+  updateCategoryBankDetails(id: number, detailsData: Partial<CategoryBankDetails>): Promise<CategoryBankDetails | undefined>;
+  deleteCategoryBankDetails(id: number): Promise<boolean>;
   
   // Gallery management
   getGalleryItems(): Promise<Gallery[]>;

@@ -1,13 +1,13 @@
 import { eq } from "drizzle-orm";
 import { db } from "./db";
 import { 
-  users, banners, quotes, donationCategories, donationCards, eventDonationCards, bankDetails, eventBankDetails, events, gallery, videos, 
+  users, banners, quotes, donationCategories, donationCards, eventDonationCards, bankDetails, eventBankDetails, categoryBankDetails, events, gallery, videos, 
   testimonials, contactMessages, socialLinks, donations, subscriptions,
   stats, schedules, blogPosts,
   type User, type InsertUser, type Banner, type InsertBanner,
   type Quote, type InsertQuote, type DonationCategory, type InsertDonationCategory,
   type DonationCard, type InsertDonationCard, type EventDonationCard, type InsertEventDonationCard,
-  type BankDetails, type InsertBankDetails,
+  type BankDetails, type InsertBankDetails, type CategoryBankDetails, type InsertCategoryBankDetails,
   type Event, type InsertEvent, type Gallery, type InsertGallery,
   type Video, type InsertVideo, type Testimonial, type InsertTestimonial,
   type ContactMessage, type InsertContactMessage, type SocialLink, type InsertSocialLink,
@@ -231,6 +231,31 @@ export class DatabaseStorage implements IStorage {
 
   async deleteEventBankDetails(id: number): Promise<boolean> {
     const result = await db.delete(eventBankDetails).where(eq(eventBankDetails.id, id));
+    return (result.rowCount || 0) > 0;
+  }
+
+  // Category-specific bank details operations
+  async getCategoryBankDetails(categoryId: number): Promise<CategoryBankDetails[]> {
+    return await db.select().from(categoryBankDetails).where(eq(categoryBankDetails.categoryId, categoryId));
+  }
+
+  async getCategoryBankDetail(id: number): Promise<CategoryBankDetails | undefined> {
+    const [detail] = await db.select().from(categoryBankDetails).where(eq(categoryBankDetails.id, id));
+    return detail;
+  }
+
+  async createCategoryBankDetails(details: InsertCategoryBankDetails): Promise<CategoryBankDetails> {
+    const [newDetails] = await db.insert(categoryBankDetails).values(details).returning();
+    return newDetails;
+  }
+
+  async updateCategoryBankDetails(id: number, detailsData: Partial<CategoryBankDetails>): Promise<CategoryBankDetails | undefined> {
+    const [details] = await db.update(categoryBankDetails).set(detailsData).where(eq(categoryBankDetails.id, id)).returning();
+    return details;
+  }
+
+  async deleteCategoryBankDetails(id: number): Promise<boolean> {
+    const result = await db.delete(categoryBankDetails).where(eq(categoryBankDetails.id, id));
     return (result.rowCount || 0) > 0;
   }
 
