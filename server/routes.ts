@@ -634,25 +634,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (categoryBankDetails && categoryBankDetails.length > 0) {
         res.json(categoryBankDetails.filter(d => d.isActive));
       } else {
-        // If no category-specific bank details, create default ones based on general bank details
-        const generalBankDetails = await storage.getBankDetails();
-        if (generalBankDetails && generalBankDetails.length > 0) {
-          const defaultBank = generalBankDetails[0];
-          // Create category-specific bank details based on general ones
-          const newCategoryBankDetails = await storage.createCategoryBankDetails({
-            categoryId: categoryId,
-            accountName: defaultBank.accountName,
-            bankName: defaultBank.bankName,
-            accountNumber: defaultBank.accountNumber,
-            ifscCode: defaultBank.ifscCode,
-            swiftCode: defaultBank.swiftCode,
-            qrCodeUrl: defaultBank.qrCodeUrl,
-            isActive: defaultBank.isActive
-          });
-          res.json([newCategoryBankDetails]);
-        } else {
-          res.json([]);
-        }
+        // If no category-specific bank details, create default ones with unique placeholder values
+        const category = await storage.getDonationCategory(categoryId);
+        const categoryName = category ? category.name : `Category ${categoryId}`;
+        
+        const newCategoryBankDetails = await storage.createCategoryBankDetails({
+          categoryId: categoryId,
+          accountName: `${categoryName} Fund`,
+          bankName: "State Bank of India",
+          accountNumber: `100000000${categoryId}`,
+          ifscCode: "SBIN0000001",
+          swiftCode: "SBININBB",
+          qrCodeUrl: "",
+          isActive: true
+        });
+        res.json([newCategoryBankDetails]);
       }
     } catch (error) {
       console.error('Error fetching category bank details:', error);
