@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import AdminLayout from "@/components/admin/Layout";
@@ -56,6 +56,23 @@ const DonationCategoriesPage = () => {
     queryKey: [`/api/donation-cards/category/${expandedCategory}`],
     enabled: !!expandedCategory,
   });
+
+  // Effect to populate form when editing a card
+  useEffect(() => {
+    if (editingCard && isCardDialogOpen) {
+      console.log('Populating form for editing card:', editingCard);
+      cardForm.reset({
+        title: editingCard.title,
+        amount: editingCard.amount,
+        description: editingCard.description || '',
+        imageUrl: editingCard.imageUrl || '',
+        categoryId: editingCard.categoryId,
+        isActive: editingCard.isActive,
+        order: editingCard.order,
+      });
+      console.log('Form values after reset in useEffect:', cardForm.getValues());
+    }
+  }, [editingCard, isCardDialogOpen, cardForm]);
 
   const deleteCategoryMutation = useMutation({
     mutationFn: (id: number) => apiRequest(`/api/donation-categories/${id}`, 'DELETE'),
@@ -137,6 +154,9 @@ const DonationCategoriesPage = () => {
   const handleEditCard = (card: DonationCard) => {
     setEditingCard(card);
     setSelectedCategoryId(card.categoryId);
+    console.log('Editing card:', card);
+    
+    // Reset form with the card data
     cardForm.reset({
       title: card.title,
       amount: card.amount,
@@ -146,6 +166,8 @@ const DonationCategoriesPage = () => {
       isActive: card.isActive,
       order: card.order,
     });
+    
+    console.log('Form values after reset:', cardForm.getValues());
     setIsCardDialogOpen(true);
   };
 
@@ -378,7 +400,14 @@ const DonationCategoriesPage = () => {
         />
 
         {/* Donation Card Modal */}
-        <Dialog open={isCardDialogOpen} onOpenChange={setIsCardDialogOpen}>
+        <Dialog open={isCardDialogOpen} onOpenChange={(open) => {
+          if (!open) {
+            setEditingCard(null);
+            setSelectedCategoryId(null);
+            cardForm.reset();
+          }
+          setIsCardDialogOpen(open);
+        }}>
           <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>
