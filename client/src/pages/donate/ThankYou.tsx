@@ -235,26 +235,6 @@ const ThankYou = () => {
                 {/* Receipt Action Buttons */}
                 <div className="flex flex-wrap gap-2">
                   <Button 
-                    onClick={handleDownloadReceipt}
-                    disabled={isDownloading}
-                    size="sm"
-                    variant="default"
-                  >
-                    <Download className="w-4 h-4 mr-1" />
-                    {isDownloading ? 'Downloading...' : 'Download PDF'}
-                  </Button>
-                  
-                  <Button 
-                    onClick={handleSendEmail}
-                    disabled={isSendingEmail}
-                    size="sm"
-                    variant="outline"
-                  >
-                    <Mail className="w-4 h-4 mr-1" />
-                    {isSendingEmail ? 'Sending...' : 'Email Receipt'}
-                  </Button>
-                  
-                  <Button 
                     onClick={handlePrint}
                     size="sm"
                     variant="outline"
