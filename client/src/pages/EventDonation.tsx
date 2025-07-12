@@ -110,7 +110,7 @@ export default function EventDonation() {
       <main style={{ padding: '0', backgroundColor: '#F5F3F3', color: '#333', minHeight: '100vh' }}>
         <div style={{ width: '100%', padding: '20px' }}>
           {/* Title */}
-          <h1 style={{ textAlign: 'center', fontSize: '32px', fontWeight: 'bold', marginBottom: '10px' }}>
+          <h1 style={{ textAlign: 'left', fontSize: '32px', fontWeight: 'bold', marginBottom: '10px' }}>
             {event.title}
           </h1>
           
@@ -119,7 +119,7 @@ export default function EventDonation() {
             width: '100px', 
             height: '4px', 
             backgroundColor: '#faa817', 
-            margin: '0 auto 20px auto', 
+            margin: '0 0 20px 0', 
             borderRadius: '2px' 
           }}></div>
 
