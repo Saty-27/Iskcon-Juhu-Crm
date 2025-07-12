@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import { Plus, Edit, Trash2, Settings, CreditCard } from 'lucide-react';
+import { Plus, Edit, Trash2, Settings, CreditCard, DollarSign } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { DonationCategory, DonationCard, insertDonationCardSchema } from '@shared/schema';
 import { apiRequest } from '@/lib/queryClient';
@@ -25,11 +25,13 @@ const donationCardFormSchema = insertDonationCardSchema.extend({
 
 const DonationCategoriesPage = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<DonationCategory | null>(null);
   const [isCardDialogOpen, setIsCardDialogOpen] = useState(false);
   const [editingCard, setEditingCard] = useState<DonationCard | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [expandedCategory, setExpandedCategory] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState<string>('details');
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -326,6 +328,19 @@ const DonationCategoriesPage = () => {
                     <Button
                       variant="ghost"
                       size="sm"
+                      onClick={() => {
+                        setEditingCategory(category);
+                        setActiveTab('payment-details');
+                        setIsEditDialogOpen(true);
+                      }}
+                      className="text-green-600 hover:text-green-800"
+                      title="Manage payment details"
+                    >
+                      <DollarSign className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={() => handleEdit(category)}
                     >
                       <Edit className="w-4 h-4" />
@@ -426,142 +441,27 @@ const DonationCategoriesPage = () => {
 
         {/* Category Modal */}
         <DonationCategoryModal
-          isOpen={isAddDialogOpen || !!editingCategory}
+          isOpen={isAddDialogOpen}
           onClose={() => {
             setIsAddDialogOpen(false);
             setEditingCategory(null);
           }}
+          category={null}
+        />
+        
+        {/* Edit Category Modal */}
+        <DonationCategoryModal
+          isOpen={isEditDialogOpen}
+          onClose={() => {
+            setIsEditDialogOpen(false);
+            setEditingCategory(null);
+            setActiveTab('details');
+          }}
           category={editingCategory}
+          initialActiveTab={activeTab}
         />
 
-        {/* Donation Card Modal */}
-        <Dialog open={isCardDialogOpen} onOpenChange={(open) => {
-          if (!open) {
-            setEditingCard(null);
-            setSelectedCategoryId(null);
-            cardForm.reset();
-          }
-          setIsCardDialogOpen(open);
-        }}>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>
-                {editingCard ? 'Edit Donation Card' : 'Add Donation Card'}
-                {selectedCategoryId && (
-                  <span className="text-sm font-normal text-gray-500 ml-2">
-                    (Category ID: {selectedCategoryId})
-                  </span>
-                )}
-              </DialogTitle>
-            </DialogHeader>
-            <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
-              
-              <div>
-                <Label htmlFor="title">Card Title</Label>
-                <Input
-                  id="title"
-                  {...cardForm.register('title')}
-                  placeholder="e.g., Temple Renovation"
-                />
-                {cardForm.formState.errors.title && (
-                  <p className="text-sm text-red-600">{cardForm.formState.errors.title.message}</p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="amount">Amount (₹)</Label>
-                <Input
-                  id="amount"
-                  type="number"
-                  {...cardForm.register('amount', { valueAsNumber: true })}
-                  placeholder="1001"
-                />
-                {cardForm.formState.errors.amount && (
-                  <p className="text-sm text-red-600">{cardForm.formState.errors.amount.message}</p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  {...cardForm.register('description')}
-                  placeholder="Brief description of what this donation supports"
-                  rows={3}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="imageUrl">Image URL (optional)</Label>
-                <Input
-                  id="imageUrl"
-                  {...cardForm.register('imageUrl')}
-                  placeholder="https://example.com/image.jpg"
-                />
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="isActive"
-                  checked={cardForm.watch('isActive')}
-                  onCheckedChange={(checked) => cardForm.setValue('isActive', checked)}
-                />
-                <Label htmlFor="isActive">Active</Label>
-              </div>
-
-              <div className="flex justify-end space-x-2">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => setIsCardDialogOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button 
-                  type="button" 
-                  onClick={() => {
-                    alert('Button clicked! Category ID: ' + selectedCategoryId);
-                    console.log('Button clicked manually');
-                    console.log('Selected category ID:', selectedCategoryId);
-                    console.log('Form values:', cardForm.getValues());
-                    
-                    // Get form data manually
-                    const formData = cardForm.getValues();
-                    const cardData = {
-                      title: formData.title,
-                      amount: formData.amount,
-                      description: formData.description || '',
-                      imageUrl: formData.imageUrl || '',
-                      categoryId: selectedCategoryId!,
-                      isActive: formData.isActive !== undefined ? formData.isActive : true,
-                      order: 0,
-                    };
-                    
-                    console.log('Manually constructed card data:', cardData);
-                    
-                    if (!selectedCategoryId) {
-                      toast({ 
-                        title: 'Error', 
-                        description: 'Category ID is missing. Please close and reopen the form.', 
-                        variant: 'destructive' 
-                      });
-                      return;
-                    }
-                    
-                    if (editingCard) {
-                      updateCardMutation.mutate({ id: editingCard.id, data: cardData });
-                    } else {
-                      createCardMutation.mutate(cardData);
-                    }
-                  }}
-                  disabled={createCardMutation.isPending || updateCardMutation.isPending}
-                >
-                  {(createCardMutation.isPending || updateCardMutation.isPending) ? 'Saving...' : 'Save'}
-                </Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
+        {/* Donation cards are now managed within the main category modal */}
       </div>
     </AdminLayout>
   );

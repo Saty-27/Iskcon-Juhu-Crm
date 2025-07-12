@@ -33,14 +33,22 @@ interface DonationCategoryModalProps {
   isOpen: boolean;
   onClose: () => void;
   category?: DonationCategory | null;
+  initialActiveTab?: string;
 }
 
-export default function DonationCategoryModal({ isOpen, onClose, category }: DonationCategoryModalProps) {
-  const [activeTab, setActiveTab] = useState("details");
+export default function DonationCategoryModal({ isOpen, onClose, category, initialActiveTab = "details" }: DonationCategoryModalProps) {
+  const [activeTab, setActiveTab] = useState(initialActiveTab);
   const [donationCards, setDonationCards] = useState<any[]>([]);
   const [bankDetails, setBankDetails] = useState<any>(null);
   const [suggestedAmountsInput, setSuggestedAmountsInput] = useState("");
   const [uploadingImage, setUploadingImage] = useState<string | null>(null);
+  
+  // Update activeTab when initialActiveTab changes
+  useEffect(() => {
+    if (initialActiveTab) {
+      setActiveTab(initialActiveTab);
+    }
+  }, [initialActiveTab]);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
