@@ -3,8 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Helmet } from 'react-helmet';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { DonationCategory, DonationCard, BankDetails } from "@shared/schema";
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -123,295 +126,197 @@ export default function CategoryDonation() {
       
       <Header />
       
-      <main>
-        <section style={{ padding: '20px', backgroundColor: '#F5F3F3', color: '#333', minHeight: '100vh' }}>
-          {/* Header Information */}
-          <div style={{ 
-            display: 'flex', 
-            gap: '20px', 
-            marginBottom: '30px'
-          }} className="flex-col md:flex-row">
-            <div style={{
-              flex: 1,
-              backgroundImage: 'url(/gradientbg.png)',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              position: 'relative',
-              borderRadius: '10px',
-              overflow: 'hidden',
-              boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)'
-            }}>
-              {/* Black overlay */}
-              <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                borderRadius: '10px'
-              }}></div>
-              
-              {/* Content */}
-              <div style={{
-                position: 'relative',
-                zIndex: 2,
-                color: '#fff',
-                padding: '20px'
-              }}>
-                <h2 style={{ fontSize: '24px', marginBottom: '10px', fontWeight: 'bold' }}>
-                  {category.name}
-                </h2>
-                <p style={{ marginBottom: '20px', lineHeight: '1.6' }}>
-                  {category.description && getWordCount(category.description) > 20 
-                    ? getTruncatedDescription(category.description, 20)
-                    : category.description}
-                </p>
-                
-                {/* Always show Read More button if there's a description */}
-                {category.description && (
-                  <Dialog open={isDescriptionModalOpen} onOpenChange={setIsDescriptionModalOpen}>
-                    <DialogTrigger asChild>
-                      <button style={{
-                        backgroundColor: '#faa817',
-                        color: '#fff',
-                        border: 'none',
-                        padding: '10px 15px',
-                        borderRadius: '5px',
-                        cursor: 'pointer',
-                        fontSize: '14px',
-                        fontWeight: '500'
-                      }}>
-                        Read More
-                      </button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-2xl">
-                      <DialogHeader>
-                        <DialogTitle>{category.name}</DialogTitle>
-                      </DialogHeader>
-                      <div className="mt-4">
-                        <p className="text-gray-700 leading-relaxed">
-                          {category.description}
-                        </p>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                )}
-              </div>
-            </div>
-            
-            <div style={{ flex: 1 }}>
-              <img
-                src={category.imageUrl}
-                alt={category.name}
-                style={{
-                  width: '100%',
-                  height: '350px',
-                  objectFit: 'cover',
-                  borderRadius: '10px'
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Dynamic Donation Cards from Admin Panel */}
-          <h2 style={{ fontSize: '24px', marginBottom: '20px' }}>
-            {category.name} - {activeDonationCards.length} Donation Options
-          </h2>
-          
-          <div style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '20px'
-          }}>
-            {activeDonationCards.length > 0 ? activeDonationCards.map((card) => (
-              <div key={card.id} style={{
-                backgroundColor: '#fff',
-                padding: '15px',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                flex: '1 1 calc(25% - 20px)',
-                boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
-                minWidth: '250px',
-                textAlign: 'center'
-              }}>
-
-
-                {/* Title */}
-                <p style={{ 
-                  fontSize: '16px', 
-                  marginBottom: '10px', 
-                  fontWeight: 'bold' 
-                }}>
-                  {card.title}
-                </p>
-
-                {/* Description */}
-                {card.description && (
-                  <p style={{ 
-                    fontSize: '14px', 
-                    marginBottom: '10px', 
-                    color: '#666' 
-                  }}>
-                    {card.description}
+      <main className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-4xl mx-auto px-4">
+          {/* Category Header */}
+          <div className="bg-gradient-to-r from-purple-600 to-purple-800 rounded-2xl p-8 mb-8 text-white">
+            <h1 className="text-4xl font-bold mb-4">{category.name}</h1>
+            <p className="text-purple-100 text-lg mb-6">
+              {category.description && getWordCount(category.description) > 25 
+                ? getTruncatedDescription(category.description, 25)
+                : category.description}
+            </p>
+            <Dialog open={isDescriptionModalOpen} onOpenChange={setIsDescriptionModalOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg">
+                  Read More
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl font-bold">{category.name}</DialogTitle>
+                </DialogHeader>
+                <div className="mt-6">
+                  <p className="text-gray-700 leading-relaxed text-lg">
+                    {category.description}
                   </p>
-                )}
-
-                {/* Amount */}
-                <p style={{ 
-                  color: '#faa817', 
-                  marginBottom: '15px',
-                  fontSize: '18px',
-                  fontWeight: 'bold'
-                }}>
-                  ₹{card.amount.toLocaleString()}
-                </p>
-
-                {/* Donate Button */}
-                <Button 
-                  onClick={() => handleDonateClick(card)}
-                  style={{
-                    backgroundColor: '#faa817',
-                    color: '#fff',
-                    border: 'none',
-                    padding: '10px 15px',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                    width: '100%'
-                  }}
-                >
-                  Add Donation
-                </Button>
-              </div>
-            )) : (
-              <div style={{
-                textAlign: 'center',
-                padding: '40px',
-                backgroundColor: '#f8f9fa',
-                borderRadius: '10px',
-                border: '2px dashed #dee2e6',
-                width: '100%'
-              }}>
-                <h3 style={{ marginBottom: '15px', color: '#6c757d' }}>
-                  No donation cards available for this category
-                </h3>
-                <p style={{ color: '#6c757d', marginBottom: '20px' }}>
-                  Donation cards for this category can be managed in the admin panel. 
-                  Please visit the general donation page for other donation options.
-                </p>
-                <Button 
-                  onClick={() => window.location.href = '/donate'}
-                  style={{
-                    backgroundColor: '#faa817',
-                    color: '#fff',
-                    border: 'none',
-                    padding: '12px 24px',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                    fontSize: '16px'
-                  }}
-                >
-                  Go to Donation Page
-                </Button>
-              </div>
-            )}
-          </div>
-
-          {/* Custom Amount Section */}
-          <div style={{
-            marginTop: '40px',
-            backgroundColor: '#fff',
-            padding: '20px',
-            borderRadius: '10px',
-            boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)'
-          }}>
-            <h3 style={{ marginBottom: '15px', fontSize: '18px', fontWeight: 'bold' }}>
-              Any Donation of Your Choice for {category.name}
-            </h3>
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-              <input
-                type="number"
-                placeholder="Enter the Amount"
-                value={customAmount}
-                onChange={(e) => setCustomAmount(e.target.value)}
-                style={{
-                  flex: 1,
-                  padding: '12px',
-                  border: '1px solid #ddd',
-                  borderRadius: '5px',
-                  fontSize: '16px'
-                }}
-              />
-              <Button
-                onClick={handleCustomDonation}
-                style={{
-                  backgroundColor: '#faa817',
-                  color: '#fff',
-                  border: 'none',
-                  padding: '12px 24px',
-                  borderRadius: '5px',
-                  cursor: 'pointer',
-                  fontSize: '16px'
-                }}
-              >
-                Donate
-              </Button>
-            </div>
-          </div>
-
-          {/* Bank Details and QR Code Section */}
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: '1fr 1fr', 
-            gap: '20px', 
-            marginTop: '40px' 
-          }} className="grid-cols-1 lg:grid-cols-2">
-            {/* Account Details */}
-            {currentBankDetail && (
-              <div style={{
-                backgroundColor: '#fff',
-                padding: '20px',
-                borderRadius: '10px',
-                boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)'
-              }}>
-                <h3 style={{ marginBottom: '15px', fontSize: '18px', fontWeight: 'bold' }}>
-                  Account Details
-                </h3>
-                <div style={{ lineHeight: '1.8' }}>
-                  <p><strong>Bank Name:</strong> {currentBankDetail.bankName}</p>
-                  <p><strong>Account Name:</strong> {currentBankDetail.accountName}</p>
-                  <p><strong>Account Number:</strong> {currentBankDetail.accountNumber}</p>
-                  <p><strong>IFSC Code:</strong> {currentBankDetail.ifscCode}</p>
                 </div>
-              </div>
-            )}
-
-            {/* QR Code */}
-            {currentBankDetail && currentBankDetail.qrCodeUrl && (
-              <div style={{
-                backgroundColor: '#fff',
-                padding: '20px',
-                borderRadius: '10px',
-                boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
-                textAlign: 'center'
-              }}>
-                <h3 style={{ marginBottom: '15px', fontSize: '18px', fontWeight: 'bold' }}>
-                  Donate through UPI
-                </h3>
-                <img
-                  src={currentBankDetail.qrCodeUrl}
-                  alt="QR Code for UPI Payment"
-                  style={{
-                    maxWidth: '200px',
-                    height: 'auto',
-                    margin: '0 auto'
-                  }}
-                />
-              </div>
-            )}
+              </DialogContent>
+            </Dialog>
           </div>
-        </section>
+
+          {/* Tabs for Category Details */}
+          <Tabs defaultValue="details" className="w-full">
+            <TabsList className="grid w-full grid-cols-4 mb-8">
+              <TabsTrigger value="details">Category Details</TabsTrigger>
+              <TabsTrigger value="donation-cards">Donation Cards</TabsTrigger>
+              <TabsTrigger value="custom-donation">Custom Donation</TabsTrigger>
+              <TabsTrigger value="payment-details">Payment Details</TabsTrigger>
+            </TabsList>
+
+            {/* Category Details Tab */}
+            <TabsContent value="details" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Category Information</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <h3 className="font-semibold text-lg mb-2">Category Name</h3>
+                      <p className="text-gray-600">{category.name}</p>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg mb-2">Description</h3>
+                      <p className="text-gray-600">{category.description}</p>
+                    </div>
+                    {category.imageUrl && (
+                      <div className="md:col-span-2">
+                        <h3 className="font-semibold text-lg mb-2">Category Image</h3>
+                        <img 
+                          src={category.imageUrl} 
+                          alt={category.name}
+                          className="w-full max-w-md rounded-lg shadow-md"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Donation Cards Tab */}
+            <TabsContent value="donation-cards" className="space-y-6">
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-bold mb-2">{category.name} - Donation Options</h2>
+                <p className="text-gray-600">Choose from our donation packages to support this category</p>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {activeDonationCards.length > 0 ? activeDonationCards.map((card) => (
+                  <Card key={card.id} className="hover:shadow-lg transition-shadow">
+                    <CardContent className="p-6 text-center">
+                      <h3 className="text-xl font-semibold mb-2">{card.title}</h3>
+                      <div className="text-3xl font-bold text-orange-600 mb-4">₹{card.amount}</div>
+                      {card.description && (
+                        <p className="text-gray-600 text-sm mb-4">{card.description}</p>
+                      )}
+                      <Button 
+                        onClick={() => handleDonateClick(card)}
+                        className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+                      >
+                        Add Donation
+                      </Button>
+                    </CardContent>
+                  </Card>
+                )) : (
+                  <div className="col-span-full text-center py-8">
+                    <p className="text-gray-500">No donation cards available for this category</p>
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+
+            {/* Custom Donation Tab */}
+            <TabsContent value="custom-donation" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Any Donation of Your Choice for {category.name}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col md:flex-row gap-4 items-end">
+                    <div className="flex-1">
+                      <Label htmlFor="custom-amount">Enter the Amount</Label>
+                      <Input
+                        id="custom-amount"
+                        type="number"
+                        placeholder="Enter amount"
+                        value={customAmount}
+                        onChange={(e) => setCustomAmount(e.target.value)}
+                        className="mt-2"
+                      />
+                    </div>
+                    <Button 
+                      onClick={handleCustomDonation}
+                      className="bg-orange-500 hover:bg-orange-600 text-white px-8"
+                      disabled={!customAmount || parseInt(customAmount) <= 0}
+                    >
+                      Donate
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Payment Details Tab */}
+            <TabsContent value="payment-details" className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Account Details</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {currentBankDetail ? (
+                      <div className="space-y-4">
+                        <div>
+                          <Label>Bank Name:</Label>
+                          <p className="font-medium">{currentBankDetail.bankName}</p>
+                        </div>
+                        <div>
+                          <Label>Account Name:</Label>
+                          <p className="font-medium">{currentBankDetail.accountName}</p>
+                        </div>
+                        <div>
+                          <Label>Account Number:</Label>
+                          <p className="font-medium">{currentBankDetail.accountNumber}</p>
+                        </div>
+                        <div>
+                          <Label>IFSC Code:</Label>
+                          <p className="font-medium">{currentBankDetail.ifscCode}</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-gray-500">No bank details available</p>
+                    )}
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Donate through UPI</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {currentBankDetail?.qrCodeUrl ? (
+                      <div className="text-center">
+                        <img 
+                          src={currentBankDetail.qrCodeUrl} 
+                          alt="UPI QR Code"
+                          className="mx-auto mb-4 max-w-48"
+                        />
+                        <p className="text-sm text-gray-600">Scan to donate via UPI</p>
+                      </div>
+                    ) : (
+                      <p className="text-gray-500">UPI QR Code not available</p>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
       </main>
+
+      <Footer />
 
       {/* Payment Modal */}
       {paymentModal.isOpen && (
@@ -420,11 +325,9 @@ export default function CategoryDonation() {
           onClose={closePaymentModal}
           donationCard={paymentModal.donationCard}
           customAmount={paymentModal.customAmount}
-          donationCategory={category}
+          categoryTitle={category.name}
         />
       )}
-
-      <Footer />
     </>
   );
 }
