@@ -135,25 +135,25 @@ const DonationCategoriesPage = () => {
       
       if (currentPaymentDetails.length > 0) {
         const details = currentPaymentDetails[0];
-        paymentForm.reset({
-          accountName: details.accountName || '',
-          bankName: details.bankName || '',
-          accountNumber: details.accountNumber || '',
-          ifscCode: details.ifscCode || '',
-          swiftCode: details.swiftCode || '',
-          qrCodeUrl: details.qrCodeUrl || '',
-        });
-        console.log('Form populated with existing data');
+        console.log('Setting form values with details:', details);
+        
+        // Set each field individually
+        paymentForm.setValue('accountName', details.accountName || '');
+        paymentForm.setValue('bankName', details.bankName || '');
+        paymentForm.setValue('accountNumber', details.accountNumber || '');
+        paymentForm.setValue('ifscCode', details.ifscCode || '');
+        paymentForm.setValue('swiftCode', details.swiftCode || '');
+        paymentForm.setValue('qrCodeUrl', details.qrCodeUrl || '');
+        
+        console.log('Form values set:', paymentForm.getValues());
       } else {
-        paymentForm.reset({
-          accountName: '',
-          bankName: '',
-          accountNumber: '',
-          ifscCode: '',
-          swiftCode: '',
-          qrCodeUrl: '',
-        });
-        console.log('Form reset to empty values');
+        console.log('No payment details found, clearing form');
+        paymentForm.setValue('accountName', '');
+        paymentForm.setValue('bankName', '');
+        paymentForm.setValue('accountNumber', '');
+        paymentForm.setValue('ifscCode', '');
+        paymentForm.setValue('swiftCode', '');
+        paymentForm.setValue('qrCodeUrl', '');
       }
     }
   }, [currentPaymentDetails, isPaymentModalOpen, paymentForm]);
