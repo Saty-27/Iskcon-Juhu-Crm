@@ -119,6 +119,11 @@ const DonationCategoriesPage = () => {
     qrCodeUrl: '',
   });
 
+  // Debug effect to track modal data changes
+  useEffect(() => {
+    console.log('modalPaymentData changed:', modalPaymentData);
+  }, [modalPaymentData]);
+
   // Effect to populate form when editing a card
   useEffect(() => {
     if (editingCard && isCardDialogOpen) {
@@ -357,14 +362,17 @@ const DonationCategoriesPage = () => {
           console.log('Setting modal payment details:', details);
           
           // Set modal data immediately
-          setModalPaymentData({
+          const newModalData = {
             accountName: details.accountName || '',
             bankName: details.bankName || '',
             accountNumber: details.accountNumber || '',
             ifscCode: details.ifscCode || '',
             swiftCode: details.swiftCode || '',
             qrCodeUrl: details.qrCodeUrl || '',
-          });
+          };
+          
+          console.log('About to set modal payment details:', newModalData);
+          setModalPaymentData(newModalData);
           console.log('Modal payment details set successfully');
         } else {
           console.log('No existing payment details found');
