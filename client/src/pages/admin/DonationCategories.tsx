@@ -278,6 +278,85 @@ const DonationCategoriesPage = () => {
     }
   };
 
+  const handleOpenPaymentModal = async (categoryId: number) => {
+    setSelectedCategoryId(categoryId);
+    
+    // Load existing payment details
+    try {
+      const response = await fetch(`/api/categories/${categoryId}/bank-details`);
+      if (response.ok) {
+        const bankDetails = await response.json();
+        if (bankDetails && bankDetails.length > 0) {
+          const details = bankDetails[0];
+          setPaymentDetails({
+            accountName: details.accountName || '',
+            bankName: details.bankName || '',
+            accountNumber: details.accountNumber || '',
+            ifscCode: details.ifscCode || '',
+            swiftCode: details.swiftCode || '',
+            qrCodeUrl: details.qrCodeUrl || '',
+          });
+        } else {
+          // Reset to empty if no existing details
+          setPaymentDetails({
+            accountName: '',
+            bankName: '',
+            accountNumber: '',
+            ifscCode: '',
+            swiftCode: '',
+            qrCodeUrl: '',
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error loading payment details:', error);
+      // Reset to empty on error
+      setPaymentDetails({
+        accountName: '',
+        bankName: '',
+        accountNumber: '',
+        ifscCode: '',
+        swiftCode: '',
+        qrCodeUrl: '',
+      });
+    }
+    
+    setIsPaymentModalOpen(true);
+  };
+
+  const handleSavePaymentDetails = async () => {
+    if (!selectedCategoryId) return;
+    
+    try {
+      const response = await fetch(`/api/categories/${selectedCategoryId}/bank-details`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(paymentDetails),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save payment details');
+      }
+
+      toast({
+        title: 'Success',
+        description: 'Payment details saved successfully',
+      });
+      
+      setIsPaymentModalOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['/api/donation-categories'] });
+    } catch (error) {
+      console.error('Save error:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to save payment details',
+        variant: 'destructive',
+      });
+    }
+  };
+
   // Form submission is now handled inline in the form onSubmit handler
 
   const toggleCategoryExpansion = (categoryId: number) => {
@@ -377,10 +456,7 @@ const DonationCategoriesPage = () => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => {
-                        setPaymentCategoryId(category.id);
-                        setIsPaymentModalOpen(true);
-                      }}
+                      onClick={() => handleOpenPaymentModal(category.id)}
                       className="text-green-600 hover:text-green-800"
                       title="Manage payment details"
                     >
@@ -745,7 +821,11 @@ const DonationCategoriesPage = () => {
                 >
                   Cancel
                 </Button>
-                <Button type="button">
+                <Button 
+                  type="button" 
+                  onClick={handleSavePaymentDetails}
+                  className="bg-purple-600 hover:bg-purple-700"
+                >
                   Save Payment Details
                 </Button>
               </div>
