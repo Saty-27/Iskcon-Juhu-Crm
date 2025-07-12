@@ -304,55 +304,58 @@ const DonationCategoriesPage = () => {
   const handleOpenPaymentModal = async (categoryId: number) => {
     setSelectedCategoryId(categoryId);
     
-    // Load existing payment details
-    try {
-      console.log('Loading payment details for category:', categoryId);
-      const response = await fetch(`/api/categories/${categoryId}/bank-details`);
-      
-      if (response.ok) {
-        const bankDetails = await response.json();
-        console.log('Loaded bank details:', bankDetails);
-        
-        if (bankDetails && bankDetails.length > 0) {
-          const details = bankDetails[0];
-          console.log('Setting payment details:', details);
-          setPaymentDetails({
-            accountName: details.accountName || '',
-            bankName: details.bankName || '',
-            accountNumber: details.accountNumber || '',
-            ifscCode: details.ifscCode || '',
-            swiftCode: details.swiftCode || '',
-            qrCodeUrl: details.qrCodeUrl || '',
-          });
-        } else {
-          console.log('No existing payment details found, resetting to empty');
-          // Reset to empty if no existing details
-          setPaymentDetails({
-            accountName: '',
-            bankName: '',
-            accountNumber: '',
-            ifscCode: '',
-            swiftCode: '',
-            qrCodeUrl: '',
-          });
-        }
-      } else {
-        console.error('Failed to load payment details, response not ok:', response.status);
-      }
-    } catch (error) {
-      console.error('Error loading payment details:', error);
-      // Reset to empty on error
-      setPaymentDetails({
-        accountName: '',
-        bankName: '',
-        accountNumber: '',
-        ifscCode: '',
-        swiftCode: '',
-        qrCodeUrl: '',
-      });
-    }
-    
+    // First open the modal
     setIsPaymentModalOpen(true);
+    
+    // Then load existing payment details with a small delay
+    setTimeout(async () => {
+      try {
+        console.log('Loading payment details for category:', categoryId);
+        const response = await fetch(`/api/categories/${categoryId}/bank-details`);
+        
+        if (response.ok) {
+          const bankDetails = await response.json();
+          console.log('Loaded bank details:', bankDetails);
+          
+          if (bankDetails && bankDetails.length > 0) {
+            const details = bankDetails[0];
+            console.log('Setting payment details:', details);
+            setPaymentDetails({
+              accountName: details.accountName || '',
+              bankName: details.bankName || '',
+              accountNumber: details.accountNumber || '',
+              ifscCode: details.ifscCode || '',
+              swiftCode: details.swiftCode || '',
+              qrCodeUrl: details.qrCodeUrl || '',
+            });
+          } else {
+            console.log('No existing payment details found, resetting to empty');
+            // Reset to empty if no existing details
+            setPaymentDetails({
+              accountName: '',
+              bankName: '',
+              accountNumber: '',
+              ifscCode: '',
+              swiftCode: '',
+              qrCodeUrl: '',
+            });
+          }
+        } else {
+          console.error('Failed to load payment details, response not ok:', response.status);
+        }
+      } catch (error) {
+        console.error('Error loading payment details:', error);
+        // Reset to empty on error
+        setPaymentDetails({
+          accountName: '',
+          bankName: '',
+          accountNumber: '',
+          ifscCode: '',
+          swiftCode: '',
+          qrCodeUrl: '',
+        });
+      }
+    }, 100);
   };
 
   const handleSavePaymentDetails = async () => {
