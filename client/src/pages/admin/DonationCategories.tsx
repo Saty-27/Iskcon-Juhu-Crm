@@ -333,7 +333,8 @@ const DonationCategoriesPage = () => {
   };
 
   const handleOpenPaymentModal = async (categoryId: number) => {
-    console.log('🚀 Opening payment modal for category:', categoryId);
+    console.log('🚀 FUNCTION CALLED - Opening payment modal for category:', categoryId);
+    alert('Payment modal function called for category: ' + categoryId);
     setSelectedCategoryId(categoryId);
     
     // Open the modal first
