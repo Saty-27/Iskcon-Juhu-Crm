@@ -10,6 +10,7 @@ import {
   Event, InsertEvent, events,
   Gallery, InsertGallery, gallery,
   Video, InsertVideo, videos,
+  LiveVideo, InsertLiveVideo, liveVideos,
   Testimonial, InsertTestimonial, testimonials,
   ContactMessage, InsertContactMessage, contactMessages,
   SocialLink, InsertSocialLink, socialLinks,
@@ -108,6 +109,13 @@ export interface IStorage {
   updateVideo(id: number, videoData: Partial<Video>): Promise<Video | undefined>;
   deleteVideo(id: number): Promise<boolean>;
   
+  // Live video management
+  getLiveVideos(): Promise<LiveVideo[]>;
+  getLiveVideo(id: number): Promise<LiveVideo | undefined>;
+  createLiveVideo(liveVideo: InsertLiveVideo): Promise<LiveVideo>;
+  updateLiveVideo(id: number, liveVideoData: Partial<LiveVideo>): Promise<LiveVideo | undefined>;
+  deleteLiveVideo(id: number): Promise<boolean>;
+  
   // Testimonial management
   getTestimonials(): Promise<Testimonial[]>;
   getTestimonial(id: number): Promise<Testimonial | undefined>;
@@ -182,6 +190,7 @@ export class MemStorage implements IStorage {
   private eventsData: Map<number, Event>;
   private galleryData: Map<number, Gallery>;
   private videosData: Map<number, Video>;
+  private liveVideosData: Map<number, LiveVideo>;
   private testimonialsData: Map<number, Testimonial>;
   private contactMessagesData: Map<number, ContactMessage>;
   private socialLinksData: Map<number, SocialLink>;
@@ -201,6 +210,7 @@ export class MemStorage implements IStorage {
   private eventIdCounter: number;
   private galleryIdCounter: number;
   private videoIdCounter: number;
+  private liveVideoIdCounter: number;
   private testimonialIdCounter: number;
   private contactMessageIdCounter: number;
   private socialLinkIdCounter: number;
@@ -221,6 +231,7 @@ export class MemStorage implements IStorage {
     this.eventsData = new Map();
     this.galleryData = new Map();
     this.videosData = new Map();
+    this.liveVideosData = new Map();
     this.testimonialsData = new Map();
     this.contactMessagesData = new Map();
     this.socialLinksData = new Map();
@@ -240,6 +251,7 @@ export class MemStorage implements IStorage {
     this.eventIdCounter = 1;
     this.galleryIdCounter = 1;
     this.videoIdCounter = 1;
+    this.liveVideoIdCounter = 1;
     this.testimonialIdCounter = 1;
     this.contactMessageIdCounter = 1;
     this.socialLinkIdCounter = 1;
@@ -389,6 +401,13 @@ export class MemStorage implements IStorage {
       title: "Temple Aarti Ceremony",
       thumbnailUrl: "https://images.unsplash.com/photo-1599930113854-d6d7fd522504?ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=600",
       youtubeUrl: "https://www.youtube.com/watch?v=example1",
+      order: 1
+    });
+
+    // Add sample live video
+    this.createLiveVideo({
+      title: "Live Temple Darshan",
+      youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
       order: 1
     });
     
@@ -1079,6 +1098,44 @@ export class MemStorage implements IStorage {
 
   async deleteVideo(id: number): Promise<boolean> {
     return this.videosData.delete(id);
+  }
+
+  // Live video methods
+  async getLiveVideos(): Promise<LiveVideo[]> {
+    return Array.from(this.liveVideosData.values())
+      .filter(v => v.isActive)
+      .sort((a, b) => a.order - b.order);
+  }
+
+  async getLiveVideo(id: number): Promise<LiveVideo | undefined> {
+    return this.liveVideosData.get(id);
+  }
+
+  async createLiveVideo(liveVideo: InsertLiveVideo): Promise<LiveVideo> {
+    const id = this.liveVideoIdCounter++;
+    const now = new Date();
+    const newLiveVideo: LiveVideo = { 
+      ...liveVideo, 
+      id,
+      createdAt: now,
+      updatedAt: now,
+      isActive: liveVideo.isActive ?? true
+    };
+    this.liveVideosData.set(id, newLiveVideo);
+    return newLiveVideo;
+  }
+
+  async updateLiveVideo(id: number, liveVideoData: Partial<LiveVideo>): Promise<LiveVideo | undefined> {
+    const liveVideo = this.liveVideosData.get(id);
+    if (!liveVideo) return undefined;
+    
+    const updatedLiveVideo = { ...liveVideo, ...liveVideoData, updatedAt: new Date() };
+    this.liveVideosData.set(id, updatedLiveVideo);
+    return updatedLiveVideo;
+  }
+
+  async deleteLiveVideo(id: number): Promise<boolean> {
+    return this.liveVideosData.delete(id);
   }
 
   // Testimonial methods

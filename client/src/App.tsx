@@ -33,6 +33,7 @@ import AdminEventManagement from "@/pages/admin/EventManagement";
 import EventsAdmin from "@/pages/admin/EventsAdmin";
 import AdminGallery from "@/pages/admin/Gallery";
 import AdminVideos from "@/pages/admin/Videos";
+import AdminLiveVideos from "@/pages/admin/LiveVideos";
 import AdminDonations from "@/pages/admin/Donations";
 import AdminDonationCategories from "@/pages/admin/DonationCategories";
 import AdminDonationStats from "@/pages/admin/DonationStats";
@@ -111,6 +112,13 @@ function Router() {
         {() => (
           <AdminRoute>
             <AdminVideos />
+          </AdminRoute>
+        )}
+      </Route>
+      <Route path="/admin/live-videos">
+        {() => (
+          <AdminRoute>
+            <AdminLiveVideos />
           </AdminRoute>
         )}
       </Route>

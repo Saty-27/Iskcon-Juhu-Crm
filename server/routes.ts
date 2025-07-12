@@ -15,7 +15,8 @@ import {
   insertBankDetailsSchema,
   insertEventSchema, 
   insertGallerySchema, 
-  insertVideoSchema, 
+  insertVideoSchema,
+  insertLiveVideoSchema, 
   insertTestimonialSchema,
   insertContactMessageSchema,
   insertSocialLinkSchema,
@@ -1046,6 +1047,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Video deleted" });
     } catch (error) {
       res.status(500).json({ message: "Error deleting video" });
+    }
+  });
+
+  // Live videos API endpoints
+  app.get("/api/live-videos", async (req, res) => {
+    try {
+      const liveVideos = await storage.getLiveVideos();
+      res.json(liveVideos);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching live videos" });
+    }
+  });
+
+  app.post("/api/live-videos", isAdmin, async (req, res) => {
+    try {
+      const data = insertLiveVideoSchema.parse(req.body);
+      const liveVideo = await storage.createLiveVideo(data);
+      res.status(201).json(liveVideo);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error creating live video" });
+    }
+  });
+
+  app.put("/api/live-videos/:id", isAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const data = insertLiveVideoSchema.partial().parse(req.body);
+      const liveVideo = await storage.updateLiveVideo(id, data);
+      if (!liveVideo) {
+        return res.status(404).json({ message: "Live video not found" });
+      }
+      res.json(liveVideo);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error updating live video" });
+    }
+  });
+
+  app.delete("/api/live-videos/:id", isAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteLiveVideo(id);
+      if (!success) {
+        return res.status(404).json({ message: "Live video not found" });
+      }
+      res.json({ message: "Live video deleted" });
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting live video" });
     }
   });
 

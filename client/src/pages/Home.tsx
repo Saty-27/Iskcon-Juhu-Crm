@@ -11,6 +11,7 @@ import CurrentEvents from '@/components/home/CurrentEvents';
 import MediaHighlights from '@/components/home/MediaHighlights';
 import Testimonials from '@/components/home/Testimonials';
 import ContactSection from '@/components/home/ContactSection';
+import WatchLiveButton from '@/components/WatchLiveButton';
 
 const Home = () => {
   return (
@@ -42,6 +43,7 @@ const Home = () => {
       </main>
       
       <Footer />
+      <WatchLiveButton />
     </>
   );
 };

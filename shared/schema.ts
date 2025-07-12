@@ -218,6 +218,26 @@ export const insertVideoSchema = createInsertSchema(videos).omit({
   id: true,
 });
 
+// Live videos table
+export const liveVideos = pgTable("live_videos", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  youtubeUrl: text("youtube_url").notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  order: integer("order").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertLiveVideoSchema = createInsertSchema(liveVideos).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type LiveVideo = typeof liveVideos.$inferSelect;
+export type InsertLiveVideo = typeof liveVideos.$inferInsert;
+
 // Testimonials table
 export const testimonials = pgTable("testimonials", {
   id: serial("id").primaryKey(),

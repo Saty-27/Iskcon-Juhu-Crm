@@ -1,7 +1,7 @@
 import { eq, and } from "drizzle-orm";
 import { db } from "./db";
 import { 
-  users, banners, quotes, donationCategories, donationCards, eventDonationCards, bankDetails, eventBankDetails, categoryBankDetails, events, gallery, videos, 
+  users, banners, quotes, donationCategories, donationCards, eventDonationCards, bankDetails, eventBankDetails, categoryBankDetails, events, gallery, videos, liveVideos,
   testimonials, contactMessages, socialLinks, donations, subscriptions,
   stats, schedules, blogPosts,
   type User, type InsertUser, type Banner, type InsertBanner,
@@ -9,7 +9,7 @@ import {
   type DonationCard, type InsertDonationCard, type EventDonationCard, type InsertEventDonationCard,
   type BankDetails, type InsertBankDetails, type CategoryBankDetails, type InsertCategoryBankDetails,
   type Event, type InsertEvent, type Gallery, type InsertGallery,
-  type Video, type InsertVideo, type Testimonial, type InsertTestimonial,
+  type Video, type InsertVideo, type LiveVideo, type InsertLiveVideo, type Testimonial, type InsertTestimonial,
   type ContactMessage, type InsertContactMessage, type SocialLink, type InsertSocialLink,
   type Donation, type InsertDonation, type Subscription, type InsertSubscription,
   type Stat, type InsertStat, type Schedule, type InsertSchedule,
@@ -390,6 +390,31 @@ export class DatabaseStorage implements IStorage {
 
   async deleteVideo(id: number): Promise<boolean> {
     const result = await db.delete(videos).where(eq(videos.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Live Video operations
+  async getLiveVideos(): Promise<LiveVideo[]> {
+    return await db.select().from(liveVideos);
+  }
+
+  async getLiveVideo(id: number): Promise<LiveVideo | undefined> {
+    const [liveVideo] = await db.select().from(liveVideos).where(eq(liveVideos.id, id));
+    return liveVideo;
+  }
+
+  async createLiveVideo(liveVideo: InsertLiveVideo): Promise<LiveVideo> {
+    const [newLiveVideo] = await db.insert(liveVideos).values(liveVideo).returning();
+    return newLiveVideo;
+  }
+
+  async updateLiveVideo(id: number, liveVideoData: Partial<LiveVideo>): Promise<LiveVideo | undefined> {
+    const [liveVideo] = await db.update(liveVideos).set(liveVideoData).where(eq(liveVideos.id, id)).returning();
+    return liveVideo;
+  }
+
+  async deleteLiveVideo(id: number): Promise<boolean> {
+    const result = await db.delete(liveVideos).where(eq(liveVideos.id, id));
     return result.rowCount > 0;
   }
 
