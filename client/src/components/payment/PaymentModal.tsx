@@ -48,24 +48,12 @@ const PaymentModal = ({
       : event 
       ? [`/api/events/${event.id}/bank-details`]
       : ['/api/bank-details'],
-    enabled: isOpen && (donationCategory || event),
+    enabled: Boolean(isOpen && (donationCategory || event)),
     staleTime: 0,
     refetchOnWindowFocus: true,
   });
 
-  // Debug authentication state
-  useEffect(() => {
-    if (isOpen) {
-      console.log('PaymentModal Auth Debug:', {
-        isOpen,
-        authLoading,
-        isAuthenticated,
-        authUser: authUser ? 'User exists' : 'No user',
-        userId: authUser?.id,
-        bankDetails: bankDetails.length > 0 ? 'Bank details loaded' : 'No bank details'
-      });
-    }
-  }, [isOpen, authLoading, isAuthenticated, authUser, bankDetails]);
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
