@@ -135,15 +135,17 @@ const DonationCategoriesPage = () => {
         const details = currentPaymentDetails[0];
         console.log('Setting payment details state:', details);
         
-        setPaymentFormData({
+        const newFormData = {
           accountName: details.accountName || '',
           bankName: details.bankName || '',
           accountNumber: details.accountNumber || '',
           ifscCode: details.ifscCode || '',
           swiftCode: details.swiftCode || '',
           qrCodeUrl: details.qrCodeUrl || '',
-        });
+        };
         
+        console.log('Setting form data to:', newFormData);
+        setPaymentFormData(newFormData);
         console.log('Payment details state updated');
       } else {
         console.log('No payment details found, clearing state');
@@ -756,6 +758,10 @@ const DonationCategoriesPage = () => {
               </div>
             ) : (
               <div className="space-y-4">
+                {/* Debug info - will remove later */}
+                <div className="p-2 bg-gray-100 text-xs rounded">
+                  <strong>Debug State:</strong> {JSON.stringify(paymentFormData, null, 2)}
+                </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="accountName">Account Holder Name</Label>
