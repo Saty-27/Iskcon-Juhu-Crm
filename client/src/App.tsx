@@ -56,7 +56,7 @@ function Router() {
       <Route path="/donate/payment-gateway" component={PaymentGateway} />
       <Route path="/donate/payment-failed" component={PaymentFailed} />
       <Route path="/donate/event/:eventId" component={EventDonation} />
-      <Route path="/donate/:categoryId" component={CategoryDonation} />
+      <Route path="/donate/category/:categoryId" component={CategoryDonation} />
       
       {/* Payment result pages */}
       <Route path="/payment/success" component={PaymentSuccess} />
