@@ -232,13 +232,24 @@ const DonationCategoriesPage = () => {
     console.log('Selected category ID:', selectedCategoryId);
     console.log('Form watch values:', cardForm.watch());
     
-    // Ensure categoryId is set correctly
+    // Ensure categoryId is set correctly - force it from selectedCategoryId
     const cardData = {
       ...data,
-      categoryId: selectedCategoryId || data.categoryId,
+      categoryId: selectedCategoryId!, // Force the categoryId from state
+      order: data.order || 0, // Ensure order is set
     };
     
     console.log('Final card data to submit:', cardData);
+    
+    // Validate required fields before submission
+    if (!cardData.categoryId) {
+      toast({ 
+        title: 'Error', 
+        description: 'Category ID is missing. Please close and reopen the form.', 
+        variant: 'destructive' 
+      });
+      return;
+    }
     
     if (editingCard) {
       updateCardMutation.mutate({ id: editingCard.id, data: cardData });
@@ -465,6 +476,11 @@ const DonationCategoriesPage = () => {
             <DialogHeader>
               <DialogTitle>
                 {editingCard ? 'Edit Donation Card' : 'Add Donation Card'}
+                {selectedCategoryId && (
+                  <span className="text-sm font-normal text-gray-500 ml-2">
+                    (Category ID: {selectedCategoryId})
+                  </span>
+                )}
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={cardForm.handleSubmit(handleSubmitCard)} className="space-y-4">
