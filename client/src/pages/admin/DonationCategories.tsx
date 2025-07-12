@@ -133,28 +133,31 @@ const DonationCategoriesPage = () => {
     if (currentPaymentDetails && isPaymentModalOpen) {
       console.log('Loading payment details into form:', currentPaymentDetails);
       
-      if (currentPaymentDetails.length > 0) {
-        const details = currentPaymentDetails[0];
-        console.log('Setting form values with details:', details);
-        
-        // Set each field individually
-        paymentForm.setValue('accountName', details.accountName || '');
-        paymentForm.setValue('bankName', details.bankName || '');
-        paymentForm.setValue('accountNumber', details.accountNumber || '');
-        paymentForm.setValue('ifscCode', details.ifscCode || '');
-        paymentForm.setValue('swiftCode', details.swiftCode || '');
-        paymentForm.setValue('qrCodeUrl', details.qrCodeUrl || '');
-        
-        console.log('Form values set:', paymentForm.getValues());
-      } else {
-        console.log('No payment details found, clearing form');
-        paymentForm.setValue('accountName', '');
-        paymentForm.setValue('bankName', '');
-        paymentForm.setValue('accountNumber', '');
-        paymentForm.setValue('ifscCode', '');
-        paymentForm.setValue('swiftCode', '');
-        paymentForm.setValue('qrCodeUrl', '');
-      }
+      // Use setTimeout to ensure form is ready and avoid race conditions
+      setTimeout(() => {
+        if (currentPaymentDetails.length > 0) {
+          const details = currentPaymentDetails[0];
+          console.log('Setting form values with details:', details);
+          
+          // Set each field individually with trigger to force re-render
+          paymentForm.setValue('accountName', details.accountName || '', { shouldTouch: true });
+          paymentForm.setValue('bankName', details.bankName || '', { shouldTouch: true });
+          paymentForm.setValue('accountNumber', details.accountNumber || '', { shouldTouch: true });
+          paymentForm.setValue('ifscCode', details.ifscCode || '', { shouldTouch: true });
+          paymentForm.setValue('swiftCode', details.swiftCode || '', { shouldTouch: true });
+          paymentForm.setValue('qrCodeUrl', details.qrCodeUrl || '', { shouldTouch: true });
+          
+          console.log('Form values set:', paymentForm.getValues());
+        } else {
+          console.log('No payment details found, clearing form');
+          paymentForm.setValue('accountName', '', { shouldTouch: true });
+          paymentForm.setValue('bankName', '', { shouldTouch: true });
+          paymentForm.setValue('accountNumber', '', { shouldTouch: true });
+          paymentForm.setValue('ifscCode', '', { shouldTouch: true });
+          paymentForm.setValue('swiftCode', '', { shouldTouch: true });
+          paymentForm.setValue('qrCodeUrl', '', { shouldTouch: true });
+        }
+      }, 100); // Small delay to ensure form is fully initialized
     }
   }, [currentPaymentDetails, isPaymentModalOpen, paymentForm]);
 
@@ -747,8 +750,16 @@ const DonationCategoriesPage = () => {
             <DialogHeader>
               <DialogTitle>Payment Details</DialogTitle>
             </DialogHeader>
-            <Form {...paymentForm}>
-              <form className="space-y-4">
+            {isLoadingPaymentDetails ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+                  <p className="mt-2 text-sm text-gray-600">Loading payment details...</p>
+                </div>
+              </div>
+            ) : (
+              <Form {...paymentForm}>
+                <form className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={paymentForm.control}
@@ -891,6 +902,7 @@ const DonationCategoriesPage = () => {
                 </div>
               </form>
             </Form>
+            )}
 
             <div className="flex justify-end space-x-2">
               <Button 
