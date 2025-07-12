@@ -37,19 +37,19 @@ const Sidebar = () => {
   };
 
   const menuItems = [
-    { href: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
-    { href: '/admin/banners', icon: Images, label: 'Banners' },
-    { href: '/admin/events', icon: Calendar, label: 'Events' },
-    { href: '/admin/gallery', icon: Images, label: 'Gallery' },
-    { href: '/admin/videos', icon: Film, label: 'Videos' },
-    { href: '/admin/donations', icon: DollarSign, label: 'Donations' },
-    { href: '/admin/donation-categories', icon: Target, label: 'Donation Categories' },
-    { href: '/admin/quotes', icon: Quote, label: 'Quotes' },
-    { href: '/admin/blog', icon: FileText, label: 'Blog Management' },
-    { href: '/admin/users', icon: Users, label: 'Users' },
-    { href: '/admin/messages', icon: Mail, label: 'Messages' },
-    { href: '/admin/testimonials', icon: MessageSquare, label: 'Testimonials' },
-    { href: '/admin/social-links', icon: Share, label: 'Social Links' },
+    { href: '/admin', icon: LayoutDashboard, label: 'Dashboard', tourId: 'dashboard-nav' },
+    { href: '/admin/banners', icon: Images, label: 'Banners', tourId: 'content-nav' },
+    { href: '/admin/events', icon: Calendar, label: 'Events', tourId: 'events-nav' },
+    { href: '/admin/gallery', icon: Images, label: 'Gallery', tourId: 'content-nav' },
+    { href: '/admin/videos', icon: Film, label: 'Videos', tourId: 'content-nav' },
+    { href: '/admin/donations', icon: DollarSign, label: 'Donations', tourId: 'donations-nav' },
+    { href: '/admin/donation-categories', icon: Target, label: 'Donation Categories', tourId: 'categories-nav' },
+    { href: '/admin/quotes', icon: Quote, label: 'Quotes', tourId: 'content-nav' },
+    { href: '/admin/blog', icon: FileText, label: 'Blog Management', tourId: 'content-nav' },
+    { href: '/admin/users', icon: Users, label: 'Users', tourId: 'users-nav' },
+    { href: '/admin/messages', icon: Mail, label: 'Messages', tourId: 'content-nav' },
+    { href: '/admin/testimonials', icon: MessageSquare, label: 'Testimonials', tourId: 'content-nav' },
+    { href: '/admin/social-links', icon: Share, label: 'Social Links', tourId: 'content-nav' },
   ];
 
   return (
@@ -96,6 +96,7 @@ const Sidebar = () => {
                         : 'hover:bg-gray-100'
                     }`}
                     onClick={closeMobileMenu}
+                    data-tour={item.tourId}
                   >
                     <Icon className="mr-3 h-5 w-5" />
                     <span className="font-medium">{item.label}</span>
@@ -139,6 +140,7 @@ const Sidebar = () => {
                         ? 'bg-purple-100 text-purple-700 border-l-4 border-purple-600'
                         : 'hover:bg-gray-100'
                     }`}
+                    data-tour={item.tourId}
                   >
                     <Icon className="mr-3 h-5 w-5" />
                     <span className="font-medium">{item.label}</span>

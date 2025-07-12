@@ -962,3 +962,21 @@ body.modal-open .stat-box {
     height: auto;
   }
 }
+
+/* Onboarding Tour Styles */
+.tour-highlight {
+  position: relative;
+  z-index: 51;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5), 0 0 0 8px rgba(59, 130, 246, 0.2);
+  border-radius: 8px;
+  animation: tour-pulse 2s ease-in-out infinite;
+}
+
+@keyframes tour-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5), 0 0 0 8px rgba(59, 130, 246, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.7), 0 0 0 12px rgba(59, 130, 246, 0.1);
+  }
+}

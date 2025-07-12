@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Menu, Download, User } from 'lucide-react';
+import { Menu, Download, User, HelpCircle } from 'lucide-react';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -11,11 +11,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import useAuth from '@/hooks/useAuth';
+import { useOnboarding } from '@/components/admin/OnboardingProvider';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [location] = useLocation();
   const { user, logout } = useAuth();
+  const { startTour } = useOnboarding();
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -40,6 +42,18 @@ const Header = () => {
       </div>
 
       <div className="flex items-center space-x-4">
+        {/* Tour Help Button */}
+        <Button 
+          onClick={startTour}
+          variant="outline" 
+          size="sm"
+          className="hidden md:flex items-center"
+          title="Restart Admin Tour"
+        >
+          <HelpCircle className="h-4 w-4 mr-2" />
+          Tour
+        </Button>
+        
         {showExportButton && (
           <Button className="bg-purple-600 hover:bg-purple-700 text-white rounded-lg px-4 py-2 font-medium transition-all duration-200">
             <Download className="h-4 w-4 mr-2" />

@@ -11,8 +11,12 @@ import {
   TrendingUp,
   IndianRupee
 } from 'lucide-react';
+import OnboardingTour from '@/components/admin/OnboardingTour';
+import { useOnboarding } from '@/components/admin/OnboardingProvider';
 
 const AdminDashboard = () => {
+  const { shouldShowTour, completeTour, skipTour } = useOnboarding();
+
   // Fetch real donation data from API
   const { data: donations = [] } = useQuery({ 
     queryKey: ['/api/admin/donations'],
@@ -30,6 +34,12 @@ const AdminDashboard = () => {
 
   return (
     <Layout>
+      {shouldShowTour && (
+        <OnboardingTour 
+          onComplete={completeTour}
+          onSkip={skipTour}
+        />
+      )}
       <Helmet>
         <title>Admin Dashboard - ISKCON Juhu</title>
       </Helmet>
@@ -42,7 +52,7 @@ const AdminDashboard = () => {
           </div>
 
           {/* Real-time Donation Statistics Grid - Modern Gradient Design */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" data-tour="dashboard-stats">
             {/* Total Donations Card */}
             <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500 via-purple-600 to-purple-700 p-6 text-white shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
               <div className="absolute top-0 right-0 -mt-4 -mr-4 h-16 w-16 rounded-full bg-white/10"></div>

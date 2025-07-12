@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import { OnboardingProvider } from './OnboardingProvider';
 
 interface LayoutProps {
   children: ReactNode;
@@ -8,22 +9,24 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Sidebar />
-      
-      {/* Content wrapper - different positioning for mobile vs desktop */}
-      <div className="pt-16 md:pt-0 md:ml-64">
-        {/* Desktop Header - hidden on mobile since we use mobile header from Sidebar */}
-        <div className="hidden md:block bg-white border-b border-gray-200">
-          <Header />
-        </div>
+    <OnboardingProvider>
+      <div className="min-h-screen bg-gray-50">
+        <Sidebar />
         
-        {/* Main content */}
-        <main className="min-h-screen bg-gray-50 p-6">
-          {children}
-        </main>
+        {/* Content wrapper - different positioning for mobile vs desktop */}
+        <div className="pt-16 md:pt-0 md:ml-64">
+          {/* Desktop Header - hidden on mobile since we use mobile header from Sidebar */}
+          <div className="hidden md:block bg-white border-b border-gray-200">
+            <Header />
+          </div>
+          
+          {/* Main content */}
+          <main className="min-h-screen bg-gray-50 p-6">
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
+    </OnboardingProvider>
   );
 };
 
