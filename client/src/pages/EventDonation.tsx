@@ -6,12 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Helmet } from 'react-helmet';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Event, EventDonationCard, BankDetails } from "@shared/schema";
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import PaymentModal from '@/components/payment/PaymentModal';
-
-
 
 export default function EventDonation() {
   const { eventId } = useParams();
@@ -42,11 +42,11 @@ export default function EventDonation() {
     queryKey: ["/api/events"]
   });
 
-  const { data: eventDonationCards = [], refetch: refetchEventCards } = useQuery<EventDonationCard[]>({
+  const { data: eventDonationCards = [] } = useQuery<EventDonationCard[]>({
     queryKey: [`/api/events/${eventId}/donation-cards`],
     enabled: !!eventId,
-    staleTime: 0, // Always fetch fresh data
-    gcTime: 0, // Don't cache the data (v5 syntax)
+    staleTime: 0,
+    gcTime: 0,
     refetchOnMount: true,
     refetchOnWindowFocus: true,
   });
@@ -88,7 +88,7 @@ export default function EventDonation() {
     setPaymentModal({ isOpen: false });
   };
 
-  const currentBankDetail = bankDetails[0]; // Use first bank detail
+  const currentBankDetail = bankDetails[0];
 
   if (!event) {
     return (
@@ -109,273 +109,208 @@ export default function EventDonation() {
       
       <Header />
       
-      <main>
-        <section className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-orange-50 px-4 py-8 md:px-8">
-          {/* Header Information */}
-          <div className="max-w-7xl mx-auto mb-12">
-            <div className="flex flex-col lg:flex-row gap-8 items-center">
-              <div className="flex-1 relative">
-                <div className="relative bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-800 rounded-3xl overflow-hidden shadow-2xl">
-                  {/* Decorative elements */}
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-                  <div className="absolute bottom-0 left-0 w-24 h-24 bg-orange-300/20 rounded-full -ml-12 -mb-12"></div>
-                  
-                  {/* Content */}
-                  <div className="relative z-10 p-8 md:p-12">
-                    <div className="inline-flex items-center px-4 py-2 bg-orange-400 text-white rounded-full text-sm font-medium mb-6">
-                      <span className="w-2 h-2 bg-white rounded-full mr-2"></span>
-                      Live Event
-                    </div>
-                    
-                    <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
-                      {event.title}
-                    </h1>
-                    
-                    <p className="text-purple-100 text-lg leading-relaxed mb-8">
-                      {event.description && getWordCount(event.description) > 25 
-                        ? getTruncatedDescription(event.description, 25)
-                        : event.description}
-                    </p>
-                    
-                    <Dialog open={isDescriptionModalOpen} onOpenChange={setIsDescriptionModalOpen}>
-                      <DialogTrigger asChild>
-                        <button className="inline-flex items-center px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-all duration-200 font-medium">
-                          <span>Read More</span>
-                          <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        </button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-2xl">
-                        <DialogHeader>
-                          <DialogTitle className="text-2xl font-bold">{event.title}</DialogTitle>
-                        </DialogHeader>
-                        <div className="mt-6">
-                          <p className="text-gray-700 leading-relaxed text-lg">
-                            {event.description}
-                          </p>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                  </div>
+      <main className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-4xl mx-auto px-4">
+          {/* Event Header */}
+          <div className="bg-gradient-to-r from-purple-600 to-purple-800 rounded-2xl p-8 mb-8 text-white">
+            <h1 className="text-4xl font-bold mb-4">{event.title}</h1>
+            <p className="text-purple-100 text-lg mb-6">
+              {event.description && getWordCount(event.description) > 25 
+                ? getTruncatedDescription(event.description, 25)
+                : event.description}
+            </p>
+            <Dialog open={isDescriptionModalOpen} onOpenChange={setIsDescriptionModalOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg">
+                  Read More
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl font-bold">{event.title}</DialogTitle>
+                </DialogHeader>
+                <div className="mt-6">
+                  <p className="text-gray-700 leading-relaxed text-lg">
+                    {event.description}
+                  </p>
                 </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          {/* Tabs for Event Details */}
+          <Tabs defaultValue="details" className="w-full">
+            <TabsList className="grid w-full grid-cols-4 mb-8">
+              <TabsTrigger value="details">Event Details</TabsTrigger>
+              <TabsTrigger value="donation-cards">Donation Cards</TabsTrigger>
+              <TabsTrigger value="custom-donation">Custom Donation</TabsTrigger>
+              <TabsTrigger value="payment-details">Payment Details</TabsTrigger>
+            </TabsList>
+
+            {/* Event Details Tab */}
+            <TabsContent value="details" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Event Information</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <h3 className="font-semibold text-lg mb-2">Event Title</h3>
+                      <p className="text-gray-600">{event.title}</p>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg mb-2">Description</h3>
+                      <p className="text-gray-600">{event.description}</p>
+                    </div>
+                    {event.imageUrl && (
+                      <div className="md:col-span-2">
+                        <h3 className="font-semibold text-lg mb-2">Event Image</h3>
+                        <img 
+                          src={event.imageUrl} 
+                          alt={event.title}
+                          className="w-full max-w-md rounded-lg shadow-md"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Donation Cards Tab */}
+            <TabsContent value="donation-cards" className="space-y-6">
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-bold mb-2">{event.title} - Donation Options</h2>
+                <p className="text-gray-600">Choose from our donation packages to support this event</p>
               </div>
               
-              <div className="flex-1 lg:max-w-lg">
-                <div className="relative rounded-3xl overflow-hidden shadow-2xl">
-                  <img
-                    src={event.imageUrl}
-                    alt={event.title}
-                    className="w-full h-80 lg:h-96 object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Donation Cards Section */}
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 to-orange-500 bg-clip-text text-transparent mb-4">
-                {event.title} Donation Options
-              </h2>
-              <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-                Choose from our specially curated donation packages to support this sacred event
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
-              {activeEventDonationCards.length > 0 ? activeEventDonationCards.map((card, index) => (
-                <div key={card.id} className="group relative">
-                  <div className="relative bg-white rounded-2xl shadow-xl border border-purple-100 overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
-                    {/* Card Header with Gradient */}
-                    <div className="bg-gradient-to-r from-purple-500 to-orange-500 h-2"></div>
-                    
-                    {/* Card Number Badge */}
-                    <div className="absolute top-4 left-4 bg-gradient-to-r from-purple-600 to-purple-700 text-white px-3 py-1 rounded-full text-sm font-medium">
-                      Card {index + 1}
-                    </div>
-                    
-                    {/* Card Content */}
-                    <div className="p-6 pt-12">
-                      <div className="text-center">
-                        {/* Title */}
-                        <h3 className="text-xl font-bold text-gray-800 mb-4 min-h-[3rem] flex items-center justify-center">
-                          {card.title}
-                        </h3>
-                        
-                        {/* Amount */}
-                        <div className="mb-6">
-                          <div className="text-3xl font-bold bg-gradient-to-r from-orange-500 to-purple-600 bg-clip-text text-transparent">
-                            ₹{card.amount.toLocaleString()}
-                          </div>
-                          <div className="text-sm text-gray-500 mt-1">Recommended Amount</div>
-                        </div>
-                        
-                        {/* Description */}
-                        {card.description && (
-                          <p className="text-gray-600 text-sm mb-6 leading-relaxed min-h-[2rem]">
-                            {card.description.length > 80 
-                              ? card.description.substring(0, 80) + "..."
-                              : card.description}
-                          </p>
-                        )}
-                        
-                        {/* Donate Button */}
-                        <Button 
-                          onClick={() => handleEventDonateClick(card)}
-                          className="w-full bg-gradient-to-r from-purple-600 to-orange-500 hover:from-purple-700 hover:to-orange-600 text-white font-medium py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-                        >
-                          <span className="mr-2">🙏</span>
-                          Donate Now
-                        </Button>
-                      </div>
-                    </div>
-                    
-                    {/* Decorative Elements */}
-                    <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-purple-200/20 to-orange-200/20 rounded-full -mr-10 -mt-10"></div>
-                    <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-orange-200/20 to-purple-200/20 rounded-full -ml-8 -mb-8"></div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {activeEventDonationCards.length > 0 ? activeEventDonationCards.map((card) => (
+                  <Card key={card.id} className="hover:shadow-lg transition-shadow">
+                    <CardContent className="p-6 text-center">
+                      <h3 className="text-xl font-semibold mb-2">{card.title}</h3>
+                      <div className="text-3xl font-bold text-orange-600 mb-4">₹{card.amount}</div>
+                      {card.description && (
+                        <p className="text-gray-600 text-sm mb-4">{card.description}</p>
+                      )}
+                      <Button 
+                        onClick={() => handleEventDonateClick(card)}
+                        className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+                      >
+                        Add Donation
+                      </Button>
+                    </CardContent>
+                  </Card>
+                )) : (
+                  <div className="col-span-full text-center py-8">
+                    <p className="text-gray-500">No donation cards available for this event</p>
                   </div>
-                </div>
-              )) : (
-                <div className="col-span-full">
-                  <div className="text-center bg-white rounded-3xl shadow-xl border-2 border-dashed border-purple-200 p-12">
-                    <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-purple-100 to-orange-100 rounded-full flex items-center justify-center">
-                      <svg className="w-12 h-12 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                      </svg>
+                )}
+              </div>
+            </TabsContent>
+
+            {/* Custom Donation Tab */}
+            <TabsContent value="custom-donation" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Any Donation of Your Choice for {event.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col md:flex-row gap-4 items-end">
+                    <div className="flex-1">
+                      <Label htmlFor="custom-amount">Enter the Amount</Label>
+                      <Input
+                        id="custom-amount"
+                        type="number"
+                        placeholder="Enter amount"
+                        value={customAmount}
+                        onChange={(e) => setCustomAmount(e.target.value)}
+                        className="mt-2"
+                      />
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-700 mb-4">
-                      No donation cards available for this event
-                    </h3>
-                    <p className="text-gray-500 mb-8 max-w-md mx-auto">
-                      Donation cards for this event can be managed in the admin panel. 
-                      Please visit the general donation page for other donation options.
-                    </p>
                     <Button 
-                      onClick={() => window.location.href = '/donate'}
-                      className="bg-gradient-to-r from-purple-600 to-orange-500 hover:from-purple-700 hover:to-orange-600 text-white font-medium py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                      onClick={handleCustomEventDonation}
+                      className="bg-orange-500 hover:bg-orange-600 text-white px-8"
+                      disabled={!customAmount || parseInt(customAmount) <= 0}
                     >
-                      Visit General Donation Page
+                      Donate
                     </Button>
                   </div>
-                </div>
-              )}
-            </div>
-          </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-      {/* Custom Donation */}
-      <div style={{
-        background: 'white',
-        borderRadius: '10px',
-        padding: '30px',
-        marginTop: '30px'
-      }}>
-        <h3 style={{ marginBottom: '15px', fontSize: '20px' }}>
-          Any Donation of Your Choice for {event.title}
-        </h3>
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
-          <Input
-            type="number"
-            value={customAmount}
-            onChange={(e) => setCustomAmount(e.target.value)}
-            placeholder="Enter the Amount"
-            style={{
-              flex: '1',
-              minWidth: '200px',
-              borderRadius: '5px',
-              border: '1px solid #ddd',
-              height: '50px',
-              fontSize: '18px',
-              fontWeight: '500',
-              padding: '5px 10px'
-            }}
-          />
-          <Button
-            onClick={handleCustomEventDonation}
-            disabled={!customAmount || parseInt(customAmount) <= 0}
-            style={{
-              backgroundColor: '#faa817',
-              color: '#fff',
-              border: 'none',
-              padding: '10px 20px',
-              borderRadius: '5px',
-              cursor: 'pointer',
-              height: '50px',
-              fontSize: '18px',
-              minWidth: '100px'
-            }}
-          >
-            Donate Now
-          </Button>
-        </div>
-      </div>
+            {/* Payment Details Tab */}
+            <TabsContent value="payment-details" className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Account Details</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {currentBankDetail ? (
+                      <div className="space-y-4">
+                        <div>
+                          <Label>Bank Name:</Label>
+                          <p className="font-medium">{currentBankDetail.bankName}</p>
+                        </div>
+                        <div>
+                          <Label>Account Name:</Label>
+                          <p className="font-medium">{currentBankDetail.accountName}</p>
+                        </div>
+                        <div>
+                          <Label>Account Number:</Label>
+                          <p className="font-medium">{currentBankDetail.accountNumber}</p>
+                        </div>
+                        <div>
+                          <Label>IFSC Code:</Label>
+                          <p className="font-medium">{currentBankDetail.ifscCode}</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-gray-500">No bank details available</p>
+                    )}
+                  </CardContent>
+                </Card>
 
-      {/* Account Details */}
-      {currentBankDetail && (
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          marginTop: '30px',
-          gap: '20px'
-        }} className="flex-col md:flex-row">
-          <div style={{
-            flex: 1,
-            backgroundColor: '#fff',
-            padding: '20px',
-            borderRadius: '8px',
-            boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)'
-          }}>
-            <h3 style={{ marginBottom: '15px' }}>Account Details</h3>
-            <p><strong>Bank Name:</strong> {currentBankDetail.bankName}</p>
-            <p><strong>Account Name:</strong> {currentBankDetail.accountName}</p>
-            <p><strong>Account Number:</strong> {currentBankDetail.accountNumber}</p>
-            <p><strong>IFSC Code:</strong> {currentBankDetail.ifscCode}</p>
-            {currentBankDetail.swiftCode && (
-              <p><strong>Swift Code:</strong> {currentBankDetail.swiftCode}</p>
-            )}
-          </div>
-          
-          {currentBankDetail.qrCodeUrl && (
-            <div style={{
-              flex: 1,
-              textAlign: 'center',
-              backgroundColor: '#fff',
-              padding: '20px',
-              borderRadius: '8px',
-              boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)'
-            }}>
-              <h3 style={{ marginBottom: '15px' }}>Donate through UPI</h3>
-              <img 
-                src={currentBankDetail.qrCodeUrl} 
-                alt="QR Code" 
-                style={{ 
-                  height: '200px', 
-                  width: '200px',
-                  border: '1px solid #ddd',
-                  borderRadius: '8px',
-                  margin: '0 auto',
-                  display: 'block'
-                }}
-              />
-            </div>
-          )}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Donate through UPI</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {currentBankDetail?.qrCodeUrl ? (
+                      <div className="text-center">
+                        <img 
+                          src={currentBankDetail.qrCodeUrl} 
+                          alt="UPI QR Code"
+                          className="mx-auto mb-4 max-w-48"
+                        />
+                        <p className="text-sm text-gray-600">Scan to donate via UPI</p>
+                      </div>
+                    ) : (
+                      <p className="text-gray-500">UPI QR Code not available</p>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
-      )}
-        </section>
       </main>
-      
+
       <Footer />
 
       {/* Payment Modal */}
-      <PaymentModal
-        isOpen={paymentModal.isOpen}
-        onClose={closePaymentModal}
-        eventDonationCard={paymentModal.eventDonationCard}
-        customAmount={paymentModal.customAmount}
-        event={event}
-      />
+      {paymentModal.isOpen && (
+        <PaymentModal
+          isOpen={paymentModal.isOpen}
+          onClose={closePaymentModal}
+          eventDonationCard={paymentModal.eventDonationCard}
+          customAmount={paymentModal.customAmount}
+          eventTitle={event.title}
+        />
+      )}
     </>
   );
 }
