@@ -138,7 +138,7 @@ const DonationsPage = () => {
   if (isLoading) {
     return (
       <AdminLayout>
-        <div className="bg-gray-50 min-h-screen p-6">
+        <div className="bg-gray-50 min-h-screen p-2.5">
           <div className="animate-pulse space-y-6">
             <div className="h-8 bg-gray-200 rounded w-1/3"></div>
             <div className="grid grid-cols-4 gap-6">
@@ -156,7 +156,7 @@ const DonationsPage = () => {
   return (
     <AdminLayout>
       <div className="bg-gray-50 min-h-screen">
-        <div className="p-6">
+        <div className="p-2.5">
           {/* Summary Cards Grid - Modern Gradient Design */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {/* Total Donations Card */}
