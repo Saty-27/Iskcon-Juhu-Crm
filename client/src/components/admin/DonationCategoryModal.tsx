@@ -115,14 +115,23 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
           qrCodeUrl: '',
         });
       }
+    } else {
+      // Clear states when modal closes
+      setDonationCards([]);
+      setBankDetails(null);
+      setActiveTab("details");
+      setSuggestedAmountsInput("");
     }
   }, [isOpen, category?.id, form, category]);
 
   // Load existing donation cards when editing
   useEffect(() => {
-    if (category?.id && existingDonationCards.length > 0) {
+    if (isOpen && category?.id && existingDonationCards.length > 0) {
       const categoryCards = existingDonationCards.filter(card => card.categoryId === category.id);
-      setDonationCards(categoryCards.map(card => ({
+      console.log('Loading existing cards for category:', category.id, categoryCards);
+      
+      // Prevent duplicate loading by checking if cards are already loaded
+      if (JSON.stringify(donationCards) !== JSON.stringify(categoryCards.map(card => ({
         id: card.id,
         title: card.title,
         description: card.description || "",
@@ -130,9 +139,22 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
         imageUrl: card.imageUrl || "",
         isActive: card.isActive,
         order: card.order || 0,
-      })));
+      })))) {
+        setDonationCards(categoryCards.map(card => ({
+          id: card.id,
+          title: card.title,
+          description: card.description || "",
+          amount: card.amount,
+          imageUrl: card.imageUrl || "",
+          isActive: card.isActive,
+          order: card.order || 0,
+        })));
+      }
+    } else if (isOpen && category?.id && existingDonationCards.length === 0) {
+      // If no existing cards for this category, clear the state
+      setDonationCards([]);
     }
-  }, [category?.id, existingDonationCards]);
+  }, [category?.id, existingDonationCards, isOpen]);
 
   // Load existing bank details
   useEffect(() => {
@@ -277,18 +299,38 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
         });
 
         // Delete cards that are no longer needed
-        for (const existingCard of existingCards) {
+        // First, check if any cards need to be deleted
+        const cardsToDelete = existingCards.filter(existingCard => {
           const stillExists = validCards.some(card => 
             (card.id && card.id === existingCard.id) || 
             (card.title === existingCard.title && card.amount === existingCard.amount)
           );
+          return !stillExists;
+        });
+
+        console.log('Cards to delete:', cardsToDelete.map(c => ({ id: c.id, title: c.title })));
+
+        for (const cardToDelete of cardsToDelete) {
+          try {
+            await apiRequest(`/api/donation-cards/${cardToDelete.id}`, 'DELETE');
+            console.log('Deleted card:', cardToDelete.id, cardToDelete.title);
+          } catch (error) {
+            console.log('Card already deleted or not found:', cardToDelete.id);
+          }
+        }
+
+        // Additionally, if we have fewer cards in the frontend than in the database,
+        // delete the excess ones
+        if (validCards.length < existingCards.length) {
+          const excessCards = existingCards.slice(validCards.length);
+          console.log('Deleting excess cards:', excessCards.map(c => ({ id: c.id, title: c.title })));
           
-          if (!stillExists) {
+          for (const excessCard of excessCards) {
             try {
-              await apiRequest(`/api/donation-cards/${existingCard.id}`, 'DELETE');
-              console.log('Deleted card:', existingCard.id, existingCard.title);
+              await apiRequest(`/api/donation-cards/${excessCard.id}`, 'DELETE');
+              console.log('Deleted excess card:', excessCard.id, excessCard.title);
             } catch (error) {
-              console.log('Card already deleted or not found:', existingCard.id);
+              console.log('Excess card already deleted or not found:', excessCard.id);
             }
           }
         }
@@ -382,7 +424,10 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
   };
 
   const removeDonationCard = (index: number) => {
-    setDonationCards(donationCards.filter((_, i) => i !== index));
+    console.log('Removing card at index:', index, 'from cards:', donationCards);
+    const newCards = donationCards.filter((_, i) => i !== index);
+    console.log('Cards after removal:', newCards);
+    setDonationCards(newCards);
   };
 
   const updateDonationCard = (index: number, field: string, value: any) => {

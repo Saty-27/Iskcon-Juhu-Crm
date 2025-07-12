@@ -182,10 +182,21 @@ export class DatabaseStorage implements IStorage {
       .limit(1);
     
     if (existingCard.length > 0) {
-      console.log('Duplicate card detected, returning existing:', existingCard[0]);
-      return existingCard[0];
+      console.log('Duplicate card detected, updating existing instead of creating new:', existingCard[0]);
+      // Update the existing card with new data
+      const [updatedCard] = await db.update(donationCards)
+        .set({
+          description: card.description,
+          imageUrl: card.imageUrl,
+          isActive: card.isActive,
+          order: card.order
+        })
+        .where(eq(donationCards.id, existingCard[0].id))
+        .returning();
+      return updatedCard;
     }
     
+    console.log('Creating new card:', card);
     const [newCard] = await db.insert(donationCards).values(card).returning();
     return newCard;
   }
