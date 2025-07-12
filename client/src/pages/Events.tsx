@@ -46,81 +46,6 @@ const Events = () => {
           </div>
         </section>
         
-        {/* Calendar/Regular Events */}
-        <section className="py-16 bg-neutral">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="font-poppins font-bold text-3xl md:text-4xl text-primary mb-4">
-                Regular Temple Programs
-              </h2>
-            </div>
-            
-            <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white p-6 rounded-xl shadow-md">
-                <h3 className="font-poppins font-semibold text-xl text-primary mb-4">Daily Programs</h3>
-                <ul className="space-y-4">
-                  <li className="flex items-start">
-                    <Clock className="text-secondary mr-3 mt-1 flex-shrink-0" size={20} />
-                    <div>
-                      <p className="font-poppins font-medium">Mangala Aarti</p>
-                      <p className="text-sm text-gray-600">4:30 AM</p>
-                    </div>
-                  </li>
-                  <li className="flex items-start">
-                    <Clock className="text-secondary mr-3 mt-1 flex-shrink-0" size={20} />
-                    <div>
-                      <p className="font-poppins font-medium">Deity Darshan</p>
-                      <p className="text-sm text-gray-600">7:15 AM - 11:00 AM</p>
-                    </div>
-                  </li>
-                  <li className="flex items-start">
-                    <Clock className="text-secondary mr-3 mt-1 flex-shrink-0" size={20} />
-                    <div>
-                      <p className="font-poppins font-medium">Evening Aarti</p>
-                      <p className="text-sm text-gray-600">7:00 PM</p>
-                    </div>
-                  </li>
-                  <li className="flex items-start">
-                    <Clock className="text-secondary mr-3 mt-1 flex-shrink-0" size={20} />
-                    <div>
-                      <p className="font-poppins font-medium">Shayan Aarti</p>
-                      <p className="text-sm text-gray-600">8:30 PM</p>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-              
-              <div className="bg-white p-6 rounded-xl shadow-md">
-                <h3 className="font-poppins font-semibold text-xl text-primary mb-4">Weekly Programs</h3>
-                <ul className="space-y-4">
-                  <li className="flex items-start">
-                    <CalendarIcon className="text-secondary mr-3 mt-1 flex-shrink-0" size={20} />
-                    <div>
-                      <p className="font-poppins font-medium">Sunday Feast</p>
-                      <p className="text-sm text-gray-600">Sunday, 6:00 PM - 9:00 PM</p>
-                      <p className="text-sm">Spiritual discourse, bhajans, and prasadam</p>
-                    </div>
-                  </li>
-                  <li className="flex items-start">
-                    <CalendarIcon className="text-secondary mr-3 mt-1 flex-shrink-0" size={20} />
-                    <div>
-                      <p className="font-poppins font-medium">Bhagavad Gita Class</p>
-                      <p className="text-sm text-gray-600">Wednesday, 7:00 PM</p>
-                    </div>
-                  </li>
-                  <li className="flex items-start">
-                    <CalendarIcon className="text-secondary mr-3 mt-1 flex-shrink-0" size={20} />
-                    <div>
-                      <p className="font-poppins font-medium">Youth Program</p>
-                      <p className="text-sm text-gray-600">Saturday, 5:00 PM</p>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
-        
         {/* Special Events */}
         <section className="py-16">
           <div className="container mx-auto px-4">
@@ -216,6 +141,81 @@ const Events = () => {
                 ))}
               </div>
             )}
+          </div>
+        </section>
+        
+        {/* Calendar/Regular Events */}
+        <section className="py-16 bg-neutral">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="font-poppins font-bold text-3xl md:text-4xl text-primary mb-4">
+                Regular Temple Programs
+              </h2>
+            </div>
+            
+            <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white p-6 rounded-xl shadow-md">
+                <h3 className="font-poppins font-semibold text-xl text-primary mb-4">Daily Programs</h3>
+                <ul className="space-y-4">
+                  <li className="flex items-start">
+                    <Clock className="text-secondary mr-3 mt-1 flex-shrink-0" size={20} />
+                    <div>
+                      <p className="font-poppins font-medium">Mangala Aarti</p>
+                      <p className="text-sm text-gray-600">4:30 AM</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <Clock className="text-secondary mr-3 mt-1 flex-shrink-0" size={20} />
+                    <div>
+                      <p className="font-poppins font-medium">Deity Darshan</p>
+                      <p className="text-sm text-gray-600">7:15 AM - 11:00 AM</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <Clock className="text-secondary mr-3 mt-1 flex-shrink-0" size={20} />
+                    <div>
+                      <p className="font-poppins font-medium">Evening Aarti</p>
+                      <p className="text-sm text-gray-600">7:00 PM</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <Clock className="text-secondary mr-3 mt-1 flex-shrink-0" size={20} />
+                    <div>
+                      <p className="font-poppins font-medium">Shayan Aarti</p>
+                      <p className="text-sm text-gray-600">8:30 PM</p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              
+              <div className="bg-white p-6 rounded-xl shadow-md">
+                <h3 className="font-poppins font-semibold text-xl text-primary mb-4">Weekly Programs</h3>
+                <ul className="space-y-4">
+                  <li className="flex items-start">
+                    <CalendarIcon className="text-secondary mr-3 mt-1 flex-shrink-0" size={20} />
+                    <div>
+                      <p className="font-poppins font-medium">Sunday Feast</p>
+                      <p className="text-sm text-gray-600">Sunday, 6:00 PM - 9:00 PM</p>
+                      <p className="text-sm">Spiritual discourse, bhajans, and prasadam</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <CalendarIcon className="text-secondary mr-3 mt-1 flex-shrink-0" size={20} />
+                    <div>
+                      <p className="font-poppins font-medium">Bhagavad Gita Class</p>
+                      <p className="text-sm text-gray-600">Wednesday, 7:00 PM</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <CalendarIcon className="text-secondary mr-3 mt-1 flex-shrink-0" size={20} />
+                    <div>
+                      <p className="font-poppins font-medium">Youth Program</p>
+                      <p className="text-sm text-gray-600">Saturday, 5:00 PM</p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
         </section>
       </main>
