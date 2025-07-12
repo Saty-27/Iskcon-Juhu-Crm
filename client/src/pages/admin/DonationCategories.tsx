@@ -110,16 +110,14 @@ const DonationCategoriesPage = () => {
     }
   }, [allPaymentDetails]);
 
-  // Use React Hook Form for payment details
-  const paymentForm = useForm({
-    defaultValues: {
-      accountName: '',
-      bankName: '',
-      accountNumber: '',
-      ifscCode: '',
-      swiftCode: '',
-      qrCodeUrl: '',
-    },
+  // Simple state management for payment details instead of React Hook Form
+  const [paymentFormData, setPaymentFormData] = useState({
+    accountName: '',
+    bankName: '',
+    accountNumber: '',
+    ifscCode: '',
+    swiftCode: '',
+    qrCodeUrl: '',
   });
 
   // Query for payment details when modal is open
@@ -128,38 +126,38 @@ const DonationCategoriesPage = () => {
     enabled: isPaymentModalOpen && !!selectedCategoryId,
   });
 
-  // Effect to populate form when payment details are loaded
+  // Effect to populate state when payment details are loaded
   useEffect(() => {
     if (currentPaymentDetails && isPaymentModalOpen) {
-      console.log('Loading payment details into form:', currentPaymentDetails);
+      console.log('Loading payment details into state:', currentPaymentDetails);
       
-      // Use setTimeout to ensure form is ready and avoid race conditions
-      setTimeout(() => {
-        if (currentPaymentDetails.length > 0) {
-          const details = currentPaymentDetails[0];
-          console.log('Setting form values with details:', details);
-          
-          // Set each field individually with trigger to force re-render
-          paymentForm.setValue('accountName', details.accountName || '', { shouldTouch: true });
-          paymentForm.setValue('bankName', details.bankName || '', { shouldTouch: true });
-          paymentForm.setValue('accountNumber', details.accountNumber || '', { shouldTouch: true });
-          paymentForm.setValue('ifscCode', details.ifscCode || '', { shouldTouch: true });
-          paymentForm.setValue('swiftCode', details.swiftCode || '', { shouldTouch: true });
-          paymentForm.setValue('qrCodeUrl', details.qrCodeUrl || '', { shouldTouch: true });
-          
-          console.log('Form values set:', paymentForm.getValues());
-        } else {
-          console.log('No payment details found, clearing form');
-          paymentForm.setValue('accountName', '', { shouldTouch: true });
-          paymentForm.setValue('bankName', '', { shouldTouch: true });
-          paymentForm.setValue('accountNumber', '', { shouldTouch: true });
-          paymentForm.setValue('ifscCode', '', { shouldTouch: true });
-          paymentForm.setValue('swiftCode', '', { shouldTouch: true });
-          paymentForm.setValue('qrCodeUrl', '', { shouldTouch: true });
-        }
-      }, 100); // Small delay to ensure form is fully initialized
+      if (currentPaymentDetails.length > 0) {
+        const details = currentPaymentDetails[0];
+        console.log('Setting payment details state:', details);
+        
+        setPaymentFormData({
+          accountName: details.accountName || '',
+          bankName: details.bankName || '',
+          accountNumber: details.accountNumber || '',
+          ifscCode: details.ifscCode || '',
+          swiftCode: details.swiftCode || '',
+          qrCodeUrl: details.qrCodeUrl || '',
+        });
+        
+        console.log('Payment details state updated');
+      } else {
+        console.log('No payment details found, clearing state');
+        setPaymentFormData({
+          accountName: '',
+          bankName: '',
+          accountNumber: '',
+          ifscCode: '',
+          swiftCode: '',
+          qrCodeUrl: '',
+        });
+      }
     }
-  }, [currentPaymentDetails, isPaymentModalOpen, paymentForm]);
+  }, [currentPaymentDetails, isPaymentModalOpen]);
 
   // Effect to populate form when editing a card
   useEffect(() => {
@@ -348,7 +346,7 @@ const DonationCategoriesPage = () => {
       }
 
       const data = await response.json();
-      paymentForm.setValue('qrCodeUrl', data.url);
+      setPaymentFormData(prev => ({ ...prev, qrCodeUrl: data.url }));
       
       toast({
         title: 'Success',
@@ -376,13 +374,12 @@ const DonationCategoriesPage = () => {
     if (!selectedCategoryId) return;
     
     try {
-      const formData = paymentForm.getValues();
       const response = await fetch(`/api/categories/${selectedCategoryId}/bank-details`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(paymentFormData),
       });
 
       if (!response.ok) {
@@ -758,87 +755,68 @@ const DonationCategoriesPage = () => {
                 </div>
               </div>
             ) : (
-              <Form {...paymentForm}>
-                <form className="space-y-4">
+              <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={paymentForm.control}
-                    name="accountName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Account Holder Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="International Society for Krishna Consciousness" {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={paymentForm.control}
-                    name="bankName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Bank Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="State Bank of India" {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
+                  <div>
+                    <Label htmlFor="accountName">Account Holder Name</Label>
+                    <Input 
+                      id="accountName"
+                      placeholder="International Society for Krishna Consciousness"
+                      value={paymentFormData.accountName}
+                      onChange={(e) => setPaymentFormData(prev => ({ ...prev, accountName: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="bankName">Bank Name</Label>
+                    <Input 
+                      id="bankName"
+                      placeholder="State Bank of India"
+                      value={paymentFormData.bankName}
+                      onChange={(e) => setPaymentFormData(prev => ({ ...prev, bankName: e.target.value }))}
+                    />
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={paymentForm.control}
-                    name="accountNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Account Number</FormLabel>
-                        <FormControl>
-                          <Input placeholder="10000000025" {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={paymentForm.control}
-                    name="ifscCode"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>IFSC Code</FormLabel>
-                        <FormControl>
-                          <Input placeholder="SBIN000001" {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
+                  <div>
+                    <Label htmlFor="accountNumber">Account Number</Label>
+                    <Input 
+                      id="accountNumber"
+                      placeholder="10000000025"
+                      value={paymentFormData.accountNumber}
+                      onChange={(e) => setPaymentFormData(prev => ({ ...prev, accountNumber: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="ifscCode">IFSC Code</Label>
+                    <Input 
+                      id="ifscCode"
+                      placeholder="SBIN000001"
+                      value={paymentFormData.ifscCode}
+                      onChange={(e) => setPaymentFormData(prev => ({ ...prev, ifscCode: e.target.value }))}
+                    />
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={paymentForm.control}
-                    name="swiftCode"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>SWIFT Code (Optional)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="SBININBB" {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={paymentForm.control}
-                    name="qrCodeUrl"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>UPI QR Code</FormLabel>
-                        <FormControl>
-                          <Input placeholder="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=iskcon@sbi&pn=ISKCON" {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
+                  <div>
+                    <Label htmlFor="swiftCode">SWIFT Code (Optional)</Label>
+                    <Input 
+                      id="swiftCode"
+                      placeholder="SBININBB"
+                      value={paymentFormData.swiftCode}
+                      onChange={(e) => setPaymentFormData(prev => ({ ...prev, swiftCode: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="qrCodeUrl">UPI QR Code</Label>
+                    <Input 
+                      id="qrCodeUrl"
+                      placeholder="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=iskcon@sbi&pn=ISKCON"
+                      value={paymentFormData.qrCodeUrl}
+                      onChange={(e) => setPaymentFormData(prev => ({ ...prev, qrCodeUrl: e.target.value }))}
+                    />
+                  </div>
                 </div>
 
                 <div className="flex items-center space-x-2">
@@ -881,15 +859,54 @@ const DonationCategoriesPage = () => {
                   </Button>
                 </div>
 
-                {paymentForm.watch('qrCodeUrl') && (
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-500">or</span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const input = document.createElement('input');
+                      input.type = 'file';
+                      input.accept = 'image/*';
+                      input.onchange = (e) => {
+                        const file = (e.target as HTMLInputElement).files?.[0];
+                        if (file) {
+                          if (file.size > 1024 * 1024) {
+                            toast({
+                              title: 'File too large',
+                              description: 'Please select an image smaller than 1MB',
+                              variant: 'destructive',
+                            });
+                            return;
+                          }
+                          handleFileUpload(file);
+                        }
+                      };
+                      input.click();
+                    }}
+                    disabled={uploadingQR}
+                  >
+                    {uploadingQR ? (
+                      <>
+                        <div className="animate-spin w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full mr-2" />
+                        Uploading...
+                      </>
+                    ) : (
+                      'Upload QR Code'
+                    )}
+                  </Button>
+                </div>
+
+                {paymentFormData.qrCodeUrl && (
                   <div className="mt-2">
                     <div className="text-xs text-gray-600 mb-1">QR Code Preview:</div>
                     <img 
-                      src={paymentForm.watch('qrCodeUrl')} 
+                      src={paymentFormData.qrCodeUrl} 
                       alt="QR Code preview" 
                       className="w-32 h-32 object-cover rounded border border-gray-300"
                       onError={(e) => {
-                        console.log('QR code image failed to load:', paymentForm.watch('qrCodeUrl'));
+                        console.log('QR code image failed to load:', paymentFormData.qrCodeUrl);
                         (e.target as HTMLImageElement).style.display = 'none';
                       }}
                     />
@@ -900,8 +917,7 @@ const DonationCategoriesPage = () => {
                   <Switch id="showPaymentDetails" defaultChecked />
                   <Label htmlFor="showPaymentDetails">Show payment details section</Label>
                 </div>
-              </form>
-            </Form>
+              </div>
             )}
 
             <div className="flex justify-end space-x-2">
