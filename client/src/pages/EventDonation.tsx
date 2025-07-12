@@ -123,33 +123,89 @@ export default function EventDonation() {
             borderRadius: '2px' 
           }}></div>
 
-          {/* Event Description */}
+          {/* Event Information Section */}
           <div style={{ 
-            background: '#fff5e1', 
-            border: '2px solid #e3b04b', 
-            borderRadius: '12px', 
-            padding: '20px', 
-            margin: '20px auto', 
-            boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)' 
+            display: 'flex', 
+            gap: '20px', 
+            marginBottom: '30px',
+            flexWrap: 'wrap'
           }}>
-            <h3 style={{ 
-              fontSize: '1.8rem', 
-              color: '#b56a00', 
-              textAlign: 'center', 
-              fontWeight: 'bold' 
+            <div style={{ 
+              flex: '1',
+              minWidth: '300px',
+              background: 'linear-gradient(135deg, #8B5A96 0%, #B68CB8 100%)',
+              color: '#fff',
+              padding: '30px',
+              borderRadius: '15px',
+              boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
+              position: 'relative'
             }}>
-              🙏 {event.title} 🙏
-            </h3>
-            <p style={{ 
-              fontSize: '1rem', 
-              color: '#444', 
-              lineHeight: '1.6', 
-              textAlign: 'center' 
+              <h2 style={{ 
+                fontSize: '24px', 
+                fontWeight: 'bold', 
+                marginBottom: '15px',
+                color: '#fff'
+              }}>
+                {event.title}
+              </h2>
+              <p style={{ 
+                fontSize: '16px', 
+                lineHeight: '1.6', 
+                marginBottom: '20px',
+                color: '#f0f0f0'
+              }}>
+                {event.description && getWordCount(event.description) > 25 
+                  ? getTruncatedDescription(event.description, 25)
+                  : event.description}
+              </p>
+              <Dialog open={isDescriptionModalOpen} onOpenChange={setIsDescriptionModalOpen}>
+                <DialogTrigger asChild>
+                  <button style={{ 
+                    backgroundColor: '#faa817', 
+                    color: '#fff', 
+                    border: 'none', 
+                    padding: '10px 20px', 
+                    borderRadius: '8px', 
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    fontSize: '14px'
+                  }}>
+                    Read More
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl font-bold">{event.title}</DialogTitle>
+                  </DialogHeader>
+                  <div className="mt-6">
+                    <p className="text-gray-700 leading-relaxed text-lg">
+                      {event.description}
+                    </p>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+            
+            <div style={{ 
+              flex: '1',
+              minWidth: '300px'
             }}>
-              {event.description && getWordCount(event.description) > 25 
-                ? getTruncatedDescription(event.description, 25)
-                : event.description}
-            </p>
+              <div style={{ 
+                borderRadius: '15px', 
+                overflow: 'hidden',
+                boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)'
+              }}>
+                <img
+                  src={event.imageUrl}
+                  alt={event.title}
+                  style={{ 
+                    width: '100%', 
+                    height: '250px', 
+                    objectFit: 'cover'
+                  }}
+                />
+              </div>
+            </div>
           </div>
 
           {/* Donation Options Title */}
@@ -270,53 +326,7 @@ export default function EventDonation() {
             </div>
           </div>
 
-          {/* Account Details */}
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            marginTop: '30px', 
-            gap: '20px' 
-          }}>
-            <div style={{ 
-              flex: 1, 
-              backgroundColor: '#fff', 
-              padding: '20px', 
-              borderRadius: '8px', 
-              boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)' 
-            }}>
-              <h3 style={{ marginBottom: '15px' }}>Account Details</h3>
-              {currentBankDetail ? (
-                <>
-                  <p style={{ marginBottom: '8px' }}>Bank Name: {currentBankDetail.bankName}</p>
-                  <p style={{ marginBottom: '8px' }}>Account Name: {currentBankDetail.accountName}</p>
-                  <p style={{ marginBottom: '8px' }}>Account Number: {currentBankDetail.accountNumber}</p>
-                  <p style={{ marginBottom: '8px' }}>IFSC Code: {currentBankDetail.ifscCode}</p>
-                </>
-              ) : (
-                <p>No account details available</p>
-              )}
-            </div>
-            
-            <div style={{ 
-              flex: 1, 
-              textAlign: 'center', 
-              backgroundColor: '#fff', 
-              padding: '20px', 
-              borderRadius: '8px', 
-              boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)' 
-            }}>
-              <h3 style={{ marginBottom: '15px' }}>Donate through UPI</h3>
-              {currentBankDetail?.qrCodeUrl ? (
-                <img 
-                  src={currentBankDetail.qrCodeUrl} 
-                  alt="QR Code" 
-                  style={{ height: '200px', width: '200px', objectFit: 'contain' }}
-                />
-              ) : (
-                <p>QR Code not available</p>
-              )}
-            </div>
-          </div>
+
 
           {/* Receipt Information */}
           <div style={{ 
