@@ -520,11 +520,15 @@ export default function DonationCategoryModal({ isOpen, onClose, category, initi
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className={`grid w-full ${category ? 'grid-cols-4' : 'grid-cols-1'}`}>
             <TabsTrigger value="details">Category Details</TabsTrigger>
-            <TabsTrigger value="cards">Donation Cards</TabsTrigger>
-            <TabsTrigger value="custom">Custom Donation</TabsTrigger>
-            <TabsTrigger value="payment">Payment Details</TabsTrigger>
+            {category && (
+              <>
+                <TabsTrigger value="cards">Donation Cards</TabsTrigger>
+                <TabsTrigger value="custom">Custom Donation</TabsTrigger>
+                <TabsTrigger value="payment">Payment Details</TabsTrigger>
+              </>
+            )}
           </TabsList>
 
           <Form {...form}>
@@ -709,8 +713,9 @@ export default function DonationCategoryModal({ isOpen, onClose, category, initi
                 </Card>
               </TabsContent>
 
-              {/* Donation Cards Tab */}
-              <TabsContent value="cards" className="space-y-6">
+              {/* Donation Cards Tab - Only show when editing existing category */}
+              {category && (
+                <TabsContent value="cards" className="space-y-6">
                 <Card>
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -785,9 +790,11 @@ export default function DonationCategoryModal({ isOpen, onClose, category, initi
                   </CardContent>
                 </Card>
               </TabsContent>
+              )}
 
-              {/* Custom Donation Tab */}
-              <TabsContent value="custom" className="space-y-6">
+              {/* Custom Donation Tab - Only show when editing existing category */}
+              {category && (
+                <TabsContent value="custom" className="space-y-6">
                 <Card>
                   <CardHeader>
                     <CardTitle>Custom Donation Section</CardTitle>
@@ -815,9 +822,11 @@ export default function DonationCategoryModal({ isOpen, onClose, category, initi
                   </CardContent>
                 </Card>
               </TabsContent>
+              )}
 
-              {/* Payment Details Tab */}
-              <TabsContent value="payment" className="space-y-6">
+              {/* Payment Details Tab - Only show when editing existing category */}
+              {category && (
+                <TabsContent value="payment" className="space-y-6">
                 <Card>
                   <CardHeader>
                     <CardTitle>Bank & UPI Payment Details</CardTitle>
@@ -1012,6 +1021,7 @@ export default function DonationCategoryModal({ isOpen, onClose, category, initi
                   </CardContent>
                 </Card>
               </TabsContent>
+              )}
 
               <div className="flex justify-end space-x-4 pt-6 border-t">
                 <Button type="button" variant="outline" onClick={onClose}>
