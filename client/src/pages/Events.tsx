@@ -172,7 +172,7 @@ const Events = () => {
                 {events.map((event) => (
                   <div 
                     key={event.id}
-                    className="bg-neutral rounded-xl overflow-hidden shadow-md flex flex-col md:flex-row"
+                    className="bg-white rounded-xl overflow-hidden shadow-md border border-gray-200 flex flex-col md:flex-row"
                   >
                     <img 
                       src={event.imageUrl} 
@@ -181,15 +181,15 @@ const Events = () => {
                     />
                     <div className="p-6 md:w-2/3">
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-poppins font-bold text-2xl text-primary">{event.title}</h3>
-                        <span className="bg-secondary text-white text-sm font-poppins py-1 px-2 rounded">
+                        <h3 className="font-poppins font-bold text-2xl text-gray-900">{event.title}</h3>
+                        <span className="bg-orange-500 text-white text-sm font-poppins py-1 px-2 rounded">
                           {format(new Date(event.date), 'MMMM d, yyyy')}
                         </span>
                       </div>
-                      <p className="font-opensans text-dark mb-4">{event.description}</p>
+                      <p className="font-opensans text-gray-700 mb-4">{event.description}</p>
                       
                       <div className="flex items-center mb-4">
-                        <MapPin className="text-secondary mr-2" size={18} />
+                        <MapPin className="text-orange-500 mr-2" size={18} />
                         <span className="text-gray-700">ISKCON Temple, Juhu, Mumbai</span>
                       </div>
                       
@@ -198,7 +198,7 @@ const Events = () => {
                           <button 
                             key={amount}
                             onClick={() => handleDonateClick(event.id)}
-                            className="bg-white hover:bg-gray-100 text-dark font-medium py-1 px-3 rounded-full transition-colors"
+                            className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-1 px-3 rounded-full transition-colors border border-gray-300"
                           >
                             ₹{amount.toLocaleString('en-IN')}
                           </button>
@@ -207,7 +207,7 @@ const Events = () => {
                       
                       <button 
                         onClick={() => handleDonateClick(event.id)}
-                        className="bg-primary text-white font-poppins font-medium py-2 px-6 rounded-lg hover:bg-opacity-90 transition-colors"
+                        className="bg-purple-600 text-white font-poppins font-medium py-2 px-6 rounded-lg hover:bg-purple-700 transition-colors"
                       >
                         Donate for {event.title}
                       </button>
