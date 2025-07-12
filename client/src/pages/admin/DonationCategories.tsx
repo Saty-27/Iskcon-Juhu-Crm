@@ -70,7 +70,10 @@ const DonationCategoriesPage = () => {
     enabled: !!expandedCategory,
   });
 
-  // Fetch payment details for all categories
+  // Store payment details status for each category
+  const [categoryPaymentStatus, setCategoryPaymentStatus] = useState<Record<number, boolean>>({});
+
+  // Fetch payment details status for all categories
   const { data: allPaymentDetails = [] } = useQuery({
     queryKey: ['/api/bank-details'],
     queryFn: async () => {
@@ -92,6 +95,19 @@ const DonationCategoriesPage = () => {
     },
     enabled: categories.length > 0,
   });
+
+  // Update payment status when data changes
+  useEffect(() => {
+    if (allPaymentDetails.length > 0) {
+      const statusMap: Record<number, boolean> = {};
+      allPaymentDetails.forEach((pd) => {
+        const hasDetails = pd.details && pd.details.length > 0 && pd.details[0].accountName && pd.details[0].bankName;
+        statusMap[pd.categoryId] = !!hasDetails;
+      });
+      setCategoryPaymentStatus(statusMap);
+      console.log('Updated category payment status:', statusMap);
+    }
+  }, [allPaymentDetails]);
 
   // Effect to populate form when editing a card
   useEffect(() => {
@@ -304,22 +320,34 @@ const DonationCategoriesPage = () => {
   const handleOpenPaymentModal = async (categoryId: number) => {
     setSelectedCategoryId(categoryId);
     
-    // First open the modal
+    // First reset payment details to prevent showing old data
+    setPaymentDetails({
+      accountName: '',
+      bankName: '',
+      accountNumber: '',
+      ifscCode: '',
+      swiftCode: '',
+      qrCodeUrl: '',
+    });
+    
+    // Open the modal
     setIsPaymentModalOpen(true);
     
-    // Then load existing payment details with a small delay
-    setTimeout(async () => {
-      try {
-        console.log('Loading payment details for category:', categoryId);
-        const response = await fetch(`/api/categories/${categoryId}/bank-details`);
+    // Load existing payment details
+    try {
+      console.log('Loading payment details for category:', categoryId);
+      const response = await fetch(`/api/categories/${categoryId}/bank-details`);
+      
+      if (response.ok) {
+        const bankDetails = await response.json();
+        console.log('Loaded bank details:', bankDetails);
         
-        if (response.ok) {
-          const bankDetails = await response.json();
-          console.log('Loaded bank details:', bankDetails);
+        if (bankDetails && bankDetails.length > 0) {
+          const details = bankDetails[0];
+          console.log('Setting payment details:', details);
           
-          if (bankDetails && bankDetails.length > 0) {
-            const details = bankDetails[0];
-            console.log('Setting payment details:', details);
+          // Use setTimeout to ensure modal is rendered before setting data
+          setTimeout(() => {
             setPaymentDetails({
               accountName: details.accountName || '',
               bankName: details.bankName || '',
@@ -328,34 +356,17 @@ const DonationCategoriesPage = () => {
               swiftCode: details.swiftCode || '',
               qrCodeUrl: details.qrCodeUrl || '',
             });
-          } else {
-            console.log('No existing payment details found, resetting to empty');
-            // Reset to empty if no existing details
-            setPaymentDetails({
-              accountName: '',
-              bankName: '',
-              accountNumber: '',
-              ifscCode: '',
-              swiftCode: '',
-              qrCodeUrl: '',
-            });
-          }
+            console.log('Payment details set successfully');
+          }, 200);
         } else {
-          console.error('Failed to load payment details, response not ok:', response.status);
+          console.log('No existing payment details found');
         }
-      } catch (error) {
-        console.error('Error loading payment details:', error);
-        // Reset to empty on error
-        setPaymentDetails({
-          accountName: '',
-          bankName: '',
-          accountNumber: '',
-          ifscCode: '',
-          swiftCode: '',
-          qrCodeUrl: '',
-        });
+      } else {
+        console.error('Failed to load payment details, response not ok:', response.status);
       }
-    }, 100);
+    } catch (error) {
+      console.error('Error loading payment details:', error);
+    }
   };
 
   const handleSavePaymentDetails = async () => {
@@ -413,14 +424,7 @@ const DonationCategoriesPage = () => {
   };
 
   const getPaymentDetailsStatus = (categoryId: number) => {
-    const paymentDetail = allPaymentDetails.find(pd => pd.categoryId === categoryId);
-    if (paymentDetail && paymentDetail.details && paymentDetail.details.length > 0) {
-      const details = paymentDetail.details[0];
-      if (details.accountName && details.bankName && details.accountNumber && details.ifscCode) {
-        return 'Payment details configured';
-      }
-    }
-    return 'Payment details not configured';
+    return categoryPaymentStatus[categoryId] ? 'Payment details configured' : 'Payment details not configured';
   };
 
   if (isLoading) {
