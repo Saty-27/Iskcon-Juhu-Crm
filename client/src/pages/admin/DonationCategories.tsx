@@ -520,6 +520,7 @@ const DonationCategoriesPage = () => {
                 <Button 
                   type="button" 
                   onClick={() => {
+                    alert('Button clicked! Category ID: ' + selectedCategoryId);
                     console.log('Button clicked manually');
                     console.log('Selected category ID:', selectedCategoryId);
                     console.log('Form values:', cardForm.getValues());
