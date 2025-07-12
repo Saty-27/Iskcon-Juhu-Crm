@@ -45,6 +45,8 @@ interface Donation {
   paymentId?: string;
   categoryId?: number;
   eventId?: number;
+  categoryName?: string;
+  eventTitle?: string;
 }
 
 const DonationsPage = () => {
@@ -106,8 +108,8 @@ const DonationsPage = () => {
     const matchesStatus = statusFilter === "all" || donation.status === statusFilter;
     
     const matchesType = typeFilter === "all" || 
-      (typeFilter === "category" && donation.categoryId) ||
-      (typeFilter === "event" && donation.eventId);
+      (typeFilter === "category" && donation.categoryName) ||
+      (typeFilter === "event" && donation.eventTitle);
     
     return matchesSearch && matchesStatus && matchesType;
   });
@@ -315,9 +317,21 @@ const DonationsPage = () => {
                           </div>
                         </td>
                         <td className="py-5 px-6">
-                          <span className="inline-flex px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-700">
-                            {donation.categoryId ? 'Category' : donation.eventId ? 'Event' : 'General'}
-                          </span>
+                          <div className="flex flex-col gap-1">
+                            <span className="inline-flex px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-700">
+                              {donation.categoryName ? 'Category' : donation.eventTitle ? 'Event' : 'General'}
+                            </span>
+                            {donation.categoryName && (
+                              <span className="text-xs text-gray-500 truncate max-w-32">
+                                {donation.categoryName}
+                              </span>
+                            )}
+                            {donation.eventTitle && (
+                              <span className="text-xs text-gray-500 truncate max-w-32">
+                                {donation.eventTitle}
+                              </span>
+                            )}
+                          </div>
                         </td>
                         <td className="py-5 px-6">
                           <span className="font-bold text-gray-900 text-lg">₹{donation.amount.toLocaleString()}</span>
