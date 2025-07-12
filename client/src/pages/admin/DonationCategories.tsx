@@ -32,6 +32,8 @@ const DonationCategoriesPage = () => {
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [expandedCategory, setExpandedCategory] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<string>('details');
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [paymentCategoryId, setPaymentCategoryId] = useState<number | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -329,9 +331,8 @@ const DonationCategoriesPage = () => {
                       variant="ghost"
                       size="sm"
                       onClick={() => {
-                        setEditingCategory(category);
-                        setActiveTab('payment-details');
-                        setIsEditDialogOpen(true);
+                        setPaymentCategoryId(category.id);
+                        setIsPaymentModalOpen(true);
                       }}
                       className="text-green-600 hover:text-green-800"
                       title="Manage payment details"
@@ -503,25 +504,6 @@ const DonationCategoriesPage = () => {
                 )}
               </div>
 
-              <div>
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  {...cardForm.register('description')}
-                  placeholder="Brief description of what this donation supports"
-                  rows={3}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="imageUrl">Image URL (optional)</Label>
-                <Input
-                  id="imageUrl"
-                  {...cardForm.register('imageUrl')}
-                  placeholder="https://example.com/image.jpg"
-                />
-              </div>
-
               <div className="flex items-center space-x-2">
                 <Switch
                   id="isActive"
@@ -575,6 +557,108 @@ const DonationCategoriesPage = () => {
                 </Button>
               </div>
             </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Payment Details Modal */}
+        <Dialog open={isPaymentModalOpen} onOpenChange={setIsPaymentModalOpen}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Payment Details</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="accountName">Account Holder Name</Label>
+                  <Input
+                    id="accountName"
+                    placeholder="International Society for Krishna Consciousness"
+                    defaultValue=""
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="bankName">Bank Name</Label>
+                  <Input
+                    id="bankName"
+                    placeholder="State Bank of India"
+                    defaultValue=""
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="accountNumber">Account Number</Label>
+                  <Input
+                    id="accountNumber"
+                    placeholder="10000000025"
+                    defaultValue=""
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="ifscCode">IFSC Code</Label>
+                  <Input
+                    id="ifscCode"
+                    placeholder="SBIN000001"
+                    defaultValue=""
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="swiftCode">SWIFT Code (Optional)</Label>
+                  <Input
+                    id="swiftCode"
+                    placeholder="SBININBB"
+                    defaultValue=""
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="qrCodeUrl">UPI QR Code</Label>
+                  <Input
+                    id="qrCodeUrl"
+                    placeholder="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=iskcon@sbi&pn=ISKCON"
+                    defaultValue=""
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-500">or</span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = 'image/*';
+                    input.click();
+                  }}
+                >
+                  Upload QR Code
+                </Button>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Switch id="showPaymentDetails" defaultChecked />
+                <Label htmlFor="showPaymentDetails">Show payment details section</Label>
+              </div>
+
+              <div className="flex justify-end space-x-2">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setIsPaymentModalOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button type="button">
+                  Save Payment Details
+                </Button>
+              </div>
+            </div>
           </DialogContent>
         </Dialog>
       </div>
