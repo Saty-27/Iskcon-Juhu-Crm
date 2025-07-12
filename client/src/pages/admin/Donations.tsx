@@ -65,6 +65,16 @@ const DonationsPage = () => {
     gcTime: 0, // Don't cache the data (gcTime is the new name for cacheTime)
   });
 
+  // Debug: Log the donations data
+  React.useEffect(() => {
+    console.log('Donations data:', donations);
+    console.log('Donations length:', donations.length);
+    if (donations.length > 0) {
+      console.log('First donation:', donations[0]);
+      console.log('Status of first donation:', donations[0].status);
+    }
+  }, [donations]);
+
   // Force refresh on page load
   React.useEffect(() => {
     const forceRefresh = () => {
@@ -242,7 +252,7 @@ const DonationsPage = () => {
                     </SelectTrigger>
                     <SelectContent className="border-0 shadow-xl rounded-xl">
                       <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="success">Completed</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
                       <SelectItem value="pending">Pending</SelectItem>
                       <SelectItem value="failed">Failed</SelectItem>
                     </SelectContent>
@@ -325,13 +335,13 @@ const DonationsPage = () => {
                         </td>
                         <td className="py-5 px-6">
                           <span className={`inline-flex px-4 py-2 text-xs font-bold rounded-full shadow-sm ${
-                            donation.status === 'success'
+                            donation.status === 'completed'
                               ? 'bg-gradient-to-r from-emerald-400 to-emerald-500 text-white'
                               : donation.status === 'pending'
                               ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-white'
                               : 'bg-gradient-to-r from-red-400 to-red-500 text-white'
                           }`}>
-                            {donation.status === 'success' ? 'Completed' : 
+                            {donation.status === 'completed' ? 'Completed' : 
                              donation.status === 'pending' ? 'Pending' : 'Failed'}
                           </span>
                         </td>
@@ -409,13 +419,13 @@ const DonationsPage = () => {
                   <div className="bg-gray-50 rounded-2xl p-5">
                     <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3 block">Status</label>
                     <span className={`inline-flex px-4 py-2 text-sm font-bold rounded-full shadow-sm ${
-                      selectedDonation.status === 'success'
+                      selectedDonation.status === 'completed'
                         ? 'bg-gradient-to-r from-emerald-400 to-emerald-500 text-white'
                         : selectedDonation.status === 'pending'
                         ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-white'
                         : 'bg-gradient-to-r from-red-400 to-red-500 text-white'
                     }`}>
-                      {selectedDonation.status === 'success' ? 'Completed' : 
+                      {selectedDonation.status === 'completed' ? 'Completed' : 
                        selectedDonation.status === 'pending' ? 'Pending' : 'Failed'}
                     </span>
                   </div>
