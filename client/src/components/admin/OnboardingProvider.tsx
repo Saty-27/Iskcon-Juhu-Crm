@@ -13,7 +13,14 @@ const OnboardingContext = createContext<OnboardingContextType | undefined>(undef
 export const useOnboarding = () => {
   const context = useContext(OnboardingContext);
   if (!context) {
-    throw new Error('useOnboarding must be used within an OnboardingProvider');
+    // Return a default context instead of throwing an error
+    return {
+      shouldShowTour: false,
+      startTour: () => {},
+      completeTour: () => {},
+      skipTour: () => {},
+      resetTour: () => {}
+    };
   }
   return context;
 };
@@ -24,6 +31,7 @@ interface OnboardingProviderProps {
 
 export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({ children }) => {
   const [shouldShowTour, setShouldShowTour] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     // Check if user has completed onboarding
@@ -32,7 +40,12 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({ children
     
     if (!hasCompletedOnboarding && !hasSkippedOnboarding) {
       // Show tour after a short delay to let the page load
-      setTimeout(() => setShouldShowTour(true), 1000);
+      setTimeout(() => {
+        setShouldShowTour(true);
+        setIsInitialized(true);
+      }, 1000);
+    } else {
+      setIsInitialized(true);
     }
   }, []);
 
