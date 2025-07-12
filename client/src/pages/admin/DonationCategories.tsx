@@ -16,6 +16,7 @@ import { DonationCategory, DonationCard, insertDonationCardSchema } from '@share
 import { apiRequest } from '@/lib/queryClient';
 import DonationCategoryModal from '@/components/admin/DonationCategoryModal';
 import { useForm } from 'react-hook-form';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
