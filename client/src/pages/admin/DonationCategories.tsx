@@ -109,38 +109,32 @@ const DonationCategoriesPage = () => {
     }
   }, [allPaymentDetails]);
 
-  // Separate state for modal data - completely isolated
-  const [modalPaymentData, setModalPaymentData] = useState({
-    accountName: '',
-    bankName: '',
-    accountNumber: '',
-    ifscCode: '',
-    swiftCode: '',
-    qrCodeUrl: '',
+  // Use React Hook Form for payment details
+  const paymentForm = useForm({
+    defaultValues: {
+      accountName: '',
+      bankName: '',
+      accountNumber: '',
+      ifscCode: '',
+      swiftCode: '',
+      qrCodeUrl: '',
+    },
   });
 
-  // Flag to prevent modal data from being reset
-  const [isModalDataLoaded, setIsModalDataLoaded] = useState(false);
-
-  // Debug effect to track modal data changes
-  useEffect(() => {
-    console.log('🔄 modalPaymentData changed:', modalPaymentData);
-  }, [modalPaymentData]);
-
   // Query for payment details when modal is open
-  const { data: currentPaymentDetails, refetch: refetchPaymentDetails } = useQuery({
+  const { data: currentPaymentDetails, isLoading: isLoadingPaymentDetails } = useQuery({
     queryKey: ['/api/categories', selectedCategoryId, 'bank-details'],
     enabled: isPaymentModalOpen && !!selectedCategoryId,
   });
 
-  // Effect to populate modal data when payment details are loaded
+  // Effect to populate form when payment details are loaded
   useEffect(() => {
-    if (isPaymentModalOpen && currentPaymentDetails && !isModalDataLoaded) {
-      console.log('Populating modal with payment details:', currentPaymentDetails);
+    if (currentPaymentDetails && isPaymentModalOpen) {
+      console.log('Loading payment details into form:', currentPaymentDetails);
       
       if (currentPaymentDetails.length > 0) {
         const details = currentPaymentDetails[0];
-        setModalPaymentData({
+        paymentForm.reset({
           accountName: details.accountName || '',
           bankName: details.bankName || '',
           accountNumber: details.accountNumber || '',
@@ -148,8 +142,9 @@ const DonationCategoriesPage = () => {
           swiftCode: details.swiftCode || '',
           qrCodeUrl: details.qrCodeUrl || '',
         });
+        console.log('Form populated with existing data');
       } else {
-        setModalPaymentData({
+        paymentForm.reset({
           accountName: '',
           bankName: '',
           accountNumber: '',
@@ -157,10 +152,10 @@ const DonationCategoriesPage = () => {
           swiftCode: '',
           qrCodeUrl: '',
         });
+        console.log('Form reset to empty values');
       }
-      setIsModalDataLoaded(true);
     }
-  }, [isPaymentModalOpen, currentPaymentDetails, isModalDataLoaded]);
+  }, [currentPaymentDetails, isPaymentModalOpen, paymentForm]);
 
   // Effect to populate form when editing a card
   useEffect(() => {
@@ -349,10 +344,7 @@ const DonationCategoriesPage = () => {
       }
 
       const data = await response.json();
-      setModalPaymentData(prev => ({
-        ...prev,
-        qrCodeUrl: data.url
-      }));
+      paymentForm.setValue('qrCodeUrl', data.url);
       
       toast({
         title: 'Success',
@@ -374,19 +366,19 @@ const DonationCategoriesPage = () => {
     console.log('Opening payment modal for category:', categoryId);
     setSelectedCategoryId(categoryId);
     setIsPaymentModalOpen(true);
-    setIsModalDataLoaded(false);
   };
 
   const handleSavePaymentDetails = async () => {
     if (!selectedCategoryId) return;
     
     try {
+      const formData = paymentForm.getValues();
       const response = await fetch(`/api/categories/${selectedCategoryId}/bank-details`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(modalPaymentData),
+        body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
@@ -415,16 +407,7 @@ const DonationCategoriesPage = () => {
   const handleClosePaymentModal = () => {
     setIsPaymentModalOpen(false);
     setSelectedCategoryId(null);
-    setIsModalDataLoaded(false);
-    // Reset modal data when closing
-    setModalPaymentData({
-      accountName: '',
-      bankName: '',
-      accountNumber: '',
-      ifscCode: '',
-      swiftCode: '',
-      qrCodeUrl: '',
-    });
+    paymentForm.reset();
   };
 
   // Form submission is now handled inline in the form onSubmit handler
@@ -763,146 +746,166 @@ const DonationCategoriesPage = () => {
             <DialogHeader>
               <DialogTitle>Payment Details</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="accountName">Account Holder Name</Label>
-                  <Input
-                    id="accountName"
-                    placeholder="International Society for Krishna Consciousness"
-                    value={modalPaymentData.accountName}
-                    onChange={(e) => setModalPaymentData(prev => ({ ...prev, accountName: e.target.value }))}
+            <Form {...paymentForm}>
+              <form className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={paymentForm.control}
+                    name="accountName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Account Holder Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="International Society for Krishna Consciousness" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={paymentForm.control}
+                    name="bankName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Bank Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="State Bank of India" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
                   />
                 </div>
-                <div>
-                  <Label htmlFor="bankName">Bank Name</Label>
-                  <Input
-                    id="bankName"
-                    placeholder="State Bank of India"
-                    value={modalPaymentData.bankName}
-                    onChange={(e) => setModalPaymentData(prev => ({ ...prev, bankName: e.target.value }))}
-                  />
-                </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="accountNumber">Account Number</Label>
-                  <Input
-                    id="accountNumber"
-                    placeholder="10000000025"
-                    value={modalPaymentData.accountNumber}
-                    onChange={(e) => setModalPaymentData(prev => ({ ...prev, accountNumber: e.target.value }))}
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={paymentForm.control}
+                    name="accountNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Account Number</FormLabel>
+                        <FormControl>
+                          <Input placeholder="10000000025" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={paymentForm.control}
+                    name="ifscCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>IFSC Code</FormLabel>
+                        <FormControl>
+                          <Input placeholder="SBIN000001" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
                   />
                 </div>
-                <div>
-                  <Label htmlFor="ifscCode">IFSC Code</Label>
-                  <Input
-                    id="ifscCode"
-                    placeholder="SBIN000001"
-                    value={modalPaymentData.ifscCode}
-                    onChange={(e) => setModalPaymentData(prev => ({ ...prev, ifscCode: e.target.value }))}
-                  />
-                </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="swiftCode">SWIFT Code (Optional)</Label>
-                  <Input
-                    id="swiftCode"
-                    placeholder="SBININBB"
-                    value={modalPaymentData.swiftCode}
-                    onChange={(e) => setModalPaymentData(prev => ({ ...prev, swiftCode: e.target.value }))}
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={paymentForm.control}
+                    name="swiftCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>SWIFT Code (Optional)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="SBININBB" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={paymentForm.control}
+                    name="qrCodeUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>UPI QR Code</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=iskcon@sbi&pn=ISKCON" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
                   />
                 </div>
-                <div>
-                  <Label htmlFor="qrCodeUrl">UPI QR Code</Label>
-                  <Input
-                    id="qrCodeUrl"
-                    placeholder="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=iskcon@sbi&pn=ISKCON"
-                    value={modalPaymentData.qrCodeUrl}
-                    onChange={(e) => setModalPaymentData(prev => ({ ...prev, qrCodeUrl: e.target.value }))}
-                  />
-                </div>
-              </div>
 
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-500">or</span>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const input = document.createElement('input');
-                    input.type = 'file';
-                    input.accept = 'image/*';
-                    input.onchange = (e) => {
-                      const file = (e.target as HTMLInputElement).files?.[0];
-                      if (file) {
-                        // Validate file size (1MB limit)
-                        if (file.size > 1024 * 1024) {
-                          toast({
-                            title: 'File too large',
-                            description: 'Please select an image smaller than 1MB',
-                            variant: 'destructive',
-                          });
-                          return;
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-500">or</span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const input = document.createElement('input');
+                      input.type = 'file';
+                      input.accept = 'image/*';
+                      input.onchange = (e) => {
+                        const file = (e.target as HTMLInputElement).files?.[0];
+                        if (file) {
+                          // Validate file size (1MB limit)
+                          if (file.size > 1024 * 1024) {
+                            toast({
+                              title: 'File too large',
+                              description: 'Please select an image smaller than 1MB',
+                              variant: 'destructive',
+                            });
+                            return;
+                          }
+                          handleFileUpload(file);
                         }
-                        handleFileUpload(file);
-                      }
-                    };
-                    input.click();
-                  }}
-                  disabled={uploadingQR}
-                >
-                  {uploadingQR ? (
-                    <>
-                      <div className="animate-spin w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full mr-2" />
-                      Uploading...
-                    </>
-                  ) : (
-                    'Upload QR Code'
-                  )}
-                </Button>
-              </div>
-
-              {modalPaymentData.qrCodeUrl && (
-                <div className="mt-2">
-                  <div className="text-xs text-gray-600 mb-1">QR Code Preview:</div>
-                  <img 
-                    src={modalPaymentData.qrCodeUrl} 
-                    alt="QR Code preview" 
-                    className="w-32 h-32 object-cover rounded border border-gray-300"
-                    onError={(e) => {
-                      console.log('QR code image failed to load:', modalPaymentData.qrCodeUrl);
-                      (e.target as HTMLImageElement).style.display = 'none';
+                      };
+                      input.click();
                     }}
-                  />
+                    disabled={uploadingQR}
+                  >
+                    {uploadingQR ? (
+                      <>
+                        <div className="animate-spin w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full mr-2" />
+                        Uploading...
+                      </>
+                    ) : (
+                      'Upload QR Code'
+                    )}
+                  </Button>
                 </div>
-              )}
 
-              <div className="flex items-center space-x-2">
-                <Switch id="showPaymentDetails" defaultChecked />
-                <Label htmlFor="showPaymentDetails">Show payment details section</Label>
-              </div>
+                {paymentForm.watch('qrCodeUrl') && (
+                  <div className="mt-2">
+                    <div className="text-xs text-gray-600 mb-1">QR Code Preview:</div>
+                    <img 
+                      src={paymentForm.watch('qrCodeUrl')} 
+                      alt="QR Code preview" 
+                      className="w-32 h-32 object-cover rounded border border-gray-300"
+                      onError={(e) => {
+                        console.log('QR code image failed to load:', paymentForm.watch('qrCodeUrl'));
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                  </div>
+                )}
 
-              <div className="flex justify-end space-x-2">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => setIsPaymentModalOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button 
-                  type="button" 
-                  onClick={handleSavePaymentDetails}
-                  className="bg-purple-600 hover:bg-purple-700"
-                >
-                  Save Payment Details
-                </Button>
-              </div>
+                <div className="flex items-center space-x-2">
+                  <Switch id="showPaymentDetails" defaultChecked />
+                  <Label htmlFor="showPaymentDetails">Show payment details section</Label>
+                </div>
+              </form>
+            </Form>
+
+            <div className="flex justify-end space-x-2">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setIsPaymentModalOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="button" 
+                onClick={handleSavePaymentDetails}
+                className="bg-purple-600 hover:bg-purple-700"
+              >
+                Save Payment Details
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
