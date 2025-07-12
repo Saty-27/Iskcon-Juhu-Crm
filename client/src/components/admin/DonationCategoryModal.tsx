@@ -174,6 +174,7 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
         console.log('Valid cards to create:', validCards);
         
         if (validCards.length > 0) {
+          // Create cards sequentially to prevent race conditions
           for (let i = 0; i < validCards.length; i++) {
             const card = validCards[i];
             const cardData = {
@@ -187,7 +188,13 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
             };
             
             console.log('Creating card with data:', cardData);
-            await apiRequest('/api/donation-cards', 'POST', cardData);
+            try {
+              const newCard = await apiRequest('/api/donation-cards', 'POST', cardData);
+              console.log('Successfully created card:', newCard.id, newCard.title);
+            } catch (error) {
+              console.error('Failed to create card:', card.title, error);
+              // Continue with other cards even if one fails
+            }
           }
         }
 
@@ -248,34 +255,74 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
     },
     onSuccess: async (categoryId) => {
       try {
+        // Get current state of cards
         const existingCards = existingDonationCards.filter(card => card.categoryId === categoryId);
-        for (const card of existingCards) {
-          try {
-            await apiRequest(`/api/donation-cards/${card.id}`, 'DELETE');
-          } catch (error) {
-            console.log('Card already deleted or not found:', card.id);
-          }
-        }
-
-        // Filter out empty or invalid donation cards before processing
         const validCards = donationCards.filter(card => 
           card.title && card.title.trim() && card.amount && Number(card.amount) > 0
         );
+
+        console.log('Updating cards for category:', categoryId);
+        console.log('Existing cards:', existingCards.map(c => ({ id: c.id, title: c.title })));
+        console.log('Valid new cards:', validCards.map(c => ({ id: c.id, title: c.title })));
+
+        // Create maps for efficient comparison
+        const existingCardMap = new Map(existingCards.map(card => [card.id, card]));
+        const validCardMap = new Map();
         
-        if (validCards.length > 0) {
-          for (let i = 0; i < validCards.length; i++) {
-            const card = validCards[i];
-            const cardData = {
-              title: card.title.trim(),
-              amount: Number(card.amount),
-              description: card.description || "",
-              imageUrl: card.imageUrl || "",
-              categoryId,
-              isActive: true,
-              order: i,
-            };
+        // Build valid card map with proper IDs
+        validCards.forEach(card => {
+          if (card.id) {
+            validCardMap.set(card.id, card);
+          }
+        });
+
+        // Delete cards that are no longer needed
+        for (const existingCard of existingCards) {
+          const stillExists = validCards.some(card => 
+            (card.id && card.id === existingCard.id) || 
+            (card.title === existingCard.title && card.amount === existingCard.amount)
+          );
+          
+          if (!stillExists) {
+            try {
+              await apiRequest(`/api/donation-cards/${existingCard.id}`, 'DELETE');
+              console.log('Deleted card:', existingCard.id, existingCard.title);
+            } catch (error) {
+              console.log('Card already deleted or not found:', existingCard.id);
+            }
+          }
+        }
+
+        // Update or create cards
+        for (let i = 0; i < validCards.length; i++) {
+          const card = validCards[i];
+          const cardData = {
+            title: card.title.trim(),
+            amount: Number(card.amount),
+            description: card.description || "",
+            imageUrl: card.imageUrl || "",
+            categoryId,
+            isActive: true,
+            order: i,
+          };
+
+          if (card.id && existingCardMap.has(card.id)) {
+            // Update existing card
+            await apiRequest(`/api/donation-cards/${card.id}`, 'PUT', cardData);
+            console.log('Updated card:', card.id, card.title);
+          } else {
+            // Check if card with same title and amount already exists to prevent duplicates
+            const duplicateCard = existingCards.find(existing => 
+              existing.title === card.title && existing.amount === card.amount
+            );
             
-            await apiRequest('/api/donation-cards', 'POST', cardData);
+            if (!duplicateCard) {
+              // Create new card only if no duplicate exists
+              const newCard = await apiRequest('/api/donation-cards', 'POST', cardData);
+              console.log('Created new card:', newCard.id, card.title);
+            } else {
+              console.log('Skipped duplicate card:', card.title);
+            }
           }
         }
 
@@ -291,11 +338,17 @@ export default function DonationCategoryModal({ isOpen, onClose, category }: Don
         throw error;
       }
 
+      // Comprehensive cache invalidation with forced refresh
       queryClient.invalidateQueries({ queryKey: ['/api/donation-categories'] });
       queryClient.invalidateQueries({ queryKey: ['/api/donation-cards'] });
+      queryClient.invalidateQueries({ queryKey: [`/api/donation-cards/category/${categoryId}`] });
       queryClient.invalidateQueries({ queryKey: ['/api/bank-details'] });
       queryClient.invalidateQueries({ queryKey: ['/api/events/1/bank-details'] });
       queryClient.invalidateQueries({ queryKey: [`/api/categories/${categoryId}/bank-details`] });
+      
+      // Force refresh the category-specific cards
+      await queryClient.refetchQueries({ queryKey: [`/api/donation-cards/category/${categoryId}`] });
+      
       onClose();
       toast({ title: 'Success', description: 'Category updated successfully' });
     },

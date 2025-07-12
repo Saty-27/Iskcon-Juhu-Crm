@@ -101,9 +101,17 @@ const DonationCategoriesPage = () => {
   const createCardMutation = useMutation({
     mutationFn: (data: z.infer<typeof donationCardFormSchema>) => 
       apiRequest('/api/donation-cards', 'POST', data),
-    onSuccess: () => {
+    onSuccess: async () => {
+      // Comprehensive cache invalidation
       queryClient.invalidateQueries({ queryKey: ['/api/donation-cards'] });
       queryClient.invalidateQueries({ queryKey: [`/api/donation-cards/category/${selectedCategoryId}`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/donation-categories'] });
+      
+      // Force refresh the specific category cards
+      if (selectedCategoryId) {
+        await queryClient.refetchQueries({ queryKey: [`/api/donation-cards/category/${selectedCategoryId}`] });
+      }
+      
       toast({ title: 'Success', description: 'Donation card created successfully' });
       setIsCardDialogOpen(false);
       cardForm.reset();
@@ -116,9 +124,17 @@ const DonationCategoriesPage = () => {
   const updateCardMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: Partial<z.infer<typeof donationCardFormSchema>> }) =>
       apiRequest(`/api/donation-cards/${id}`, 'PUT', data),
-    onSuccess: () => {
+    onSuccess: async () => {
+      // Comprehensive cache invalidation
       queryClient.invalidateQueries({ queryKey: ['/api/donation-cards'] });
       queryClient.invalidateQueries({ queryKey: [`/api/donation-cards/category/${selectedCategoryId}`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/donation-categories'] });
+      
+      // Force refresh the specific category cards
+      if (selectedCategoryId) {
+        await queryClient.refetchQueries({ queryKey: [`/api/donation-cards/category/${selectedCategoryId}`] });
+      }
+      
       toast({ title: 'Success', description: 'Donation card updated successfully' });
       setIsCardDialogOpen(false);
       setEditingCard(null);
@@ -131,9 +147,17 @@ const DonationCategoriesPage = () => {
 
   const deleteCardMutation = useMutation({
     mutationFn: (id: number) => apiRequest(`/api/donation-cards/${id}`, 'DELETE'),
-    onSuccess: () => {
+    onSuccess: async () => {
+      // Comprehensive cache invalidation
       queryClient.invalidateQueries({ queryKey: ['/api/donation-cards'] });
-      queryClient.invalidateQueries({ queryKey: [`/api/donation-cards/category/${selectedCategoryId}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/donation-cards/category/${expandedCategory}`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/donation-categories'] });
+      
+      // Force refresh the specific category cards
+      if (expandedCategory) {
+        await queryClient.refetchQueries({ queryKey: [`/api/donation-cards/category/${expandedCategory}`] });
+      }
+      
       toast({ title: 'Success', description: 'Donation card deleted successfully' });
     },
     onError: () => {

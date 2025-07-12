@@ -41,10 +41,13 @@ export default function CategoryDonation() {
     enabled: !!categoryId,
   });
 
-  // Fetch donation cards for this category
+  // Fetch donation cards for this category with better caching
   const { data: donationCards = [], isLoading: cardsLoading } = useQuery<DonationCard[]>({
     queryKey: [`/api/donation-cards/category/${categoryId}`],
     enabled: !!categoryId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
   });
 
   // Fetch category-specific bank details

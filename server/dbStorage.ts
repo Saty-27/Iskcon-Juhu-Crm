@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { db } from "./db";
 import { 
   users, banners, quotes, donationCategories, donationCards, eventDonationCards, bankDetails, eventBankDetails, categoryBankDetails, events, gallery, videos, 
@@ -166,10 +166,26 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getDonationCardsByCategory(categoryId: number): Promise<DonationCard[]> {
-    return await db.select().from(donationCards).where(eq(donationCards.categoryId, categoryId));
+    return await db.select().from(donationCards)
+      .where(eq(donationCards.categoryId, categoryId))
+      .orderBy(donationCards.order, donationCards.id);
   }
 
   async createDonationCard(card: InsertDonationCard): Promise<DonationCard> {
+    // Check for existing card with same title and amount in the same category to prevent duplicates
+    const existingCard = await db.select().from(donationCards)
+      .where(and(
+        eq(donationCards.categoryId, card.categoryId),
+        eq(donationCards.title, card.title),
+        eq(donationCards.amount, card.amount)
+      ))
+      .limit(1);
+    
+    if (existingCard.length > 0) {
+      console.log('Duplicate card detected, returning existing:', existingCard[0]);
+      return existingCard[0];
+    }
+    
     const [newCard] = await db.insert(donationCards).values(card).returning();
     return newCard;
   }
