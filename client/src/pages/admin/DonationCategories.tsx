@@ -34,6 +34,15 @@ const DonationCategoriesPage = () => {
   const [activeTab, setActiveTab] = useState<string>('details');
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [paymentCategoryId, setPaymentCategoryId] = useState<number | null>(null);
+  const [paymentDetails, setPaymentDetails] = useState({
+    accountName: '',
+    bankName: '',
+    accountNumber: '',
+    ifscCode: '',
+    swiftCode: '',
+    qrCodeUrl: '',
+  });
+  const [uploadingQR, setUploadingQR] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -229,6 +238,44 @@ const DonationCategoriesPage = () => {
     cardForm.setValue('order', 0);
     
     setIsCardDialogOpen(true);
+  };
+
+  const handleFileUpload = async (file: File) => {
+    setUploadingQR(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', 'qr');
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+
+      const data = await response.json();
+      setPaymentDetails(prev => ({
+        ...prev,
+        qrCodeUrl: data.url
+      }));
+      
+      toast({
+        title: 'Success',
+        description: 'QR code uploaded successfully',
+      });
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to upload QR code',
+        variant: 'destructive',
+      });
+    } finally {
+      setUploadingQR(false);
+    }
   };
 
   // Form submission is now handled inline in the form onSubmit handler
@@ -573,7 +620,8 @@ const DonationCategoriesPage = () => {
                   <Input
                     id="accountName"
                     placeholder="International Society for Krishna Consciousness"
-                    defaultValue=""
+                    value={paymentDetails.accountName}
+                    onChange={(e) => setPaymentDetails(prev => ({ ...prev, accountName: e.target.value }))}
                   />
                 </div>
                 <div>
@@ -581,7 +629,8 @@ const DonationCategoriesPage = () => {
                   <Input
                     id="bankName"
                     placeholder="State Bank of India"
-                    defaultValue=""
+                    value={paymentDetails.bankName}
+                    onChange={(e) => setPaymentDetails(prev => ({ ...prev, bankName: e.target.value }))}
                   />
                 </div>
               </div>
@@ -592,7 +641,8 @@ const DonationCategoriesPage = () => {
                   <Input
                     id="accountNumber"
                     placeholder="10000000025"
-                    defaultValue=""
+                    value={paymentDetails.accountNumber}
+                    onChange={(e) => setPaymentDetails(prev => ({ ...prev, accountNumber: e.target.value }))}
                   />
                 </div>
                 <div>
@@ -600,7 +650,8 @@ const DonationCategoriesPage = () => {
                   <Input
                     id="ifscCode"
                     placeholder="SBIN000001"
-                    defaultValue=""
+                    value={paymentDetails.ifscCode}
+                    onChange={(e) => setPaymentDetails(prev => ({ ...prev, ifscCode: e.target.value }))}
                   />
                 </div>
               </div>
@@ -611,7 +662,8 @@ const DonationCategoriesPage = () => {
                   <Input
                     id="swiftCode"
                     placeholder="SBININBB"
-                    defaultValue=""
+                    value={paymentDetails.swiftCode}
+                    onChange={(e) => setPaymentDetails(prev => ({ ...prev, swiftCode: e.target.value }))}
                   />
                 </div>
                 <div>
@@ -619,7 +671,8 @@ const DonationCategoriesPage = () => {
                   <Input
                     id="qrCodeUrl"
                     placeholder="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=iskcon@sbi&pn=ISKCON"
-                    defaultValue=""
+                    value={paymentDetails.qrCodeUrl}
+                    onChange={(e) => setPaymentDetails(prev => ({ ...prev, qrCodeUrl: e.target.value }))}
                   />
                 </div>
               </div>
@@ -634,12 +687,50 @@ const DonationCategoriesPage = () => {
                     const input = document.createElement('input');
                     input.type = 'file';
                     input.accept = 'image/*';
+                    input.onchange = (e) => {
+                      const file = (e.target as HTMLInputElement).files?.[0];
+                      if (file) {
+                        // Validate file size (1MB limit)
+                        if (file.size > 1024 * 1024) {
+                          toast({
+                            title: 'File too large',
+                            description: 'Please select an image smaller than 1MB',
+                            variant: 'destructive',
+                          });
+                          return;
+                        }
+                        handleFileUpload(file);
+                      }
+                    };
                     input.click();
                   }}
+                  disabled={uploadingQR}
                 >
-                  Upload QR Code
+                  {uploadingQR ? (
+                    <>
+                      <div className="animate-spin w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full mr-2" />
+                      Uploading...
+                    </>
+                  ) : (
+                    'Upload QR Code'
+                  )}
                 </Button>
               </div>
+
+              {paymentDetails.qrCodeUrl && (
+                <div className="mt-2">
+                  <div className="text-xs text-gray-600 mb-1">QR Code Preview:</div>
+                  <img 
+                    src={paymentDetails.qrCodeUrl} 
+                    alt="QR Code preview" 
+                    className="w-32 h-32 object-cover rounded border border-gray-300"
+                    onError={(e) => {
+                      console.log('QR code image failed to load:', paymentDetails.qrCodeUrl);
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                </div>
+              )}
 
               <div className="flex items-center space-x-2">
                 <Switch id="showPaymentDetails" defaultChecked />
