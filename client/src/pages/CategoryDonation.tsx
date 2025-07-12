@@ -124,8 +124,8 @@ export default function CategoryDonation() {
       
       <Header />
       
-      <main style={{ padding: '20px', backgroundColor: '#F5F3F3', color: '#333', minHeight: '100vh' }}>
-        <div className="max-w-6xl mx-auto">
+      <main style={{ padding: '0', backgroundColor: '#F5F3F3', color: '#333', minHeight: '100vh' }}>
+        <div style={{ width: '100%', padding: '20px' }}>
           {/* Title */}
           <h1 style={{ textAlign: 'center', fontSize: '32px', fontWeight: 'bold', marginBottom: '10px' }}>
             {category.name}
