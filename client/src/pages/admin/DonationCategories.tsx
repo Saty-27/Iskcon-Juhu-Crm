@@ -127,6 +127,53 @@ const DonationCategoriesPage = () => {
     console.log('🔄 modalPaymentData changed:', modalPaymentData);
   }, [modalPaymentData]);
 
+  // Effect to load payment details when modal opens
+  useEffect(() => {
+    if (isPaymentModalOpen && selectedCategoryId && !isModalDataLoaded) {
+      const loadPaymentDetails = async () => {
+        try {
+          console.log('Loading payment details for category:', selectedCategoryId);
+          const response = await fetch(`/api/categories/${selectedCategoryId}/bank-details`);
+          
+          if (response.ok) {
+            const bankDetails = await response.json();
+            console.log('Payment details loaded:', bankDetails);
+            
+            if (bankDetails && bankDetails.length > 0) {
+              const details = bankDetails[0];
+              console.log('Setting modal data:', details);
+              
+              setModalPaymentData({
+                accountName: details.accountName || '',
+                bankName: details.bankName || '',
+                accountNumber: details.accountNumber || '',
+                ifscCode: details.ifscCode || '',
+                swiftCode: details.swiftCode || '',
+                qrCodeUrl: details.qrCodeUrl || '',
+              });
+            } else {
+              console.log('No payment details found, setting empty data');
+              setModalPaymentData({
+                accountName: '',
+                bankName: '',
+                accountNumber: '',
+                ifscCode: '',
+                swiftCode: '',
+                qrCodeUrl: '',
+              });
+            }
+            setIsModalDataLoaded(true);
+          }
+        } catch (error) {
+          console.error('Error loading payment details:', error);
+          setIsModalDataLoaded(true);
+        }
+      };
+      
+      loadPaymentDetails();
+    }
+  }, [isPaymentModalOpen, selectedCategoryId, isModalDataLoaded]);
+
   // Effect to populate form when editing a card
   useEffect(() => {
     if (editingCard && isCardDialogOpen) {
@@ -335,49 +382,11 @@ const DonationCategoriesPage = () => {
     }
   };
 
-  const handleOpenPaymentModal = async (categoryId: number) => {
+  const handleOpenPaymentModal = (categoryId: number) => {
+    console.log('Opening payment modal for category:', categoryId);
     setSelectedCategoryId(categoryId);
     setIsPaymentModalOpen(true);
     setIsModalDataLoaded(false);
-    
-    // Load existing payment details with a delay to ensure modal is rendered
-    setTimeout(async () => {
-      try {
-        const response = await fetch(`/api/categories/${categoryId}/bank-details`);
-        
-        if (response.ok) {
-          const bankDetails = await response.json();
-          
-          if (bankDetails && bankDetails.length > 0) {
-            const details = bankDetails[0];
-            
-            // Set modal data
-            setModalPaymentData({
-              accountName: details.accountName || '',
-              bankName: details.bankName || '',
-              accountNumber: details.accountNumber || '',
-              ifscCode: details.ifscCode || '',
-              swiftCode: details.swiftCode || '',
-              qrCodeUrl: details.qrCodeUrl || '',
-            });
-            setIsModalDataLoaded(true);
-          } else {
-            setModalPaymentData({
-              accountName: '',
-              bankName: '',
-              accountNumber: '',
-              ifscCode: '',
-              swiftCode: '',
-              qrCodeUrl: '',
-            });
-            setIsModalDataLoaded(true);
-          }
-        }
-      } catch (error) {
-        console.error('Error loading payment details:', error);
-        setIsModalDataLoaded(true);
-      }
-    }, 300);
   };
 
   const handleSavePaymentDetails = async () => {
