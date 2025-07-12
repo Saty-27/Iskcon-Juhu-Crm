@@ -211,10 +211,22 @@ const DonationCategoriesPage = () => {
   };
 
   const handleSubmitCard = (data: z.infer<typeof donationCardFormSchema>) => {
+    console.log('Submitting card data:', data);
+    console.log('Selected category ID:', selectedCategoryId);
+    console.log('Form values:', cardForm.getValues());
+    
+    // Ensure categoryId is set correctly
+    const cardData = {
+      ...data,
+      categoryId: selectedCategoryId || data.categoryId,
+    };
+    
+    console.log('Final card data to submit:', cardData);
+    
     if (editingCard) {
-      updateCardMutation.mutate({ id: editingCard.id, data });
+      updateCardMutation.mutate({ id: editingCard.id, data: cardData });
     } else {
-      createCardMutation.mutate(data);
+      createCardMutation.mutate(cardData);
     }
   };
 
@@ -439,6 +451,10 @@ const DonationCategoriesPage = () => {
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={cardForm.handleSubmit(handleSubmitCard)} className="space-y-4">
+              {/* Hidden fields for required data */}
+              <input type="hidden" {...cardForm.register('categoryId')} />
+              <input type="hidden" {...cardForm.register('order')} />
+              
               <div>
                 <Label htmlFor="title">Card Title</Label>
                 <Input
