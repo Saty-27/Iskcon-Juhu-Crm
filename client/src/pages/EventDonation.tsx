@@ -140,14 +140,28 @@ export default function EventDonation() {
               boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
               position: 'relative'
             }}>
-              <h2 style={{ 
-                fontSize: '24px', 
-                fontWeight: 'bold', 
-                marginBottom: '15px',
-                color: '#fff'
-              }}>
-                {event.title}
-              </h2>
+              {/* Dark overlay */}
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'rgba(0, 0, 0, 0.3)',
+                borderRadius: '15px',
+                zIndex: 1
+              }}></div>
+              
+              {/* Content above overlay */}
+              <div style={{ position: 'relative', zIndex: 2 }}>
+                <h2 style={{ 
+                  fontSize: '24px', 
+                  fontWeight: 'bold', 
+                  marginBottom: '15px',
+                  color: '#fff'
+                }}>
+                  {event.title}
+                </h2>
               <p style={{ 
                 fontSize: '16px', 
                 lineHeight: '1.6', 
@@ -184,6 +198,7 @@ export default function EventDonation() {
                   </div>
                 </DialogContent>
               </Dialog>
+              </div>
             </div>
             
             <div style={{ 

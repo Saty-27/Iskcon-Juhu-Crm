@@ -157,39 +157,52 @@ export default function CategoryDonation() {
               boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
               position: 'relative'
             }}>
-              <h2 style={{ 
-                fontSize: '24px', 
-                fontWeight: 'bold', 
-                marginBottom: '15px',
-                color: '#fff'
-              }}>
-                {category.name}
-              </h2>
-              <p style={{ 
-                fontSize: '16px', 
-                lineHeight: '1.6', 
-                marginBottom: '20px',
-                color: '#f0f0f0'
-              }}>
-                {category.description && getWordCount(category.description) > 25 
-                  ? getTruncatedDescription(category.description, 25)
-                  : category.description}
-              </p>
-              <Dialog open={isDescriptionModalOpen} onOpenChange={setIsDescriptionModalOpen}>
-                <DialogTrigger asChild>
-                  <button style={{ 
-                    backgroundColor: '#faa817', 
-                    color: '#fff', 
-                    border: 'none', 
-                    padding: '10px 20px', 
-                    borderRadius: '8px', 
-                    cursor: 'pointer',
-                    fontWeight: 'bold',
-                    fontSize: '14px'
-                  }}>
-                    Read More
-                  </button>
-                </DialogTrigger>
+              {/* Dark overlay */}
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'rgba(0, 0, 0, 0.3)',
+                borderRadius: '15px',
+                zIndex: 1
+              }}></div>
+              {/* Content above overlay */}
+              <div style={{ position: 'relative', zIndex: 2 }}>
+                <h2 style={{ 
+                  fontSize: '24px', 
+                  fontWeight: 'bold', 
+                  marginBottom: '15px',
+                  color: '#fff'
+                }}>
+                  {category.name}
+                </h2>
+                <p style={{ 
+                  fontSize: '16px', 
+                  lineHeight: '1.6', 
+                  marginBottom: '20px',
+                  color: '#f0f0f0'
+                }}>
+                  {category.description && getWordCount(category.description) > 25 
+                    ? getTruncatedDescription(category.description, 25)
+                    : category.description}
+                </p>
+                <Dialog open={isDescriptionModalOpen} onOpenChange={setIsDescriptionModalOpen}>
+                  <DialogTrigger asChild>
+                    <button style={{ 
+                      backgroundColor: '#faa817', 
+                      color: '#fff', 
+                      border: 'none', 
+                      padding: '10px 20px', 
+                      borderRadius: '8px', 
+                      cursor: 'pointer',
+                      fontWeight: 'bold',
+                      fontSize: '14px'
+                    }}>
+                      Read More
+                    </button>
+                  </DialogTrigger>
                 <DialogContent className="max-w-2xl">
                   <DialogHeader>
                     <DialogTitle className="text-2xl font-bold">{category.name}</DialogTitle>
@@ -200,7 +213,8 @@ export default function CategoryDonation() {
                     </p>
                   </div>
                 </DialogContent>
-              </Dialog>
+                </Dialog>
+              </div>
             </div>
             
             <div style={{ 
