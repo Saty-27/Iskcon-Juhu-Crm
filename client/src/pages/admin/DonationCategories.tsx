@@ -227,40 +227,7 @@ const DonationCategoriesPage = () => {
     setIsCardDialogOpen(true);
   };
 
-  const handleSubmitCard = (data: z.infer<typeof donationCardFormSchema>) => {
-    console.log('Form data received:', data);
-    console.log('Selected category ID:', selectedCategoryId);
-    console.log('Form watch values:', cardForm.watch());
-    
-    // Validate required fields before submission
-    if (!selectedCategoryId) {
-      toast({ 
-        title: 'Error', 
-        description: 'Category ID is missing. Please close and reopen the form.', 
-        variant: 'destructive' 
-      });
-      return;
-    }
-    
-    // Manually construct the card data to ensure categoryId is included
-    const cardData = {
-      title: data.title,
-      amount: data.amount,
-      description: data.description || '',
-      imageUrl: data.imageUrl || '',
-      categoryId: selectedCategoryId, // Force from state
-      isActive: data.isActive !== undefined ? data.isActive : true,
-      order: data.order || 0,
-    };
-    
-    console.log('Final card data to submit:', cardData);
-    
-    if (editingCard) {
-      updateCardMutation.mutate({ id: editingCard.id, data: cardData });
-    } else {
-      createCardMutation.mutate(cardData);
-    }
-  };
+  // Form submission is now handled inline in the form onSubmit handler
 
   const toggleCategoryExpansion = (categoryId: number) => {
     setExpandedCategory(expandedCategory === categoryId ? null : categoryId);
@@ -487,10 +454,41 @@ const DonationCategoriesPage = () => {
                 )}
               </DialogTitle>
             </DialogHeader>
-            <form onSubmit={cardForm.handleSubmit(handleSubmitCard)} className="space-y-4">
-              {/* Hidden fields for required data */}
-              <input type="hidden" {...cardForm.register('categoryId', { valueAsNumber: true })} />
-              <input type="hidden" {...cardForm.register('order', { valueAsNumber: true })} />
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              console.log('Form submitted manually');
+              console.log('Selected category ID:', selectedCategoryId);
+              console.log('Form values:', cardForm.getValues());
+              
+              // Get form data manually
+              const formData = cardForm.getValues();
+              const cardData = {
+                title: formData.title,
+                amount: formData.amount,
+                description: formData.description || '',
+                imageUrl: formData.imageUrl || '',
+                categoryId: selectedCategoryId!,
+                isActive: formData.isActive !== undefined ? formData.isActive : true,
+                order: 0,
+              };
+              
+              console.log('Manually constructed card data:', cardData);
+              
+              if (!selectedCategoryId) {
+                toast({ 
+                  title: 'Error', 
+                  description: 'Category ID is missing. Please close and reopen the form.', 
+                  variant: 'destructive' 
+                });
+                return;
+              }
+              
+              if (editingCard) {
+                updateCardMutation.mutate({ id: editingCard.id, data: cardData });
+              } else {
+                createCardMutation.mutate(cardData);
+              }
+            }} className="space-y-4">
               
               <div>
                 <Label htmlFor="title">Card Title</Label>
