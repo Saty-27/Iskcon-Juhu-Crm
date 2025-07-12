@@ -21,10 +21,18 @@ const Profile = () => {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   
-  // Fetch user donations
-  const { data: donations = [], isLoading: isLoadingDonations } = useQuery<Donation[]>({
+  // Fetch user donations - with better error handling
+  const { data: donations = [], isLoading: isLoadingDonations, error: donationsError } = useQuery<Donation[]>({
     queryKey: ['/api/user/donations'],
-    enabled: isAuthenticated,
+    enabled: isAuthenticated && !!user,
+    retry: false,
+    onError: (error) => {
+      console.log('Donations fetch error:', error);
+      // If we get a 401 error, redirect to login
+      if (error instanceof Error && error.message.includes('401')) {
+        setLocation('/login');
+      }
+    }
   });
   
   // Redirect to login if not authenticated

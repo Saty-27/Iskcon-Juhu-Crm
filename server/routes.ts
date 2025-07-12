@@ -1562,16 +1562,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/auth/login", async (req, res) => {
     try {
-      const { username, password } = req.body;
+      const { email, username, password } = req.body;
       
-      if (!username || !password) {
-        return res.status(400).json({ message: "Username and password are required" });
+      if ((!email && !username) || !password) {
+        return res.status(400).json({ message: "Email/username and password are required" });
       }
       
-      const user = await storage.getUserByUsername(username);
+      // Try to find user by email first, then by username
+      const user = email ? await storage.getUserByEmail(email) : await storage.getUserByUsername(username);
       
       if (!user || user.password !== password) { // In a real app, password comparison would use a secure method
-        return res.status(401).json({ message: "Invalid username or password" });
+        return res.status(401).json({ message: "Invalid email or password" });
       }
       
       if (!user.isActive) {
