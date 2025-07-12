@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AdminLayout from "@/components/admin/Layout";
 import { 
@@ -57,9 +57,22 @@ const DonationsPage = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: donations = [], isLoading } = useQuery<Donation[]>({
+  const { data: donations = [], isLoading, refetch } = useQuery<Donation[]>({
     queryKey: ['/api/admin/donations'],
+    refetchInterval: 5000, // Refetch every 5 seconds
+    refetchOnWindowFocus: true,
+    staleTime: 0, // Always consider data stale
+    gcTime: 0, // Don't cache the data (gcTime is the new name for cacheTime)
   });
+
+  // Force refresh on page load
+  React.useEffect(() => {
+    const forceRefresh = () => {
+      queryClient.removeQueries({ queryKey: ['/api/admin/donations'] });
+      refetch();
+    };
+    forceRefresh();
+  }, [queryClient, refetch]);
 
   const deleteDonationMutation = useMutation({
     mutationFn: async (id: number) => {

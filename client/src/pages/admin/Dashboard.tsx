@@ -16,7 +16,10 @@ const AdminDashboard = () => {
   // Fetch real donation data from API
   const { data: donations = [] } = useQuery({ 
     queryKey: ['/api/admin/donations'],
-    retry: false
+    retry: false,
+    refetchInterval: 5000, // Refetch every 5 seconds
+    refetchOnWindowFocus: true,
+    staleTime: 0, // Always consider data stale
   });
 
   // Calculate real donation statistics
