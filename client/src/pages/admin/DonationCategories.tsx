@@ -60,7 +60,6 @@ const DonationCategoriesPage = () => {
   // Effect to populate form when editing a card
   useEffect(() => {
     if (editingCard && isCardDialogOpen) {
-      console.log('Populating form for editing card:', editingCard);
       cardForm.reset({
         title: editingCard.title,
         amount: editingCard.amount,
@@ -70,7 +69,6 @@ const DonationCategoriesPage = () => {
         isActive: editingCard.isActive,
         order: editingCard.order,
       });
-      console.log('Form values after reset in useEffect:', cardForm.getValues());
     }
   }, [editingCard, isCardDialogOpen, cardForm]);
 
@@ -102,19 +100,26 @@ const DonationCategoriesPage = () => {
     mutationFn: (data: z.infer<typeof donationCardFormSchema>) => 
       apiRequest('/api/donation-cards', 'POST', data),
     onSuccess: async () => {
-      // Comprehensive cache invalidation
+      // Comprehensive cache invalidation for both admin and frontend
       queryClient.invalidateQueries({ queryKey: ['/api/donation-cards'] });
       queryClient.invalidateQueries({ queryKey: [`/api/donation-cards/category/${selectedCategoryId}`] });
       queryClient.invalidateQueries({ queryKey: ['/api/donation-categories'] });
       
-      // Force refresh the specific category cards
+      // Force refresh the specific category cards (remove stale data)
       if (selectedCategoryId) {
         await queryClient.refetchQueries({ queryKey: [`/api/donation-cards/category/${selectedCategoryId}`] });
+        // Also invalidate all related queries to ensure fresh data
+        queryClient.removeQueries({ queryKey: [`/api/donation-cards/category/${selectedCategoryId}`] });
       }
+      
+      // Clear all stale cache entries for donation cards
+      queryClient.removeQueries({ queryKey: ['/api/donation-cards'] });
       
       toast({ title: 'Success', description: 'Donation card created successfully' });
       setIsCardDialogOpen(false);
       cardForm.reset();
+      setSelectedCategoryId(null);
+      setEditingCard(null);
     },
     onError: () => {
       toast({ title: 'Error', description: 'Failed to create donation card', variant: 'destructive' });
@@ -178,7 +183,6 @@ const DonationCategoriesPage = () => {
   const handleEditCard = (card: DonationCard) => {
     setEditingCard(card);
     setSelectedCategoryId(card.categoryId);
-    console.log('Editing card:', card);
     
     // Reset form with the card data
     cardForm.reset({
@@ -190,8 +194,6 @@ const DonationCategoriesPage = () => {
       isActive: card.isActive,
       order: card.order,
     });
-    
-    console.log('Form values after reset:', cardForm.getValues());
     setIsCardDialogOpen(true);
   };
 
@@ -211,17 +213,11 @@ const DonationCategoriesPage = () => {
   };
 
   const handleSubmitCard = (data: z.infer<typeof donationCardFormSchema>) => {
-    console.log('Submitting card data:', data);
-    console.log('Selected category ID:', selectedCategoryId);
-    console.log('Form values:', cardForm.getValues());
-    
     // Ensure categoryId is set correctly
     const cardData = {
       ...data,
       categoryId: selectedCategoryId || data.categoryId,
     };
-    
-    console.log('Final card data to submit:', cardData);
     
     if (editingCard) {
       updateCardMutation.mutate({ id: editingCard.id, data: cardData });

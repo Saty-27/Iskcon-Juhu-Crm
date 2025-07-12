@@ -45,7 +45,7 @@ export default function CategoryDonation() {
   const { data: donationCards = [], isLoading: cardsLoading } = useQuery<DonationCard[]>({
     queryKey: [`/api/donation-cards/category/${categoryId}`],
     enabled: !!categoryId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 0, // Always fetch fresh data
     refetchOnWindowFocus: true,
     refetchOnMount: true,
   });
@@ -54,6 +54,9 @@ export default function CategoryDonation() {
   const { data: bankDetails = [] } = useQuery<BankDetails[]>({
     queryKey: [`/api/categories/${categoryId}/bank-details`],
     enabled: !!categoryId,
+    staleTime: 0, // Always fetch fresh data
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
   });
 
   // Filter donation cards to show only active ones
