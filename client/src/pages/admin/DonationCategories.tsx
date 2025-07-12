@@ -461,7 +461,122 @@ const DonationCategoriesPage = () => {
           initialActiveTab={activeTab}
         />
 
-        {/* Donation cards are now managed within the main category modal */}
+        {/* Simple Add Card Modal */}
+        <Dialog open={isCardDialogOpen} onOpenChange={(open) => {
+          if (!open) {
+            setEditingCard(null);
+            setSelectedCategoryId(null);
+            cardForm.reset();
+          }
+          setIsCardDialogOpen(open);
+        }}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>
+                {editingCard ? 'Edit Donation Card' : 'Add Donation Card'}
+              </DialogTitle>
+            </DialogHeader>
+            <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
+              
+              <div>
+                <Label htmlFor="title">Card Title</Label>
+                <Input
+                  id="title"
+                  {...cardForm.register('title')}
+                  placeholder="e.g., Temple Renovation"
+                />
+                {cardForm.formState.errors.title && (
+                  <p className="text-sm text-red-600">{cardForm.formState.errors.title.message}</p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="amount">Amount (₹)</Label>
+                <Input
+                  id="amount"
+                  type="number"
+                  {...cardForm.register('amount', { valueAsNumber: true })}
+                  placeholder="1001"
+                />
+                {cardForm.formState.errors.amount && (
+                  <p className="text-sm text-red-600">{cardForm.formState.errors.amount.message}</p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  {...cardForm.register('description')}
+                  placeholder="Brief description of what this donation supports"
+                  rows={3}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="imageUrl">Image URL (optional)</Label>
+                <Input
+                  id="imageUrl"
+                  {...cardForm.register('imageUrl')}
+                  placeholder="https://example.com/image.jpg"
+                />
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="isActive"
+                  checked={cardForm.watch('isActive')}
+                  onCheckedChange={(checked) => cardForm.setValue('isActive', checked)}
+                />
+                <Label htmlFor="isActive">Active</Label>
+              </div>
+
+              <div className="flex justify-end space-x-2">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setIsCardDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  type="button" 
+                  onClick={() => {
+                    // Get form data manually
+                    const formData = cardForm.getValues();
+                    const cardData = {
+                      title: formData.title,
+                      amount: formData.amount,
+                      description: formData.description || '',
+                      imageUrl: formData.imageUrl || '',
+                      categoryId: selectedCategoryId!,
+                      isActive: formData.isActive !== undefined ? formData.isActive : true,
+                      order: 0,
+                    };
+                    
+                    if (!selectedCategoryId) {
+                      toast({ 
+                        title: 'Error', 
+                        description: 'Category ID is missing. Please close and reopen the form.', 
+                        variant: 'destructive' 
+                      });
+                      return;
+                    }
+                    
+                    if (editingCard) {
+                      updateCardMutation.mutate({ id: editingCard.id, data: cardData });
+                    } else {
+                      createCardMutation.mutate(cardData);
+                    }
+                  }}
+                  disabled={createCardMutation.isPending || updateCardMutation.isPending}
+                >
+                  {(createCardMutation.isPending || updateCardMutation.isPending) ? 'Saving...' : 'Save'}
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     </AdminLayout>
   );
