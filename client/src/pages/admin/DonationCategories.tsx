@@ -96,7 +96,7 @@ const DonationCategoriesPage = () => {
     enabled: categories.length > 0,
   });
 
-  // Update payment status when data changes
+  // Update payment status when data changes - but don't affect modal state
   useEffect(() => {
     if (allPaymentDetails.length > 0) {
       const statusMap: Record<number, boolean> = {};
@@ -108,6 +108,16 @@ const DonationCategoriesPage = () => {
       console.log('Updated category payment status:', statusMap);
     }
   }, [allPaymentDetails]);
+
+  // Separate state for modal data - completely isolated
+  const [modalPaymentData, setModalPaymentData] = useState({
+    accountName: '',
+    bankName: '',
+    accountNumber: '',
+    ifscCode: '',
+    swiftCode: '',
+    qrCodeUrl: '',
+  });
 
   // Effect to populate form when editing a card
   useEffect(() => {
@@ -296,7 +306,7 @@ const DonationCategoriesPage = () => {
       }
 
       const data = await response.json();
-      setPaymentDetails(prev => ({
+      setModalPaymentData(prev => ({
         ...prev,
         qrCodeUrl: data.url
       }));
@@ -320,8 +330,8 @@ const DonationCategoriesPage = () => {
   const handleOpenPaymentModal = async (categoryId: number) => {
     setSelectedCategoryId(categoryId);
     
-    // First reset payment details to prevent showing old data
-    setPaymentDetails({
+    // First reset modal data to prevent showing old data
+    setModalPaymentData({
       accountName: '',
       bankName: '',
       accountNumber: '',
@@ -344,20 +354,18 @@ const DonationCategoriesPage = () => {
         
         if (bankDetails && bankDetails.length > 0) {
           const details = bankDetails[0];
-          console.log('Setting payment details:', details);
+          console.log('Setting modal payment details:', details);
           
-          // Use setTimeout to ensure modal is rendered before setting data
-          setTimeout(() => {
-            setPaymentDetails({
-              accountName: details.accountName || '',
-              bankName: details.bankName || '',
-              accountNumber: details.accountNumber || '',
-              ifscCode: details.ifscCode || '',
-              swiftCode: details.swiftCode || '',
-              qrCodeUrl: details.qrCodeUrl || '',
-            });
-            console.log('Payment details set successfully');
-          }, 200);
+          // Set modal data immediately
+          setModalPaymentData({
+            accountName: details.accountName || '',
+            bankName: details.bankName || '',
+            accountNumber: details.accountNumber || '',
+            ifscCode: details.ifscCode || '',
+            swiftCode: details.swiftCode || '',
+            qrCodeUrl: details.qrCodeUrl || '',
+          });
+          console.log('Modal payment details set successfully');
         } else {
           console.log('No existing payment details found');
         }
@@ -378,7 +386,7 @@ const DonationCategoriesPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(paymentDetails),
+        body: JSON.stringify(modalPaymentData),
       });
 
       if (!response.ok) {
@@ -746,8 +754,8 @@ const DonationCategoriesPage = () => {
                   <Input
                     id="accountName"
                     placeholder="International Society for Krishna Consciousness"
-                    value={paymentDetails.accountName}
-                    onChange={(e) => setPaymentDetails(prev => ({ ...prev, accountName: e.target.value }))}
+                    value={modalPaymentData.accountName}
+                    onChange={(e) => setModalPaymentData(prev => ({ ...prev, accountName: e.target.value }))}
                   />
                 </div>
                 <div>
@@ -755,8 +763,8 @@ const DonationCategoriesPage = () => {
                   <Input
                     id="bankName"
                     placeholder="State Bank of India"
-                    value={paymentDetails.bankName}
-                    onChange={(e) => setPaymentDetails(prev => ({ ...prev, bankName: e.target.value }))}
+                    value={modalPaymentData.bankName}
+                    onChange={(e) => setModalPaymentData(prev => ({ ...prev, bankName: e.target.value }))}
                   />
                 </div>
               </div>
@@ -767,8 +775,8 @@ const DonationCategoriesPage = () => {
                   <Input
                     id="accountNumber"
                     placeholder="10000000025"
-                    value={paymentDetails.accountNumber}
-                    onChange={(e) => setPaymentDetails(prev => ({ ...prev, accountNumber: e.target.value }))}
+                    value={modalPaymentData.accountNumber}
+                    onChange={(e) => setModalPaymentData(prev => ({ ...prev, accountNumber: e.target.value }))}
                   />
                 </div>
                 <div>
@@ -776,8 +784,8 @@ const DonationCategoriesPage = () => {
                   <Input
                     id="ifscCode"
                     placeholder="SBIN000001"
-                    value={paymentDetails.ifscCode}
-                    onChange={(e) => setPaymentDetails(prev => ({ ...prev, ifscCode: e.target.value }))}
+                    value={modalPaymentData.ifscCode}
+                    onChange={(e) => setModalPaymentData(prev => ({ ...prev, ifscCode: e.target.value }))}
                   />
                 </div>
               </div>
@@ -788,8 +796,8 @@ const DonationCategoriesPage = () => {
                   <Input
                     id="swiftCode"
                     placeholder="SBININBB"
-                    value={paymentDetails.swiftCode}
-                    onChange={(e) => setPaymentDetails(prev => ({ ...prev, swiftCode: e.target.value }))}
+                    value={modalPaymentData.swiftCode}
+                    onChange={(e) => setModalPaymentData(prev => ({ ...prev, swiftCode: e.target.value }))}
                   />
                 </div>
                 <div>
@@ -797,8 +805,8 @@ const DonationCategoriesPage = () => {
                   <Input
                     id="qrCodeUrl"
                     placeholder="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=iskcon@sbi&pn=ISKCON"
-                    value={paymentDetails.qrCodeUrl}
-                    onChange={(e) => setPaymentDetails(prev => ({ ...prev, qrCodeUrl: e.target.value }))}
+                    value={modalPaymentData.qrCodeUrl}
+                    onChange={(e) => setModalPaymentData(prev => ({ ...prev, qrCodeUrl: e.target.value }))}
                   />
                 </div>
               </div>
@@ -843,15 +851,15 @@ const DonationCategoriesPage = () => {
                 </Button>
               </div>
 
-              {paymentDetails.qrCodeUrl && (
+              {modalPaymentData.qrCodeUrl && (
                 <div className="mt-2">
                   <div className="text-xs text-gray-600 mb-1">QR Code Preview:</div>
                   <img 
-                    src={paymentDetails.qrCodeUrl} 
+                    src={modalPaymentData.qrCodeUrl} 
                     alt="QR Code preview" 
                     className="w-32 h-32 object-cover rounded border border-gray-300"
                     onError={(e) => {
-                      console.log('QR code image failed to load:', paymentDetails.qrCodeUrl);
+                      console.log('QR code image failed to load:', modalPaymentData.qrCodeUrl);
                       (e.target as HTMLImageElement).style.display = 'none';
                     }}
                   />
