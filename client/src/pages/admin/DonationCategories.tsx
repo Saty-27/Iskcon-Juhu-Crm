@@ -72,6 +72,14 @@ const DonationCategoriesPage = () => {
     }
   }, [editingCard, isCardDialogOpen, cardForm]);
 
+  // Effect to ensure categoryId is set when modal opens for new card
+  useEffect(() => {
+    if (isCardDialogOpen && !editingCard && selectedCategoryId) {
+      cardForm.setValue('categoryId', selectedCategoryId);
+      cardForm.setValue('order', 0);
+    }
+  }, [isCardDialogOpen, editingCard, selectedCategoryId, cardForm]);
+
   const deleteCategoryMutation = useMutation({
     mutationFn: (id: number) => apiRequest(`/api/donation-categories/${id}`, 'DELETE'),
     onSuccess: (data: any) => {
@@ -213,9 +221,8 @@ const DonationCategoriesPage = () => {
     });
     
     // Ensure categoryId is set immediately after reset
-    setTimeout(() => {
-      cardForm.setValue('categoryId', categoryId);
-    }, 0);
+    cardForm.setValue('categoryId', categoryId);
+    cardForm.setValue('order', 0);
     
     setIsCardDialogOpen(true);
   };
