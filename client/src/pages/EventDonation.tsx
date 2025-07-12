@@ -123,45 +123,39 @@ export default function EventDonation() {
             borderRadius: '2px' 
           }}></div>
 
-          {/* Event Information Section */}
+          {/* Event Information Section - Full Width */}
           <div style={{ 
-            display: 'flex', 
-            gap: '20px', 
-            marginBottom: '30px',
-            flexWrap: 'wrap'
+            width: '100%',
+            background: 'linear-gradient(135deg, #8B5A96 0%, #B68CB8 100%)',
+            color: '#fff',
+            padding: '30px',
+            borderRadius: '15px',
+            boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
+            position: 'relative',
+            marginBottom: '30px'
           }}>
-            <div style={{ 
-              flex: '1',
-              minWidth: '300px',
-              background: 'linear-gradient(135deg, #8B5A96 0%, #B68CB8 100%)',
-              color: '#fff',
-              padding: '30px',
+            {/* Dark overlay */}
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0, 0, 0, 0.3)',
               borderRadius: '15px',
-              boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
-              position: 'relative'
-            }}>
-              {/* Dark overlay */}
-              <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: 'rgba(0, 0, 0, 0.3)',
-                borderRadius: '15px',
-                zIndex: 1
-              }}></div>
-              
-              {/* Content above overlay */}
-              <div style={{ position: 'relative', zIndex: 2 }}>
-                <h2 style={{ 
-                  fontSize: '24px', 
-                  fontWeight: 'bold', 
-                  marginBottom: '15px',
-                  color: '#fff'
-                }}>
-                  {event.title}
-                </h2>
+              zIndex: 1
+            }}></div>
+            
+            {/* Content above overlay */}
+            <div style={{ position: 'relative', zIndex: 2 }}>
+              <h2 style={{ 
+                fontSize: '24px', 
+                fontWeight: 'bold', 
+                marginBottom: '15px',
+                color: '#fff'
+              }}>
+                {event.title}
+              </h2>
               <p style={{ 
                 fontSize: '16px', 
                 lineHeight: '1.6', 
@@ -198,28 +192,6 @@ export default function EventDonation() {
                   </div>
                 </DialogContent>
               </Dialog>
-              </div>
-            </div>
-            
-            <div style={{ 
-              flex: '1',
-              minWidth: '300px'
-            }}>
-              <div style={{ 
-                borderRadius: '15px', 
-                overflow: 'hidden',
-                boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)'
-              }}>
-                <img
-                  src={event.imageUrl}
-                  alt={event.title}
-                  style={{ 
-                    width: '100%', 
-                    height: '250px', 
-                    objectFit: 'cover'
-                  }}
-                />
-              </div>
             </div>
           </div>
 
