@@ -123,75 +123,103 @@ export default function EventDonation() {
             borderRadius: '2px' 
           }}></div>
 
-          {/* Event Information Section - Full Width */}
+          {/* Event Information Section */}
           <div style={{ 
-            width: '100%',
-            background: 'linear-gradient(135deg, #8B5A96 0%, #B68CB8 100%)',
-            color: '#fff',
-            padding: '30px',
-            borderRadius: '15px',
-            boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
-            position: 'relative',
-            marginBottom: '30px'
+            display: 'flex', 
+            gap: '20px', 
+            marginBottom: '30px',
+            flexWrap: 'wrap'
           }}>
-            {/* Dark overlay */}
-            <div style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'rgba(0, 0, 0, 0.3)',
+            <div style={{ 
+              flex: '1',
+              minWidth: '300px',
+              background: 'linear-gradient(135deg, #8B5A96 0%, #B68CB8 100%)',
+              color: '#fff',
+              padding: '30px',
               borderRadius: '15px',
-              zIndex: 1
-            }}></div>
+              boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
+              position: 'relative'
+            }}>
+              {/* Dark overlay */}
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'rgba(0, 0, 0, 0.3)',
+                borderRadius: '15px',
+                zIndex: 1
+              }}></div>
+              
+              {/* Content above overlay */}
+              <div style={{ position: 'relative', zIndex: 2 }}>
+                <h2 style={{ 
+                  fontSize: '24px', 
+                  fontWeight: 'bold', 
+                  marginBottom: '15px',
+                  color: '#fff'
+                }}>
+                  {event.title}
+                </h2>
+                <p style={{ 
+                  fontSize: '16px', 
+                  lineHeight: '1.6', 
+                  marginBottom: '20px',
+                  color: '#f0f0f0'
+                }}>
+                  {event.description && getWordCount(event.description) > 25 
+                    ? getTruncatedDescription(event.description, 25)
+                    : event.description}
+                </p>
+                <Dialog open={isDescriptionModalOpen} onOpenChange={setIsDescriptionModalOpen}>
+                  <DialogTrigger asChild>
+                    <button style={{ 
+                      backgroundColor: '#faa817', 
+                      color: '#fff', 
+                      border: 'none', 
+                      padding: '10px 20px', 
+                      borderRadius: '8px', 
+                      cursor: 'pointer',
+                      fontWeight: 'bold',
+                      fontSize: '14px'
+                    }}>
+                      Read More
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle className="text-2xl font-bold">{event.title}</DialogTitle>
+                    </DialogHeader>
+                    <div className="mt-6">
+                      <p className="text-gray-700 leading-relaxed text-lg">
+                        {event.description}
+                      </p>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </div>
             
-            {/* Content above overlay */}
-            <div style={{ position: 'relative', zIndex: 2 }}>
-              <h2 style={{ 
-                fontSize: '24px', 
-                fontWeight: 'bold', 
-                marginBottom: '15px',
-                color: '#fff'
+            <div style={{ 
+              flex: '1',
+              minWidth: '300px'
+            }}>
+              <div style={{ 
+                borderRadius: '15px', 
+                overflow: 'hidden',
+                boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)'
               }}>
-                {event.title}
-              </h2>
-              <p style={{ 
-                fontSize: '16px', 
-                lineHeight: '1.6', 
-                marginBottom: '20px',
-                color: '#f0f0f0'
-              }}>
-                {event.description && getWordCount(event.description) > 25 
-                  ? getTruncatedDescription(event.description, 25)
-                  : event.description}
-              </p>
-              <Dialog open={isDescriptionModalOpen} onOpenChange={setIsDescriptionModalOpen}>
-                <DialogTrigger asChild>
-                  <button style={{ 
-                    backgroundColor: '#faa817', 
-                    color: '#fff', 
-                    border: 'none', 
-                    padding: '10px 20px', 
-                    borderRadius: '8px', 
-                    cursor: 'pointer',
-                    fontWeight: 'bold',
-                    fontSize: '14px'
-                  }}>
-                    Read More
-                  </button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl">
-                  <DialogHeader>
-                    <DialogTitle className="text-2xl font-bold">{event.title}</DialogTitle>
-                  </DialogHeader>
-                  <div className="mt-6">
-                    <p className="text-gray-700 leading-relaxed text-lg">
-                      {event.description}
-                    </p>
-                  </div>
-                </DialogContent>
-              </Dialog>
+                <img
+                  src={event.imageUrl}
+                  alt={event.title}
+                  style={{ 
+                    width: '100%', 
+                    height: '250px', 
+                    objectFit: 'cover'
+                  }}
+                />
+              </div>
             </div>
           </div>
 
