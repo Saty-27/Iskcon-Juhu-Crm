@@ -224,7 +224,7 @@ export default function EventDonation() {
           </div>
 
           {/* Donation Options Title */}
-          <h2 style={{ fontSize: '24px', marginBottom: '20px', textAlign: 'center' }}>
+          <h2 style={{ fontSize: '24px', marginBottom: '20px', textAlign: 'left' }}>
             Donate for {event.title}
           </h2>
 
@@ -303,16 +303,18 @@ export default function EventDonation() {
             borderRadius: '10px', 
             padding: '30px', 
             marginTop: '20px',
-            boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)'
+            boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+            width: '100%'
           }}>
-            <h3 style={{ marginBottom: '20px', textAlign: 'center' }}>
+            <h3 style={{ marginBottom: '20px', textAlign: 'left' }}>
               Any Donation of Your Choice for {event.title}
             </h3>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', alignItems: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '10px', alignItems: 'center', width: '100%' }}>
               <input 
                 type="number" 
                 style={{ 
-                  width: '300px', 
+                  flex: '1', 
+                  maxWidth: '300px',
                   borderRadius: '5px', 
                   border: '1px solid #ddd', 
                   height: '50px', 
