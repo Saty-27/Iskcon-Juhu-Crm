@@ -60,7 +60,11 @@ const useAuth = () => {
       }
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
+      // Set the user data immediately and mark as authenticated
+      queryClient.setQueryData(['/api/auth/me'], data.user);
+      setIsAuthenticated(true);
+      // Also invalidate to ensure fresh data on next fetch
       queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
     }
   });
@@ -79,7 +83,13 @@ const useAuth = () => {
       }
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
+      // Set the user data immediately and mark as authenticated
+      if (data.user) {
+        queryClient.setQueryData(['/api/auth/me'], data.user);
+        setIsAuthenticated(true);
+      }
+      // Also invalidate to ensure fresh data on next fetch
       queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
     }
   });
