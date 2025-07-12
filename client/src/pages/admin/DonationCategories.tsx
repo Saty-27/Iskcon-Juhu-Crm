@@ -200,6 +200,8 @@ const DonationCategoriesPage = () => {
   const handleAddCard = (categoryId: number) => {
     setEditingCard(null);
     setSelectedCategoryId(categoryId);
+    
+    // Reset form with proper categoryId
     cardForm.reset({
       title: '',
       amount: 0,
@@ -209,15 +211,27 @@ const DonationCategoriesPage = () => {
       isActive: true,
       order: 0,
     });
+    
+    // Ensure categoryId is set immediately after reset
+    setTimeout(() => {
+      cardForm.setValue('categoryId', categoryId);
+    }, 0);
+    
     setIsCardDialogOpen(true);
   };
 
   const handleSubmitCard = (data: z.infer<typeof donationCardFormSchema>) => {
+    console.log('Form data received:', data);
+    console.log('Selected category ID:', selectedCategoryId);
+    console.log('Form watch values:', cardForm.watch());
+    
     // Ensure categoryId is set correctly
     const cardData = {
       ...data,
       categoryId: selectedCategoryId || data.categoryId,
     };
+    
+    console.log('Final card data to submit:', cardData);
     
     if (editingCard) {
       updateCardMutation.mutate({ id: editingCard.id, data: cardData });
@@ -448,8 +462,8 @@ const DonationCategoriesPage = () => {
             </DialogHeader>
             <form onSubmit={cardForm.handleSubmit(handleSubmitCard)} className="space-y-4">
               {/* Hidden fields for required data */}
-              <input type="hidden" {...cardForm.register('categoryId')} />
-              <input type="hidden" {...cardForm.register('order')} />
+              <input type="hidden" {...cardForm.register('categoryId', { valueAsNumber: true })} />
+              <input type="hidden" {...cardForm.register('order', { valueAsNumber: true })} />
               
               <div>
                 <Label htmlFor="title">Card Title</Label>
