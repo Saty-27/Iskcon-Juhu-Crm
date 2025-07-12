@@ -306,11 +306,16 @@ const DonationCategoriesPage = () => {
     
     // Load existing payment details
     try {
+      console.log('Loading payment details for category:', categoryId);
       const response = await fetch(`/api/categories/${categoryId}/bank-details`);
+      
       if (response.ok) {
         const bankDetails = await response.json();
+        console.log('Loaded bank details:', bankDetails);
+        
         if (bankDetails && bankDetails.length > 0) {
           const details = bankDetails[0];
+          console.log('Setting payment details:', details);
           setPaymentDetails({
             accountName: details.accountName || '',
             bankName: details.bankName || '',
@@ -320,6 +325,7 @@ const DonationCategoriesPage = () => {
             qrCodeUrl: details.qrCodeUrl || '',
           });
         } else {
+          console.log('No existing payment details found, resetting to empty');
           // Reset to empty if no existing details
           setPaymentDetails({
             accountName: '',
@@ -330,6 +336,8 @@ const DonationCategoriesPage = () => {
             qrCodeUrl: '',
           });
         }
+      } else {
+        console.error('Failed to load payment details, response not ok:', response.status);
       }
     } catch (error) {
       console.error('Error loading payment details:', error);
