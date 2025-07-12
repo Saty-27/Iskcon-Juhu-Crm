@@ -232,17 +232,8 @@ const DonationCategoriesPage = () => {
     console.log('Selected category ID:', selectedCategoryId);
     console.log('Form watch values:', cardForm.watch());
     
-    // Ensure categoryId is set correctly - force it from selectedCategoryId
-    const cardData = {
-      ...data,
-      categoryId: selectedCategoryId!, // Force the categoryId from state
-      order: data.order || 0, // Ensure order is set
-    };
-    
-    console.log('Final card data to submit:', cardData);
-    
     // Validate required fields before submission
-    if (!cardData.categoryId) {
+    if (!selectedCategoryId) {
       toast({ 
         title: 'Error', 
         description: 'Category ID is missing. Please close and reopen the form.', 
@@ -250,6 +241,19 @@ const DonationCategoriesPage = () => {
       });
       return;
     }
+    
+    // Manually construct the card data to ensure categoryId is included
+    const cardData = {
+      title: data.title,
+      amount: data.amount,
+      description: data.description || '',
+      imageUrl: data.imageUrl || '',
+      categoryId: selectedCategoryId, // Force from state
+      isActive: data.isActive !== undefined ? data.isActive : true,
+      order: data.order || 0,
+    };
+    
+    console.log('Final card data to submit:', cardData);
     
     if (editingCard) {
       updateCardMutation.mutate({ id: editingCard.id, data: cardData });
