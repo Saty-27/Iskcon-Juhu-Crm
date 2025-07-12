@@ -121,7 +121,7 @@ const DonationCategoriesPage = () => {
 
   // Debug effect to track modal data changes
   useEffect(() => {
-    console.log('modalPaymentData changed:', modalPaymentData);
+    console.log('🔄 modalPaymentData changed:', modalPaymentData);
   }, [modalPaymentData]);
 
   // Effect to populate form when editing a card
@@ -333,33 +333,24 @@ const DonationCategoriesPage = () => {
   };
 
   const handleOpenPaymentModal = async (categoryId: number) => {
+    console.log('🚀 Opening payment modal for category:', categoryId);
     setSelectedCategoryId(categoryId);
     
-    // First reset modal data to prevent showing old data
-    setModalPaymentData({
-      accountName: '',
-      bankName: '',
-      accountNumber: '',
-      ifscCode: '',
-      swiftCode: '',
-      qrCodeUrl: '',
-    });
-    
-    // Open the modal
+    // Open the modal first
     setIsPaymentModalOpen(true);
     
     // Load existing payment details
     try {
-      console.log('Loading payment details for category:', categoryId);
+      console.log('🔍 Loading payment details for category:', categoryId);
       const response = await fetch(`/api/categories/${categoryId}/bank-details`);
       
       if (response.ok) {
         const bankDetails = await response.json();
-        console.log('Loaded bank details:', bankDetails);
+        console.log('📊 Loaded bank details:', bankDetails);
         
         if (bankDetails && bankDetails.length > 0) {
           const details = bankDetails[0];
-          console.log('Setting modal payment details:', details);
+          console.log('📝 Raw payment details from API:', details);
           
           // Set modal data immediately
           const newModalData = {
@@ -371,17 +362,41 @@ const DonationCategoriesPage = () => {
             qrCodeUrl: details.qrCodeUrl || '',
           };
           
-          console.log('About to set modal payment details:', newModalData);
+          console.log('✅ About to set modal payment details:', newModalData);
           setModalPaymentData(newModalData);
-          console.log('Modal payment details set successfully');
+          console.log('✅ Modal payment details set successfully');
         } else {
-          console.log('No existing payment details found');
+          console.log('❌ No existing payment details found, setting empty data');
+          setModalPaymentData({
+            accountName: '',
+            bankName: '',
+            accountNumber: '',
+            ifscCode: '',
+            swiftCode: '',
+            qrCodeUrl: '',
+          });
         }
       } else {
-        console.error('Failed to load payment details, response not ok:', response.status);
+        console.error('❌ Failed to load payment details, response not ok:', response.status);
+        setModalPaymentData({
+          accountName: '',
+          bankName: '',
+          accountNumber: '',
+          ifscCode: '',
+          swiftCode: '',
+          qrCodeUrl: '',
+        });
       }
     } catch (error) {
-      console.error('Error loading payment details:', error);
+      console.error('❌ Error loading payment details:', error);
+      setModalPaymentData({
+        accountName: '',
+        bankName: '',
+        accountNumber: '',
+        ifscCode: '',
+        swiftCode: '',
+        qrCodeUrl: '',
+      });
     }
   };
 
