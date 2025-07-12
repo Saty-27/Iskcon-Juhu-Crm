@@ -366,10 +366,52 @@ const DonationCategoriesPage = () => {
     }
   };
 
-  const handleOpenPaymentModal = (categoryId: number) => {
+  const handleOpenPaymentModal = async (categoryId: number) => {
     console.log('Opening payment modal for category:', categoryId);
     setSelectedCategoryId(categoryId);
     setIsPaymentModalOpen(true);
+    
+    // Load existing payment details for this category
+    try {
+      const response = await fetch(`/api/categories/${categoryId}/bank-details`);
+      if (response.ok) {
+        const existingDetails = await response.json();
+        console.log('Loaded existing payment details:', existingDetails);
+        
+        if (existingDetails && existingDetails.length > 0) {
+          const details = existingDetails[0];
+          setPaymentFormData({
+            accountName: details.accountName || '',
+            bankName: details.bankName || '',
+            accountNumber: details.accountNumber || '',
+            ifscCode: details.ifscCode || '',
+            swiftCode: details.swiftCode || '',
+            qrCodeUrl: details.qrCodeUrl || '',
+          });
+        } else {
+          // Reset to empty if no existing details
+          setPaymentFormData({
+            accountName: '',
+            bankName: '',
+            accountNumber: '',
+            ifscCode: '',
+            swiftCode: '',
+            qrCodeUrl: '',
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error loading existing payment details:', error);
+      // Reset to empty form on error
+      setPaymentFormData({
+        accountName: '',
+        bankName: '',
+        accountNumber: '',
+        ifscCode: '',
+        swiftCode: '',
+        qrCodeUrl: '',
+      });
+    }
   };
 
   const handleSavePaymentDetails = async () => {
