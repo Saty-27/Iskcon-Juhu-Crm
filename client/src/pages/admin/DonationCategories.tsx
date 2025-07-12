@@ -70,6 +70,29 @@ const DonationCategoriesPage = () => {
     enabled: !!expandedCategory,
   });
 
+  // Fetch payment details for all categories
+  const { data: allPaymentDetails = [] } = useQuery({
+    queryKey: ['/api/bank-details'],
+    queryFn: async () => {
+      const responses = await Promise.all(
+        categories.map(async (category) => {
+          try {
+            const response = await fetch(`/api/categories/${category.id}/bank-details`);
+            if (response.ok) {
+              const bankDetails = await response.json();
+              return { categoryId: category.id, details: bankDetails };
+            }
+            return { categoryId: category.id, details: [] };
+          } catch (error) {
+            return { categoryId: category.id, details: [] };
+          }
+        })
+      );
+      return responses;
+    },
+    enabled: categories.length > 0,
+  });
+
   // Effect to populate form when editing a card
   useEffect(() => {
     if (editingCard && isCardDialogOpen) {
@@ -347,6 +370,7 @@ const DonationCategoriesPage = () => {
       
       setIsPaymentModalOpen(false);
       queryClient.invalidateQueries({ queryKey: ['/api/donation-categories'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/bank-details'] });
     } catch (error) {
       console.error('Save error:', error);
       toast({
@@ -375,6 +399,17 @@ const DonationCategoriesPage = () => {
   const getCustomDonationStatus = (category: DonationCategory) => {
     // For now, assume custom donations are enabled for all categories
     return 'Custom donations enabled';
+  };
+
+  const getPaymentDetailsStatus = (categoryId: number) => {
+    const paymentDetail = allPaymentDetails.find(pd => pd.categoryId === categoryId);
+    if (paymentDetail && paymentDetail.details && paymentDetail.details.length > 0) {
+      const details = paymentDetail.details[0];
+      if (details.accountName && details.bankName && details.accountNumber && details.ifscCode) {
+        return 'Payment details configured';
+      }
+    }
+    return 'Payment details not configured';
   };
 
   if (isLoading) {
@@ -439,7 +474,7 @@ const DonationCategoriesPage = () => {
                       </div>
                       <div className="flex items-center space-x-2">
                         <span className="text-gray-600">🏦</span>
-                        <span>Payment details configured</span>
+                        <span>{getPaymentDetailsStatus(category.id)}</span>
                       </div>
                     </div>
                   </div>
