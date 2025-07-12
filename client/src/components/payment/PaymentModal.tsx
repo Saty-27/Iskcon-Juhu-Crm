@@ -41,6 +41,18 @@ const PaymentModal = ({
   const { user: authUser, isAuthenticated, isLoading: authLoading } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // Fetch bank details for category or event
+  const { data: bankDetails = [] } = useQuery({
+    queryKey: donationCategory 
+      ? [`/api/categories/${donationCategory.id}/bank-details`]
+      : event 
+      ? [`/api/events/${event.id}/bank-details`]
+      : ['/api/bank-details'],
+    enabled: isOpen && (donationCategory || event),
+    staleTime: 0,
+    refetchOnWindowFocus: true,
+  });
+
   // Debug authentication state
   useEffect(() => {
     if (isOpen) {
@@ -49,10 +61,11 @@ const PaymentModal = ({
         authLoading,
         isAuthenticated,
         authUser: authUser ? 'User exists' : 'No user',
-        userId: authUser?.id
+        userId: authUser?.id,
+        bankDetails: bankDetails.length > 0 ? 'Bank details loaded' : 'No bank details'
       });
     }
-  }, [isOpen, authLoading, isAuthenticated, authUser]);
+  }, [isOpen, authLoading, isAuthenticated, authUser, bankDetails]);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -331,6 +344,34 @@ const PaymentModal = ({
               />
             </div>
           </div>
+
+          {/* Bank Details Section */}
+          {bankDetails.length > 0 && (
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+              <h3 className="font-semibold text-blue-900 mb-3">Bank Details for Direct Transfer</h3>
+              <div className="space-y-2 text-sm">
+                <div><strong>Account Name:</strong> {bankDetails[0].accountName}</div>
+                <div><strong>Bank Name:</strong> {bankDetails[0].bankName}</div>
+                <div><strong>Account Number:</strong> {bankDetails[0].accountNumber}</div>
+                <div><strong>IFSC Code:</strong> {bankDetails[0].ifscCode}</div>
+                {bankDetails[0].swiftCode && (
+                  <div><strong>SWIFT Code:</strong> {bankDetails[0].swiftCode}</div>
+                )}
+              </div>
+              
+              {/* QR Code for UPI */}
+              {bankDetails[0].qrCodeUrl && (
+                <div className="mt-4 text-center">
+                  <p className="text-sm text-blue-700 mb-2">Or scan QR code for UPI payment:</p>
+                  <img
+                    src={bankDetails[0].qrCodeUrl}
+                    alt="UPI QR Code"
+                    className="w-32 h-32 mx-auto rounded border"
+                  />
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Payment Button */}
           <div className="flex gap-3">

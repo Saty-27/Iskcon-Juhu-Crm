@@ -75,8 +75,9 @@ const DonationsPage = () => {
   });
 
   // Calculate real donation statistics
-  const completedDonations = donations.filter(d => d.status === 'success');
+  const completedDonations = donations.filter(d => d.status === 'completed');
   const pendingDonations = donations.filter(d => d.status === 'pending');
+  const failedDonations = donations.filter(d => d.status === 'failed');
   const totalAmount = completedDonations.reduce((sum, d) => sum + d.amount, 0);
 
   // Filter donations based on search and filters
