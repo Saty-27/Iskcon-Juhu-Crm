@@ -686,6 +686,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create or update category-specific bank details
+  app.post("/api/categories/:categoryId/bank-details", isAdmin, async (req, res) => {
+    try {
+      const categoryId = parseInt(req.params.categoryId);
+      console.log('Creating/updating category bank details for categoryId:', categoryId);
+      console.log('Request body:', req.body);
+      
+      // Check if bank details already exist for this category
+      const existingDetails = await storage.getCategoryBankDetails(categoryId);
+      
+      if (existingDetails && existingDetails.length > 0) {
+        // Update existing details
+        const bankDetails = await storage.updateCategoryBankDetails(existingDetails[0].id, req.body);
+        if (bankDetails) {
+          res.json(bankDetails);
+        } else {
+          res.status(404).json({ message: "Bank details not found" });
+        }
+      } else {
+        // Create new details
+        const bankDetailsData = {
+          ...req.body,
+          categoryId: categoryId,
+          isActive: true
+        };
+        
+        const bankDetails = await storage.createCategoryBankDetails(bankDetailsData);
+        res.status(201).json(bankDetails);
+      }
+    } catch (error) {
+      console.error('Error creating/updating category bank details:', error);
+      res.status(500).json({ message: "Error creating/updating category bank details" });
+    }
+  });
+
   // Update category-specific bank details
   app.put("/api/categories/:categoryId/bank-details/:id", isAdmin, async (req, res) => {
     try {
