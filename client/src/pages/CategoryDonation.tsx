@@ -6,8 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Helmet } from 'react-helmet';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { DonationCategory, DonationCard, BankDetails } from "@shared/schema";
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -126,193 +124,310 @@ export default function CategoryDonation() {
       
       <Header />
       
-      <main className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-4xl mx-auto px-4">
-          {/* Category Header */}
-          <div className="bg-gradient-to-r from-purple-600 to-purple-800 rounded-2xl p-8 mb-8 text-white">
-            <h1 className="text-4xl font-bold mb-4">{category.name}</h1>
-            <p className="text-purple-100 text-lg mb-6">
-              {category.description && getWordCount(category.description) > 25 
-                ? getTruncatedDescription(category.description, 25)
-                : category.description}
-            </p>
-            <Dialog open={isDescriptionModalOpen} onOpenChange={setIsDescriptionModalOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg">
-                  Read More
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle className="text-2xl font-bold">{category.name}</DialogTitle>
-                </DialogHeader>
-                <div className="mt-6">
-                  <p className="text-gray-700 leading-relaxed text-lg">
-                    {category.description}
-                  </p>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
+      <main style={{ padding: '20px', backgroundColor: '#F5F3F3', color: '#333', minHeight: '100vh' }}>
+        <div className="max-w-6xl mx-auto">
+          {/* Title */}
+          <h1 style={{ textAlign: 'center', fontSize: '32px', fontWeight: 'bold', marginBottom: '10px' }}>
+            {category.name}
+          </h1>
+          
+          {/* Title Underline */}
+          <div style={{ 
+            width: '100px', 
+            height: '4px', 
+            backgroundColor: '#faa817', 
+            margin: '0 auto 20px auto', 
+            borderRadius: '2px' 
+          }}></div>
 
-          {/* Tabs for Category Details */}
-          <Tabs defaultValue="details" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 mb-8">
-              <TabsTrigger value="details">Category Details</TabsTrigger>
-              <TabsTrigger value="donation-cards">Donation Cards</TabsTrigger>
-              <TabsTrigger value="custom-donation">Custom Donation</TabsTrigger>
-              <TabsTrigger value="payment-details">Payment Details</TabsTrigger>
-            </TabsList>
-
-            {/* Category Details Tab */}
-            <TabsContent value="details" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Category Information</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <h3 className="font-semibold text-lg mb-2">Category Name</h3>
-                      <p className="text-gray-600">{category.name}</p>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-lg mb-2">Description</h3>
-                      <p className="text-gray-600">{category.description}</p>
-                    </div>
-                    {category.imageUrl && (
-                      <div className="md:col-span-2">
-                        <h3 className="font-semibold text-lg mb-2">Category Image</h3>
-                        <img 
-                          src={category.imageUrl} 
-                          alt={category.name}
-                          className="w-full max-w-md rounded-lg shadow-md"
-                        />
-                      </div>
-                    )}
+          {/* Category Information Section */}
+          <div style={{ 
+            display: 'flex', 
+            gap: '20px', 
+            marginBottom: '30px',
+            flexWrap: 'wrap'
+          }}>
+            <div style={{ 
+              flex: '1',
+              minWidth: '300px',
+              background: 'linear-gradient(135deg, #8B5A96 0%, #B68CB8 100%)',
+              color: '#fff',
+              padding: '30px',
+              borderRadius: '15px',
+              boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
+              position: 'relative'
+            }}>
+              <h2 style={{ 
+                fontSize: '24px', 
+                fontWeight: 'bold', 
+                marginBottom: '15px',
+                color: '#fff'
+              }}>
+                {category.name}
+              </h2>
+              <p style={{ 
+                fontSize: '16px', 
+                lineHeight: '1.6', 
+                marginBottom: '20px',
+                color: '#f0f0f0'
+              }}>
+                {category.description && getWordCount(category.description) > 25 
+                  ? getTruncatedDescription(category.description, 25)
+                  : category.description}
+              </p>
+              <Dialog open={isDescriptionModalOpen} onOpenChange={setIsDescriptionModalOpen}>
+                <DialogTrigger asChild>
+                  <button style={{ 
+                    backgroundColor: '#faa817', 
+                    color: '#fff', 
+                    border: 'none', 
+                    padding: '10px 20px', 
+                    borderRadius: '8px', 
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    fontSize: '14px'
+                  }}>
+                    Read More
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl font-bold">{category.name}</DialogTitle>
+                  </DialogHeader>
+                  <div className="mt-6">
+                    <p className="text-gray-700 leading-relaxed text-lg">
+                      {category.description}
+                    </p>
                   </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Donation Cards Tab */}
-            <TabsContent value="donation-cards" className="space-y-6">
-              <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold mb-2">{category.name} - Donation Options</h2>
-                <p className="text-gray-600">Choose from our donation packages to support this category</p>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {activeDonationCards.length > 0 ? activeDonationCards.map((card) => (
-                  <Card key={card.id} className="hover:shadow-lg transition-shadow">
-                    <CardContent className="p-6 text-center">
-                      <h3 className="text-xl font-semibold mb-2">{card.title}</h3>
-                      <div className="text-3xl font-bold text-orange-600 mb-4">₹{card.amount}</div>
-                      {card.description && (
-                        <p className="text-gray-600 text-sm mb-4">{card.description}</p>
-                      )}
-                      <Button 
-                        onClick={() => handleDonateClick(card)}
-                        className="w-full bg-orange-500 hover:bg-orange-600 text-white"
-                      >
-                        Add Donation
-                      </Button>
-                    </CardContent>
-                  </Card>
-                )) : (
-                  <div className="col-span-full text-center py-8">
-                    <p className="text-gray-500">No donation cards available for this category</p>
+                </DialogContent>
+              </Dialog>
+            </div>
+            
+            <div style={{ 
+              flex: '1',
+              minWidth: '300px'
+            }}>
+              <div style={{ 
+                borderRadius: '15px', 
+                overflow: 'hidden',
+                boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)'
+              }}>
+                {category.imageUrl ? (
+                  <img
+                    src={category.imageUrl}
+                    alt={category.name}
+                    style={{ 
+                      width: '100%', 
+                      height: '250px', 
+                      objectFit: 'cover'
+                    }}
+                  />
+                ) : (
+                  <div style={{ 
+                    width: '100%', 
+                    height: '250px', 
+                    backgroundColor: '#ddd', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    color: '#666'
+                  }}>
+                    No Image Available
                   </div>
                 )}
               </div>
-            </TabsContent>
+            </div>
+          </div>
 
-            {/* Custom Donation Tab */}
-            <TabsContent value="custom-donation" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Any Donation of Your Choice for {category.name}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-col md:flex-row gap-4 items-end">
-                    <div className="flex-1">
-                      <Label htmlFor="custom-amount">Enter the Amount</Label>
-                      <Input
-                        id="custom-amount"
-                        type="number"
-                        placeholder="Enter amount"
-                        value={customAmount}
-                        onChange={(e) => setCustomAmount(e.target.value)}
-                        className="mt-2"
-                      />
-                    </div>
-                    <Button 
-                      onClick={handleCustomDonation}
-                      className="bg-orange-500 hover:bg-orange-600 text-white px-8"
-                      disabled={!customAmount || parseInt(customAmount) <= 0}
-                    >
-                      Donate
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
+          {/* Donation Options Title */}
+          <h2 style={{ fontSize: '24px', marginBottom: '20px', textAlign: 'center' }}>
+            Donate for {category.name}
+          </h2>
 
-            {/* Payment Details Tab */}
-            <TabsContent value="payment-details" className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Account Details</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {currentBankDetail ? (
-                      <div className="space-y-4">
-                        <div>
-                          <Label>Bank Name:</Label>
-                          <p className="font-medium">{currentBankDetail.bankName}</p>
-                        </div>
-                        <div>
-                          <Label>Account Name:</Label>
-                          <p className="font-medium">{currentBankDetail.accountName}</p>
-                        </div>
-                        <div>
-                          <Label>Account Number:</Label>
-                          <p className="font-medium">{currentBankDetail.accountNumber}</p>
-                        </div>
-                        <div>
-                          <Label>IFSC Code:</Label>
-                          <p className="font-medium">{currentBankDetail.ifscCode}</p>
-                        </div>
-                      </div>
-                    ) : (
-                      <p className="text-gray-500">No bank details available</p>
-                    )}
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Donate through UPI</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {currentBankDetail?.qrCodeUrl ? (
-                      <div className="text-center">
-                        <img 
-                          src={currentBankDetail.qrCodeUrl} 
-                          alt="UPI QR Code"
-                          className="mx-auto mb-4 max-w-48"
-                        />
-                        <p className="text-sm text-gray-600">Scan to donate via UPI</p>
-                      </div>
-                    ) : (
-                      <p className="text-gray-500">UPI QR Code not available</p>
-                    )}
-                  </CardContent>
-                </Card>
+          {/* Donation Cards */}
+          <div style={{ 
+            display: 'flex', 
+            flexWrap: 'wrap', 
+            gap: '20px', 
+            marginBottom: '30px' 
+          }}>
+            {activeDonationCards.length > 0 ? activeDonationCards.map((card) => (
+              <div key={card.id} style={{ 
+                backgroundColor: '#fff', 
+                padding: '15px', 
+                border: '1px solid #ddd', 
+                borderRadius: '8px', 
+                flex: '1 1 calc(25% - 20px)', 
+                boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+                minWidth: '200px'
+              }}>
+                <p style={{ 
+                  fontSize: '16px', 
+                  marginBottom: '10px', 
+                  fontWeight: 'bold' 
+                }}>
+                  {card.title}
+                </p>
+                <p style={{ 
+                  color: '#faa817', 
+                  marginBottom: '10px', 
+                  fontSize: '18px', 
+                  fontWeight: 'bold' 
+                }}>
+                  ₹{card.amount.toLocaleString()}
+                </p>
+                {card.description && (
+                  <p style={{ 
+                    fontSize: '14px', 
+                    color: '#666', 
+                    marginBottom: '10px' 
+                  }}>
+                    {card.description}
+                  </p>
+                )}
+                <button 
+                  onClick={() => handleDonateClick(card)}
+                  style={{ 
+                    backgroundColor: '#faa817', 
+                    color: '#fff', 
+                    border: 'none', 
+                    padding: '10px 15px', 
+                    borderRadius: '5px', 
+                    cursor: 'pointer',
+                    width: '100%' 
+                  }}
+                >
+                  Add Donation
+                </button>
               </div>
-            </TabsContent>
-          </Tabs>
+            )) : (
+              <div style={{ 
+                textAlign: 'center', 
+                backgroundColor: '#fff', 
+                padding: '40px', 
+                borderRadius: '8px', 
+                width: '100%' 
+              }}>
+                <p>No donation cards available for this category</p>
+              </div>
+            )}
+          </div>
+
+          {/* Custom Donation */}
+          <div style={{ 
+            background: 'white', 
+            borderRadius: '10px', 
+            padding: '30px', 
+            marginTop: '20px',
+            boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)'
+          }}>
+            <h3 style={{ marginBottom: '20px', textAlign: 'center' }}>
+              Any Donation of Your Choice for {category.name}
+            </h3>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', alignItems: 'center' }}>
+              <input 
+                type="number" 
+                style={{ 
+                  width: '300px', 
+                  borderRadius: '5px', 
+                  border: '1px solid #ddd', 
+                  height: '50px', 
+                  fontSize: '18px', 
+                  padding: '10px' 
+                }} 
+                value={customAmount} 
+                onChange={(e) => setCustomAmount(e.target.value)} 
+                placeholder="Enter the Amount"
+              />
+              <button 
+                style={{ 
+                  backgroundColor: '#faa817', 
+                  color: '#fff', 
+                  border: 'none', 
+                  padding: '15px 25px', 
+                  borderRadius: '5px', 
+                  cursor: 'pointer', 
+                  fontSize: '18px' 
+                }} 
+                onClick={handleCustomDonation}
+                disabled={!customAmount || parseInt(customAmount) <= 0}
+              >
+                Donate
+              </button>
+            </div>
+          </div>
+
+          {/* Account Details and UPI - only show if available */}
+          {currentBankDetail && (
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              marginTop: '30px', 
+              gap: '20px' 
+            }}>
+              <div style={{ 
+                flex: 1, 
+                backgroundColor: '#fff', 
+                padding: '20px', 
+                borderRadius: '8px', 
+                boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)' 
+              }}>
+                <h3 style={{ marginBottom: '15px' }}>Account Details</h3>
+                <p style={{ marginBottom: '8px' }}>Bank Name: {currentBankDetail.bankName}</p>
+                <p style={{ marginBottom: '8px' }}>Account Name: {currentBankDetail.accountName}</p>
+                <p style={{ marginBottom: '8px' }}>Account Number: {currentBankDetail.accountNumber}</p>
+                <p style={{ marginBottom: '8px' }}>IFSC Code: {currentBankDetail.ifscCode}</p>
+              </div>
+              
+              <div style={{ 
+                flex: 1, 
+                textAlign: 'center', 
+                backgroundColor: '#fff', 
+                padding: '20px', 
+                borderRadius: '8px', 
+                boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)' 
+              }}>
+                <h3 style={{ marginBottom: '15px' }}>Donate through UPI</h3>
+                {currentBankDetail.qrCodeUrl ? (
+                  <img 
+                    src={currentBankDetail.qrCodeUrl} 
+                    alt="QR Code" 
+                    style={{ height: '200px', width: '200px', objectFit: 'contain' }}
+                  />
+                ) : (
+                  <p>QR Code not available</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Receipt Information */}
+          <div style={{ 
+            backgroundColor: '#fff', 
+            padding: '20px', 
+            borderRadius: '8px', 
+            marginTop: '20px', 
+            boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)' 
+          }}>
+            <h3 style={{ marginBottom: '15px' }}>Receipts for your donation</h3>
+            <p style={{ marginBottom: '10px' }}>
+              Support {category.name} at ISKCON Juhu. Your donation helps us continue our sacred services.
+            </p>
+            <p style={{ marginBottom: '10px' }}>
+              80G available as per Income Tax Act 1961 and rules made thereunder.
+            </p>
+            <p>
+              To get the receipt of donation, please share your details with our team.
+            </p>
+          </div>
+
+          {/* Support */}
+          <div style={{ marginTop: '20px', textAlign: 'center' }}>
+            <h3 style={{ fontSize: '20px', marginBottom: '10px' }}>Support</h3>
+            <p style={{ fontSize: '14px' }}>
+              For more information please contact us for assistance.
+            </p>
+          </div>
         </div>
       </main>
 
