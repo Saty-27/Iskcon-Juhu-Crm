@@ -71,7 +71,16 @@ const ThankYou = () => {
     
     setIsDownloading(true);
     try {
-      const response = await fetch(`/api/payments/receipt/${paymentDetails.txnid}`);
+      // First, get the donation ID from the payment ID
+      const donationResponse = await fetch(`/api/donations/by-payment-id/${paymentDetails.txnid}`);
+      if (!donationResponse.ok) {
+        throw new Error('Failed to find donation record');
+      }
+      
+      const donation = await donationResponse.json();
+      
+      // Then download the receipt using the donation ID
+      const response = await fetch(`/api/receipt/download/${donation.id}`);
       if (!response.ok) {
         throw new Error('Failed to download receipt');
       }
@@ -80,7 +89,7 @@ const ThankYou = () => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `ISKCON_Receipt_${paymentDetails.txnid}.pdf`;
+      a.download = `ISKCON_Receipt_${donation.id}.pdf`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);

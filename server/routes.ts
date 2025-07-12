@@ -1334,6 +1334,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get donation by payment ID
+  app.get("/api/donations/by-payment-id/:paymentId", async (req, res) => {
+    try {
+      const { paymentId } = req.params;
+      const donation = await storage.getDonationByPaymentId(paymentId);
+      
+      if (!donation) {
+        return res.status(404).json({ message: "Donation not found" });
+      }
+      
+      res.json(donation);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching donation" });
+    }
+  });
+
   // Payment webhook (for PayU)
   app.post("/api/donations/payment-webhook", async (req, res) => {
     try {
