@@ -31,9 +31,11 @@ import { z } from "zod";
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-// Middleware to verify if user is authenticated - TEMPORARILY DISABLED
+// Middleware to verify if user is authenticated
 const isAuthenticated = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  // Authentication temporarily disabled for testing
+  if (!req.session || !req.session.userId) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
   next();
 };
 
@@ -57,7 +59,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       secret: process.env.SESSION_SECRET || "iskcon_juhu_secret",
       resave: false,
       saveUninitialized: false,
-      cookie: { maxAge: 86400000 } // 1 day
+      cookie: { 
+        maxAge: 86400000, // 1 day
+        httpOnly: true,
+        secure: false, // Set to true in production with HTTPS
+        sameSite: 'lax'
+      }
     })
   );
 
@@ -1323,10 +1330,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/user/donations", isAuthenticated, async (req, res) => {
     try {
-      if (!req.session.userId) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-      
       const donations = await storage.getUserDonations(req.session.userId);
       res.json(donations);
     } catch (error) {
@@ -1580,9 +1583,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       req.session.userId = user.id;
       
-      res.json({
-        message: "Login successful",
-        user: userWithoutPassword
+      // Save session explicitly to ensure it's persisted
+      req.session.save((err) => {
+        if (err) {
+          console.error('Session save error:', err);
+          return res.status(500).json({ message: "Error saving session" });
+        }
+        
+        res.json({
+          message: "Login successful",
+          user: userWithoutPassword
+        });
       });
     } catch (error) {
       res.status(500).json({ message: "Error during login" });
