@@ -375,6 +375,8 @@ const DonationCategoriesPage = () => {
   const handleSavePaymentDetails = async () => {
     if (!selectedCategoryId) return;
     
+    console.log('Saving payment details:', paymentFormData);
+    
     try {
       const response = await fetch(`/api/categories/${selectedCategoryId}/bank-details`, {
         method: 'POST',
@@ -384,9 +386,17 @@ const DonationCategoriesPage = () => {
         body: JSON.stringify(paymentFormData),
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+
       if (!response.ok) {
-        throw new Error('Failed to save payment details');
+        const errorText = await response.text();
+        console.error('Server error response:', errorText);
+        throw new Error(`Server error: ${response.status} - ${errorText}`);
       }
+
+      const result = await response.json();
+      console.log('Save result:', result);
 
       toast({
         title: 'Success',
@@ -398,10 +408,10 @@ const DonationCategoriesPage = () => {
       queryClient.invalidateQueries({ queryKey: ['/api/bank-details'] });
       queryClient.invalidateQueries({ queryKey: ['/api/categories', selectedCategoryId, 'bank-details'] });
     } catch (error) {
-      console.error('Save error:', error);
+      console.error('Save error details:', error);
       toast({
         title: 'Error',
-        description: 'Failed to save payment details',
+        description: `Failed to save payment details: ${error.message}`,
         variant: 'destructive',
       });
     }
@@ -410,7 +420,14 @@ const DonationCategoriesPage = () => {
   const handleClosePaymentModal = () => {
     setIsPaymentModalOpen(false);
     setSelectedCategoryId(null);
-    paymentForm.reset();
+    setPaymentFormData({
+      accountName: '',
+      bankName: '',
+      accountNumber: '',
+      ifscCode: '',
+      swiftCode: '',
+      qrCodeUrl: '',
+    });
   };
 
   // Form submission is now handled inline in the form onSubmit handler
@@ -758,10 +775,6 @@ const DonationCategoriesPage = () => {
               </div>
             ) : (
               <div className="space-y-4">
-                {/* Debug info - will remove later */}
-                <div className="p-2 bg-gray-100 text-xs rounded">
-                  <strong>Debug State:</strong> {JSON.stringify(paymentFormData, null, 2)}
-                </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="accountName">Account Holder Name</Label>
@@ -865,44 +878,7 @@ const DonationCategoriesPage = () => {
                   </Button>
                 </div>
 
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-500">or</span>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      const input = document.createElement('input');
-                      input.type = 'file';
-                      input.accept = 'image/*';
-                      input.onchange = (e) => {
-                        const file = (e.target as HTMLInputElement).files?.[0];
-                        if (file) {
-                          if (file.size > 1024 * 1024) {
-                            toast({
-                              title: 'File too large',
-                              description: 'Please select an image smaller than 1MB',
-                              variant: 'destructive',
-                            });
-                            return;
-                          }
-                          handleFileUpload(file);
-                        }
-                      };
-                      input.click();
-                    }}
-                    disabled={uploadingQR}
-                  >
-                    {uploadingQR ? (
-                      <>
-                        <div className="animate-spin w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full mr-2" />
-                        Uploading...
-                      </>
-                    ) : (
-                      'Upload QR Code'
-                    )}
-                  </Button>
-                </div>
+
 
                 {paymentFormData.qrCodeUrl && (
                   <div className="mt-2">
