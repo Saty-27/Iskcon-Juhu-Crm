@@ -65,15 +65,7 @@ const DonationsPage = () => {
     gcTime: 0, // Don't cache the data (gcTime is the new name for cacheTime)
   });
 
-  // Debug: Log the donations data
-  React.useEffect(() => {
-    console.log('Donations data:', donations);
-    console.log('Donations length:', donations.length);
-    if (donations.length > 0) {
-      console.log('First donation:', donations[0]);
-      console.log('Status of first donation:', donations[0].status);
-    }
-  }, [donations]);
+
 
   // Force refresh on page load
   React.useEffect(() => {

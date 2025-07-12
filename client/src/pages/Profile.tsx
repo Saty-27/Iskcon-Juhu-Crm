@@ -195,7 +195,7 @@ const Profile = () => {
                               {donation.categoryId ? "Category Donation" : "Event Donation"}
                             </h3>
                             <span className={`px-2 py-1 text-xs font-medium rounded ${
-                              donation.status === 'success' 
+                              donation.status === 'completed' 
                                 ? 'bg-green-100 text-green-800' 
                                 : donation.status === 'pending'
                                 ? 'bg-yellow-100 text-yellow-800'

@@ -155,13 +155,13 @@ const AdminDashboard = () => {
                         </td>
                         <td className="py-3 px-4">
                           <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                            donation.status === 'success'
+                            donation.status === 'completed'
                               ? 'bg-green-100 text-green-700'
                               : donation.status === 'pending'
                               ? 'bg-yellow-100 text-yellow-700'
                               : 'bg-red-100 text-red-700'
                           }`}>
-                            {donation.status === 'success' ? 'Completed' : 
+                            {donation.status === 'completed' ? 'Completed' : 
                              donation.status === 'pending' ? 'Pending' : 'Failed'}
                           </span>
                         </td>
