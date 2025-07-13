@@ -55,6 +55,7 @@ const Login = () => {
   const onSubmit = async (data: LoginFormValues) => {
     try {
       const result = await login(data);
+      console.log('Login result:', result);
       
       toast({
         title: "Login Successful",
@@ -65,14 +66,20 @@ const Login = () => {
       const params = new URLSearchParams(window.location.search);
       const redirectPath = params.get('redirect');
       
+      console.log('Redirect path:', redirectPath);
+      console.log('User role:', result?.user?.role);
+      
       if (redirectPath) {
         // If there's a redirect parameter, use it
+        console.log('Redirecting to:', redirectPath);
         setLocation(redirectPath);
       } else {
         // Otherwise redirect based on user role
-        if (result.user && result.user.role === 'admin') {
+        if (result?.user?.role === 'admin') {
+          console.log('Redirecting admin to /admin');
           setLocation('/admin');
         } else {
+          console.log('Redirecting user to /profile');
           setLocation('/profile');
         }
       }
