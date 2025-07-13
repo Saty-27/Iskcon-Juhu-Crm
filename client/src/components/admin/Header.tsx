@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Menu, Download, User, HelpCircle, LogOut, Home } from 'lucide-react';
+import { Menu, Download, User, HelpCircle, LogOut } from 'lucide-react';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -22,10 +22,6 @@ const Header = () => {
   const handleLogout = async () => {
     await logout();
     setLocation('/'); // Redirect to home page after logout
-  };
-
-  const handleBackToWebsite = () => {
-    setLocation('/'); // Navigate to home page
   };
 
   const toggleMobileMenu = () => {
@@ -51,16 +47,16 @@ const Header = () => {
       </div>
 
       <div className="flex items-center space-x-4">
-        {/* Back to Website Button */}
+        {/* Logout Button */}
         <Button 
-          onClick={handleBackToWebsite}
+          onClick={handleLogout}
           variant="outline" 
           size="sm"
-          className="flex items-center hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200"
-          title="Back to Website"
+          className="flex items-center hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+          title="Logout"
         >
-          <Home className="h-4 w-4 md:mr-2" />
-          <span className="hidden md:inline">Back to Website</span>
+          <LogOut className="h-4 w-4 md:mr-2" />
+          <span className="hidden md:inline">Logout</span>
         </Button>
 
         {/* Tour Help Button */}
@@ -81,18 +77,6 @@ const Header = () => {
             Export Donations
           </Button>
         )}
-
-        {/* Logout Button */}
-        <Button 
-          onClick={handleLogout}
-          variant="outline" 
-          size="sm"
-          className="flex items-center hover:bg-red-50 hover:text-red-600 hover:border-red-200"
-          title="Logout"
-        >
-          <LogOut className="h-4 w-4 md:mr-2" />
-          <span className="hidden md:inline">Logout</span>
-        </Button>
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
