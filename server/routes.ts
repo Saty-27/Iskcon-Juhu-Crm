@@ -65,9 +65,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         httpOnly: true,
         secure: false, // Set to true in production with HTTPS
         sameSite: 'lax'
-      }
+      },
+      name: 'sessionId' // Explicit session name
     })
   );
+  
+  // Debug middleware to log session info
+  app.use((req, res, next) => {
+    console.log('Session middleware check:', {
+      sessionId: req.sessionID,
+      userId: req.session?.userId,
+      sessionExists: !!req.session
+    });
+    next();
+  });
 
   // Configure multer for file uploads
   const uploadsDir = path.join(process.cwd(), 'uploads');
