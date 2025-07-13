@@ -77,9 +77,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const galleryDir = path.join(uploadsDir, 'gallery');
   const videosDir = path.join(uploadsDir, 'videos');
   const blogDir = path.join(uploadsDir, 'blog');
+  const socialIconsDir = path.join(uploadsDir, 'social-icons');
   
   // Create directories if they don't exist
-  [uploadsDir, bannersDir, cardsDir, qrCodesDir, galleryDir, videosDir, blogDir].forEach(dir => {
+  [uploadsDir, bannersDir, cardsDir, qrCodesDir, galleryDir, videosDir, blogDir, socialIconsDir].forEach(dir => {
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
@@ -100,6 +101,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         destDir = videosDir;
       } else if (type === 'blog') {
         destDir = blogDir;
+      } else if (type === 'social-icon') {
+        destDir = socialIconsDir;
       }
       
       console.log('Upload destination for type', type, ':', destDir);
@@ -171,6 +174,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     }
   }));
+  app.use('/uploads/social-icons', express.static(socialIconsDir, {
+    setHeaders: (res, path) => {
+      if (path.endsWith('.svg')) {
+        res.setHeader('Content-Type', 'image/svg+xml');
+      }
+    }
+  }));
 
   // Generic upload endpoint - move file to correct directory after upload
   app.post("/api/upload", upload.single('file'), (req, res) => {
@@ -201,6 +211,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else if (type === 'blog') {
         targetDir = blogDir;
         folder = 'blog';
+      } else if (type === 'social-icon') {
+        targetDir = socialIconsDir;
+        folder = 'social-icons';
       }
       
       // If file is not in the correct directory, move it
@@ -2094,6 +2107,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Payment failure handler error:', error);
       res.redirect('/payment/failure?error=processing_error');
+    }
+  });
+
+  // Social icon upload endpoint
+  app.post("/api/upload/social-icon", isAdmin, upload.single('icon'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      
+      // Move file to social-icons directory
+      const originalPath = req.file.path;
+      const filename = 'social-icon-' + Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(req.file.originalname);
+      const targetPath = path.join(socialIconsDir, filename);
+      
+      // Move file to correct directory
+      fs.renameSync(originalPath, targetPath);
+      
+      const imageUrl = `/uploads/social-icons/${filename}`;
+      res.json({ url: imageUrl });
+    } catch (error) {
+      console.error('Error uploading social icon:', error);
+      res.status(500).json({ message: "Error uploading social icon", error: error instanceof Error ? error.message : String(error) });
     }
   });
 

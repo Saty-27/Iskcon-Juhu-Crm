@@ -35,8 +35,10 @@ const SocialLinksPage = () => {
   const [formData, setFormData] = useState({
     platform: "",
     url: "",
-    isActive: true
+    isActive: true,
+    icon: ""
   });
+  const [uploadingIcon, setUploadingIcon] = useState(false);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -59,14 +61,14 @@ const SocialLinksPage = () => {
   });
 
   const createLinkMutation = useMutation({
-    mutationFn: async (data: { platform: string; url: string; isActive: boolean }) => {
+    mutationFn: async (data: { platform: string; url: string; isActive: boolean; icon?: string }) => {
       return await apiRequest("/api/social-links", "POST", data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/social-links'] });
       toast({ title: "Success", description: "Social link created successfully" });
       setIsAddDialogOpen(false);
-      setFormData({ platform: "", url: "", isActive: true });
+      setFormData({ platform: "", url: "", isActive: true, icon: "" });
     },
     onError: () => {
       toast({ title: "Error", description: "Failed to create social link", variant: "destructive" });
@@ -74,7 +76,7 @@ const SocialLinksPage = () => {
   });
 
   const updateLinkMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: { platform: string; url: string; isActive: boolean } }) => {
+    mutationFn: async ({ id, data }: { id: number; data: { platform: string; url: string; isActive: boolean; icon?: string } }) => {
       return await apiRequest(`/api/social-links/${id}`, "PUT", data);
     },
     onSuccess: () => {
@@ -82,7 +84,7 @@ const SocialLinksPage = () => {
       toast({ title: "Success", description: "Social link updated successfully" });
       setIsEditDialogOpen(false);
       setEditingLink(null);
-      setFormData({ platform: "", url: "", isActive: true });
+      setFormData({ platform: "", url: "", isActive: true, icon: "" });
     },
     onError: () => {
       toast({ title: "Error", description: "Failed to update social link", variant: "destructive" });
@@ -107,7 +109,7 @@ const SocialLinksPage = () => {
   };
 
   const handleAddLink = () => {
-    setFormData({ platform: "", url: "", isActive: true });
+    setFormData({ platform: "", url: "", isActive: true, icon: "" });
     setIsAddDialogOpen(true);
   };
 
@@ -116,9 +118,36 @@ const SocialLinksPage = () => {
     setFormData({
       platform: link.platform,
       url: link.url,
-      isActive: link.isActive
+      isActive: link.isActive,
+      icon: link.icon || ""
     });
     setIsEditDialogOpen(true);
+  };
+
+  const handleIconUpload = async (file: File) => {
+    try {
+      setUploadingIcon(true);
+      
+      const formData = new FormData();
+      formData.append('icon', file);
+      
+      const response = await fetch('/api/upload/social-icon', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+      
+      const data = await response.json();
+      setFormData(prev => ({ ...prev, icon: data.url }));
+      toast({ title: "Success", description: "Icon uploaded successfully" });
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to upload icon", variant: "destructive" });
+    } finally {
+      setUploadingIcon(false);
+    }
   };
 
   const handleSubmit = () => {
@@ -434,7 +463,7 @@ const SocialLinksPage = () => {
             setIsAddDialogOpen(false);
             setIsEditDialogOpen(false);
             setEditingLink(null);
-            setFormData({ platform: "", url: "", isActive: true });
+            setFormData({ platform: "", url: "", isActive: true, icon: "" });
           }
         }}>
           <DialogContent className="max-w-lg">
@@ -466,6 +495,69 @@ const SocialLinksPage = () => {
                 />
               </div>
               
+              <div>
+                <Label htmlFor="icon">Icon</Label>
+                <div className="flex items-center space-x-2">
+                  <Input
+                    id="icon"
+                    placeholder="Icon URL or upload an icon"
+                    value={formData.icon}
+                    onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const input = document.createElement('input');
+                      input.type = 'file';
+                      input.accept = 'image/*';
+                      input.onchange = (e) => {
+                        const file = (e.target as HTMLInputElement).files?.[0];
+                        if (file) {
+                          // Validate file size (1MB limit)
+                          if (file.size > 1024 * 1024) {
+                            toast({
+                              title: 'File too large',
+                              description: 'Please select an image smaller than 1MB',
+                              variant: 'destructive',
+                            });
+                            return;
+                          }
+                          handleIconUpload(file);
+                        }
+                      };
+                      input.click();
+                    }}
+                    disabled={uploadingIcon}
+                  >
+                    {uploadingIcon ? (
+                      <>
+                        <div className="animate-spin w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full mr-2" />
+                        Uploading...
+                      </>
+                    ) : (
+                      'Upload Icon'
+                    )}
+                  </Button>
+                </div>
+                
+                {formData.icon && (
+                  <div className="mt-2">
+                    <div className="text-xs text-gray-600 mb-1">Icon Preview:</div>
+                    <img 
+                      src={formData.icon} 
+                      alt="Icon preview" 
+                      className="w-8 h-8 object-cover rounded border border-gray-300"
+                      onError={(e) => {
+                        console.log('Icon image failed to load:', formData.icon);
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+              
               <div className="flex items-center space-x-2">
                 <Switch
                   id="isActive"
@@ -484,7 +576,7 @@ const SocialLinksPage = () => {
                   setIsAddDialogOpen(false);
                   setIsEditDialogOpen(false);
                   setEditingLink(null);
-                  setFormData({ platform: "", url: "", isActive: true });
+                  setFormData({ platform: "", url: "", isActive: true, icon: "" });
                 }}
               >
                 Cancel

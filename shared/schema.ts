@@ -275,12 +275,14 @@ export const socialLinks = pgTable("social_links", {
   id: serial("id").primaryKey(),
   platform: text("platform").notNull(),
   url: text("url").notNull(),
-  icon: text("icon").notNull(),
+  icon: text("icon"),
   isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const insertSocialLinkSchema = createInsertSchema(socialLinks).omit({
   id: true,
+  createdAt: true,
 });
 
 // Donations table
