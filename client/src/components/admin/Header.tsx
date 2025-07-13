@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Menu, Download, User, HelpCircle } from 'lucide-react';
+import { Menu, Download, User, HelpCircle, LogOut } from 'lucide-react';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -60,6 +60,18 @@ const Header = () => {
             Export Donations
           </Button>
         )}
+
+        {/* Logout Button */}
+        <Button 
+          onClick={logout}
+          variant="outline" 
+          size="sm"
+          className="hidden md:flex items-center hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+          title="Logout"
+        >
+          <LogOut className="h-4 w-4 mr-2" />
+          Logout
+        </Button>
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
