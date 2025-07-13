@@ -68,20 +68,7 @@ app.use((req, res, next) => {
   // Initialize blog data
   await initializeBlogData();
   
-  // Create a new admin user with known credentials
-  try {
-    const newAdmin = await storage.createUser({
-      username: "iskconadmin",
-      password: "iskcon123",
-      email: "admin2@iskconjuhu.org",
-      name: "ISKCON Admin",
-      role: "admin"
-    });
-    console.log("New admin created with username: iskconadmin and password: iskcon123");
-  } catch (error) {
-    // If user already exists, this will fail which is fine
-    console.log("Note: New admin account already exists or couldn't be created");
-  }
+  // Admin user creation is handled by createDefaultAdmin() function above
   
   const server = await registerRoutes(app);
 

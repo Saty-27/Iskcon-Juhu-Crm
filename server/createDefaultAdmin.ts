@@ -5,18 +5,18 @@ import { storage } from "./storage";
  */
 export async function createDefaultAdmin() {
   try {
-    // Check if the admin user already exists
-    const existingAdmin = await storage.getUserByUsername("admin");
+    // Check if the new admin user already exists
+    const existingAdmin = await storage.getUserByUsername("isk_conjuhuadmin");
     
     if (!existingAdmin) {
       console.log("Creating default admin user...");
       
-      // Create a default admin user
+      // Create the new admin user
       const adminUser = await storage.createUser({
-        username: "admin",
-        password: "admin1234", // In a real app, this would be hashed
+        username: "isk_conjuhuadmin",
+        password: "isk_conjuhukrishnaconsiousness", // In a real app, this would be hashed
         email: "admin@iskconjuhu.org",
-        name: "Admin User",
+        name: "ISKCON Juhu Admin",
         role: "admin"
       });
       
