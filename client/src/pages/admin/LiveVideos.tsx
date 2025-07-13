@@ -13,6 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { LiveVideo } from '@shared/schema';
+import Layout from '@/components/admin/Layout';
 
 const liveVideoSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -155,7 +156,7 @@ const LiveVideos = () => {
   };
 
   return (
-    <>
+    <Layout>
       <Helmet>
         <title>Live Videos Management - ISKCON Juhu Admin</title>
         <meta name="description" content="Manage live streaming videos for ISKCON Juhu temple" />
@@ -408,7 +409,7 @@ const LiveVideos = () => {
           </Form>
         </DialogContent>
       </Dialog>
-    </>
+    </Layout>
   );
 };
 
