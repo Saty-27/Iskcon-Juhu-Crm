@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { queryClient } from '@/lib/queryClient';
+import { queryClient, setAuthToken, removeAuthToken } from '@/lib/queryClient';
 
 interface User {
   id: number;
@@ -61,6 +61,10 @@ const useAuth = () => {
       return response.json();
     },
     onSuccess: async (data) => {
+      // Store JWT token
+      if (data.token) {
+        setAuthToken(data.token);
+      }
       // Set the user data immediately and mark as authenticated
       queryClient.setQueryData(['/api/auth/me'], data.user);
       setIsAuthenticated(true);
@@ -107,6 +111,8 @@ const useAuth = () => {
       return response.json();
     },
     onSuccess: () => {
+      // Remove JWT token
+      removeAuthToken();
       queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
       setIsAuthenticated(false);
     }

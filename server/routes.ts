@@ -27,17 +27,32 @@ import {
 
 import express from "express";
 import session from "express-session";
+import jwt from "jsonwebtoken";
 import { z } from "zod";
 // This is a workaround for ESM compatibility
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-// Middleware to verify if user is authenticated
+// JWT secret key
+const JWT_SECRET = process.env.JWT_SECRET || "iskcon_juhu_jwt_secret";
+
+// Middleware to verify JWT token
 const isAuthenticated = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  if (!req.session || !req.session.userId) {
+  const authHeader = req.headers.authorization;
+  
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ message: "Unauthorized" });
   }
-  next();
+  
+  const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+  
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
+    (req as any).userId = decoded.userId;
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: "Invalid token" });
+  }
 };
 
 // Middleware to verify if user is an admin - TEMPORARILY DISABLED
@@ -1583,30 +1598,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Current user endpoint
+  // Current user endpoint - JWT based
   app.get("/api/auth/me", async (req, res) => {
     try {
-      console.log('Auth check - Session:', req.session?.userId);
+      const authHeader = req.headers.authorization;
       
-      if (!req.session || !req.session.userId) {
-        console.log('No session or userId');
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        console.log('No authorization header or invalid format');
         return res.status(200).json(null);
       }
       
-      const user = await storage.getUser(req.session.userId);
+      const token = authHeader.substring(7); // Remove 'Bearer ' prefix
       
-      console.log('User from DB:', user ? { id: user.id, username: user.username, isActive: user.isActive } : null);
-      
-      if (!user) {
-        console.log('User not found in DB');
+      try {
+        const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
+        console.log('Token decoded successfully, userId:', decoded.userId);
+        
+        const user = await storage.getUser(decoded.userId);
+        
+        if (!user) {
+          console.log('User not found in DB');
+          return res.status(200).json(null);
+        }
+        
+        // Remove password from response
+        const { password, ...userWithoutPassword } = user;
+        
+        console.log('Returning user:', userWithoutPassword);
+        res.json(userWithoutPassword);
+      } catch (tokenError) {
+        console.log('Invalid token:', tokenError);
         return res.status(200).json(null);
       }
-      
-      // Remove password from response
-      const { password, ...userWithoutPassword } = user;
-      
-      console.log('Returning user:', userWithoutPassword);
-      res.json(userWithoutPassword);
     } catch (error) {
       console.error("Error fetching current user:", error);
       res.status(500).json({ message: "Error fetching current user" });
@@ -1676,22 +1699,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Remove password from response
       const { password: _, ...userWithoutPassword } = user;
       
-      console.log('Setting session userId:', user.id);
-      req.session.userId = user.id;
+      // Generate JWT token
+      const token = jwt.sign(
+        { userId: user.id, username: user.username, role: user.role },
+        JWT_SECRET,
+        { expiresIn: '24h' }
+      );
       
-      // Save session explicitly to ensure it's persisted
-      req.session.save((err) => {
-        if (err) {
-          console.error('Session save error:', err);
-          return res.status(500).json({ message: "Error saving session" });
-        }
-        
-        console.log('Session saved successfully, userId:', req.session.userId);
-        
-        res.json({
-          message: "Login successful",
-          user: userWithoutPassword
-        });
+      console.log('Login successful, generating token for user:', user.id);
+      
+      res.json({
+        message: "Login successful",
+        user: userWithoutPassword,
+        token: token
       });
     } catch (error) {
       console.error('Login error:', error);
