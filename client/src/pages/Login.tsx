@@ -33,19 +33,24 @@ const Login = () => {
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && user) {
       // Check for redirect parameter in URL
       const params = new URLSearchParams(window.location.search);
       const redirectPath = params.get('redirect');
       
+      console.log('useEffect redirect - isAuthenticated:', isAuthenticated, 'user:', user);
+      
       if (redirectPath) {
         // If there's a redirect parameter, use it
+        console.log('useEffect redirecting to:', redirectPath);
         setLocation(redirectPath);
       } else {
         // Otherwise redirect based on user role
-        if (user && user.role === 'admin') {
+        if (user.role === 'admin') {
+          console.log('useEffect redirecting admin to /admin');
           setLocation('/admin');
         } else {
+          console.log('useEffect redirecting user to /profile');
           setLocation('/profile');
         }
       }
@@ -72,15 +77,15 @@ const Login = () => {
       if (redirectPath) {
         // If there's a redirect parameter, use it
         console.log('Redirecting to:', redirectPath);
-        setLocation(redirectPath);
+        window.location.href = redirectPath;
       } else {
         // Otherwise redirect based on user role
         if (result?.user?.role === 'admin') {
           console.log('Redirecting admin to /admin');
-          setLocation('/admin');
+          window.location.href = '/admin';
         } else {
           console.log('Redirecting user to /profile');
-          setLocation('/profile');
+          window.location.href = '/profile';
         }
       }
     } catch (error) {
