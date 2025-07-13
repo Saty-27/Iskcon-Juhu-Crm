@@ -12,12 +12,15 @@ const AdminRoute = ({ children }: AdminRouteProps) => {
   const [location, setLocation] = useLocation();
 
   useEffect(() => {
+    console.log('AdminRoute check:', { isLoading, isAuthenticated, user, location });
     if (!isLoading && !isAuthenticated) {
       // Redirect to login page with redirect parameter
       const currentPath = location;
+      console.log('AdminRoute: Redirecting to login from', currentPath);
       setLocation(`/login?redirect=${encodeURIComponent(currentPath)}`);
     } else if (!isLoading && isAuthenticated && user?.role !== 'admin') {
       // Redirect to home if user is not admin
+      console.log('AdminRoute: User is not admin, redirecting to home');
       setLocation('/');
     }
   }, [isAuthenticated, user, isLoading, location, setLocation]);
