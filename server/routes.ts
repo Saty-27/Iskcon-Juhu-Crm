@@ -1631,12 +1631,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { email, username, password } = req.body;
       
+      console.log('Login attempt:', { email, username, password: '***' });
+      
       if ((!email && !username) || !password) {
         return res.status(400).json({ message: "Email/username and password are required" });
       }
       
       // Try to find user by email first, then by username
       const user = email ? await storage.getUserByEmail(email) : await storage.getUserByUsername(username);
+      
+      console.log('User found:', user ? { id: user.id, username: user.username, isActive: user.isActive } : null);
+      console.log('Password match:', user ? user.password === password : false);
       
       if (!user || user.password !== password) { // In a real app, password comparison would use a secure method
         return res.status(401).json({ message: "Invalid email or password" });
@@ -1664,6 +1669,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       });
     } catch (error) {
+      console.error('Login error:', error);
       res.status(500).json({ message: "Error during login" });
     }
   });
