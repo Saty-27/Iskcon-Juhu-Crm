@@ -22,8 +22,8 @@ const Header = () => {
     queryKey: ['/api/live-videos'],
   });
 
-  // Get the first active live video
-  const currentLiveVideo = liveVideos.find(video => video.isActive);
+  // Get the first active live video, or first video if none active
+  const currentLiveVideo = liveVideos.find(video => video.isActive) || liveVideos[0];
   
   // Function to convert YouTube URL to embed format
   const getYouTubeEmbedUrl = (url: string) => {
