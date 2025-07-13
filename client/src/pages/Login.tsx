@@ -68,7 +68,7 @@ const Login = () => {
       console.log('Redirect path:', redirectPath);
       console.log('User role:', result?.user?.role);
       
-      // Add a small delay to ensure auth state is settled
+      // Add a delay to ensure auth state is settled
       setTimeout(() => {
         if (redirectPath) {
           // If there's a redirect parameter, use it
@@ -84,7 +84,7 @@ const Login = () => {
             window.location.href = '/profile';
           }
         }
-      }, 100);
+      }, 500);
     }).catch((error) => {
       console.error('Login error:', error);
       toast({

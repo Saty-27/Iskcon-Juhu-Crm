@@ -64,8 +64,8 @@ const useAuth = () => {
       // Set the user data immediately and mark as authenticated
       queryClient.setQueryData(['/api/auth/me'], data.user);
       setIsAuthenticated(true);
-      // Also invalidate to ensure fresh data on next fetch
-      queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+      // Force immediate refetch to ensure auth state is synced
+      await queryClient.refetchQueries({ queryKey: ['/api/auth/me'] });
     }
   });
 
