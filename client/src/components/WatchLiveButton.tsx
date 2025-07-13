@@ -18,9 +18,22 @@ const WatchLiveButton = () => {
 
   // Function to convert YouTube URL to embed format
   const getYouTubeEmbedUrl = (url: string) => {
-    const videoId = url.includes('watch?v=') 
-      ? url.split('watch?v=')[1].split('&')[0]
-      : url.split('youtu.be/')[1]?.split('?')[0];
+    let videoId = '';
+    
+    if (url.includes('watch?v=')) {
+      // Regular YouTube URL: https://www.youtube.com/watch?v=VIDEO_ID
+      videoId = url.split('watch?v=')[1].split('&')[0];
+    } else if (url.includes('youtu.be/')) {
+      // Short YouTube URL: https://youtu.be/VIDEO_ID
+      videoId = url.split('youtu.be/')[1]?.split('?')[0];
+    } else if (url.includes('/live/')) {
+      // YouTube Live URL: https://www.youtube.com/live/VIDEO_ID
+      videoId = url.split('/live/')[1].split('?')[0];
+    } else {
+      // Try to extract video ID from any YouTube URL
+      const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+      videoId = match ? match[1] : '';
+    }
     
     return `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
   };
