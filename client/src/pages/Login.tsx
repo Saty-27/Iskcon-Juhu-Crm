@@ -31,31 +31,26 @@ const Login = () => {
     },
   });
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated (for page refresh scenarios)
   useEffect(() => {
-    if (isAuthenticated && user) {
+    if (isAuthenticated && user && !isPendingLogin) {
       // Check for redirect parameter in URL
       const params = new URLSearchParams(window.location.search);
       const redirectPath = params.get('redirect');
       
-      console.log('useEffect redirect - isAuthenticated:', isAuthenticated, 'user:', user);
-      
       if (redirectPath) {
         // If there's a redirect parameter, use it
-        console.log('useEffect redirecting to:', redirectPath);
-        setLocation(redirectPath);
+        window.location.href = redirectPath;
       } else {
         // Otherwise redirect based on user role
         if (user.role === 'admin') {
-          console.log('useEffect redirecting admin to /admin');
-          setLocation('/admin');
+          window.location.href = '/admin';
         } else {
-          console.log('useEffect redirecting user to /profile');
-          setLocation('/profile');
+          window.location.href = '/profile';
         }
       }
     }
-  }, [isAuthenticated, user, setLocation]);
+  }, [isAuthenticated, user, isPendingLogin]);
   
   const onSubmit = async (data: LoginFormValues) => {
     try {
@@ -74,20 +69,23 @@ const Login = () => {
       console.log('Redirect path:', redirectPath);
       console.log('User role:', result?.user?.role);
       
-      if (redirectPath) {
-        // If there's a redirect parameter, use it
-        console.log('Redirecting to:', redirectPath);
-        window.location.href = redirectPath;
-      } else {
-        // Otherwise redirect based on user role
-        if (result?.user?.role === 'admin') {
-          console.log('Redirecting admin to /admin');
-          window.location.href = '/admin';
+      // Add a small delay to ensure auth state is settled
+      setTimeout(() => {
+        if (redirectPath) {
+          // If there's a redirect parameter, use it
+          console.log('Redirecting to:', redirectPath);
+          window.location.href = redirectPath;
         } else {
-          console.log('Redirecting user to /profile');
-          window.location.href = '/profile';
+          // Otherwise redirect based on user role
+          if (result?.user?.role === 'admin') {
+            console.log('Redirecting admin to /admin');
+            window.location.href = '/admin';
+          } else {
+            console.log('Redirecting user to /profile');
+            window.location.href = '/profile';
+          }
         }
-      }
+      }, 100);
     } catch (error) {
       console.error('Login error:', error);
       toast({
