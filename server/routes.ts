@@ -54,19 +54,23 @@ declare module "express-session" {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Use a simple in-memory session store for development
+  // Simple in-memory session store for development
+  const MemoryStore = require('memorystore')(session);
+  
   app.use(
     session({
       secret: process.env.SESSION_SECRET || "iskcon_juhu_secret",
-      resave: true, // Force save session even if not modified
-      saveUninitialized: true, // Save new sessions even if not modified
+      store: new MemoryStore({
+        checkPeriod: 86400000 // prune expired entries every 24h
+      }),
+      resave: false,
+      saveUninitialized: false,
       cookie: { 
         maxAge: 86400000, // 1 day
-        httpOnly: false, // Allow client-side access for debugging
+        httpOnly: true,
         secure: false, // Set to true in production with HTTPS
-        sameSite: 'none' // Allow cross-site cookies
-      },
-      name: 'connect.sid' // Default session name
+        sameSite: 'lax'
+      }
     })
   );
   
