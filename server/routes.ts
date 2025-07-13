@@ -58,15 +58,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use(
     session({
       secret: process.env.SESSION_SECRET || "iskcon_juhu_secret",
-      resave: false,
-      saveUninitialized: false,
+      resave: true, // Force save session even if not modified
+      saveUninitialized: true, // Save new sessions even if not modified
       cookie: { 
         maxAge: 86400000, // 1 day
-        httpOnly: true,
+        httpOnly: false, // Allow client-side access for debugging
         secure: false, // Set to true in production with HTTPS
-        sameSite: 'lax'
+        sameSite: 'none' // Allow cross-site cookies
       },
-      name: 'sessionId' // Explicit session name
+      name: 'connect.sid' // Default session name
     })
   );
   
@@ -1672,6 +1672,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Remove password from response
       const { password: _, ...userWithoutPassword } = user;
       
+      console.log('Setting session userId:', user.id);
       req.session.userId = user.id;
       
       // Save session explicitly to ensure it's persisted
@@ -1680,6 +1681,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.error('Session save error:', err);
           return res.status(500).json({ message: "Error saving session" });
         }
+        
+        console.log('Session saved successfully, userId:', req.session.userId);
         
         res.json({
           message: "Login successful",
