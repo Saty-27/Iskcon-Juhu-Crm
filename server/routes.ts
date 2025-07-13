@@ -1571,19 +1571,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Current user endpoint
   app.get("/api/auth/me", async (req, res) => {
     try {
+      console.log('Auth check - Session:', req.session?.userId);
+      
       if (!req.session || !req.session.userId) {
+        console.log('No session or userId');
         return res.status(200).json(null);
       }
       
       const user = await storage.getUser(req.session.userId);
       
+      console.log('User from DB:', user ? { id: user.id, username: user.username, isActive: user.isActive } : null);
+      
       if (!user) {
+        console.log('User not found in DB');
         return res.status(200).json(null);
       }
       
       // Remove password from response
       const { password, ...userWithoutPassword } = user;
       
+      console.log('Returning user:', userWithoutPassword);
       res.json(userWithoutPassword);
     } catch (error) {
       console.error("Error fetching current user:", error);
