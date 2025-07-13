@@ -284,6 +284,7 @@ const DonationCategoriesPage = () => {
 
   const handleEdit = (category: DonationCategory) => {
     setEditingCategory(category);
+    setIsEditDialogOpen(true);
   };
 
   const handleDelete = (categoryId: number) => {
@@ -962,6 +963,23 @@ const DonationCategoriesPage = () => {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Add Category Modal */}
+        <DonationCategoryModal 
+          isOpen={isAddDialogOpen}
+          onClose={() => setIsAddDialogOpen(false)}
+          category={null}
+        />
+
+        {/* Edit Category Modal */}
+        <DonationCategoryModal 
+          isOpen={isEditDialogOpen}
+          onClose={() => {
+            setIsEditDialogOpen(false);
+            setEditingCategory(null);
+          }}
+          category={editingCategory}
+        />
       </div>
     </AdminLayout>
   );
