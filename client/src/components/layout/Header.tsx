@@ -1,17 +1,38 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Play } from 'lucide-react';
 import useAuth from '@/hooks/useAuth';
 import logoIskcon from '@/assets/logo-iskcon.png';
+import { LiveVideo } from '@shared/schema';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isLiveVideoOpen, setIsLiveVideoOpen] = useState(false);
   const [location] = useLocation();
   const { isAuthenticated, user } = useAuth();
   
   const isHomePage = location === '/';
+  
+  // Fetch live videos
+  const { data: liveVideos = [] } = useQuery<LiveVideo[]>({
+    queryKey: ['/api/live-videos'],
+  });
+
+  // Get the first active live video
+  const currentLiveVideo = liveVideos.find(video => video.isActive);
+  
+  // Function to convert YouTube URL to embed format
+  const getYouTubeEmbedUrl = (url: string) => {
+    const videoId = url.includes('watch?v=') 
+      ? url.split('watch?v=')[1].split('&')[0]
+      : url.split('youtu.be/')[1]?.split('?')[0];
+    
+    return `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+  };
   
   // Handle scroll effect
   useEffect(() => {
@@ -69,15 +90,14 @@ const Header = () => {
             <Link href="/contact" className="font-poppins font-medium text-dark hover:text-secondary transition-colors">
               Contact
             </Link>
-            <a 
-              href="https://www.youtube.com/@ISKCONJuhuTemple"
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={() => setIsLiveVideoOpen(true)}
               className="font-poppins font-medium text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded-full transition-colors flex items-center gap-2 animate-pulse"
+              disabled={!currentLiveVideo}
             >
               <Play className="w-4 h-4" />
               Watch Live
-            </a>
+            </button>
             {isAuthenticated && user ? (
               <div className="flex items-center space-x-2">
                 <span className="font-poppins text-dark font-medium">{user.name}</span>
@@ -163,16 +183,17 @@ const Header = () => {
             >
               Contact
             </Link>
-            <a 
-              href="https://www.youtube.com/@ISKCONJuhuTemple"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={closeMobileMenu}
+            <button
+              onClick={() => {
+                setIsLiveVideoOpen(true);
+                closeMobileMenu();
+              }}
               className="font-poppins font-medium text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded-full transition-colors flex items-center gap-2 animate-pulse justify-center"
+              disabled={!currentLiveVideo}
             >
               <Play className="w-4 h-4" />
               Watch Live
-            </a>
+            </button>
             {isAuthenticated && user ? (
               <div className="flex flex-col space-y-2">
                 <span className="font-poppins text-dark font-medium">Welcome, {user.name}</span>
@@ -197,6 +218,28 @@ const Header = () => {
         </div>
       </div>
 
+      {/* Live Video Modal */}
+      {currentLiveVideo && (
+        <Dialog open={isLiveVideoOpen} onOpenChange={setIsLiveVideoOpen}>
+          <DialogContent className="max-w-4xl w-full p-0 bg-black">
+            <DialogHeader className="p-4 bg-black text-white">
+              <DialogTitle className="flex items-center gap-2">
+                <Play className="w-5 h-5 text-red-500" />
+                {currentLiveVideo.title}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+              <iframe
+                src={getYouTubeEmbedUrl(currentLiveVideo.youtubeUrl)}
+                className="absolute top-0 left-0 w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                title={currentLiveVideo.title}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
 
     </header>
   );
