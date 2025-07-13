@@ -6,18 +6,9 @@
 
 import PDFDocument from 'pdfkit';
 import { Readable } from 'stream';
-import twilio from 'twilio';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { nanoid } from 'nanoid';
-
-// Initialize Twilio client with environment variables (only if credentials are valid)
-const twilioClient = process.env.TWILIO_ACCOUNT_SID && 
-  process.env.TWILIO_AUTH_TOKEN && 
-  process.env.TWILIO_ACCOUNT_SID.startsWith('AC') && 
-  process.env.TWILIO_AUTH_TOKEN.length > 0
-  ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
-  : null;
 
 interface DonationReceipt {
   txnid: string;
