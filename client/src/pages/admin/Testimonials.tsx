@@ -2,6 +2,10 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AdminLayout from "@/components/admin/Layout";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { 
   Dialog, 
   DialogContent, 
@@ -9,7 +13,7 @@ import {
   DialogTitle, 
   DialogFooter 
 } from "@/components/ui/dialog";
-import { MessageCircle, Eye, Trash2, Search, Star, Users, Plus } from "lucide-react";
+import { MessageCircle, Eye, Trash2, Search, Star, Users, Plus, Edit } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -26,7 +30,17 @@ interface Testimonial {
 const TestimonialsPage = () => {
   const [selectedTestimonial, setSelectedTestimonial] = useState<Testimonial | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingTestimonial, setEditingTestimonial] = useState<Testimonial | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    title: "",
+    content: "",
+    rating: 5,
+    isPublished: true
+  });
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -48,6 +62,37 @@ const TestimonialsPage = () => {
     },
   });
 
+  const createTestimonialMutation = useMutation({
+    mutationFn: async (data: { name: string; title?: string; content: string; rating: number; isPublished: boolean }) => {
+      return await apiRequest("/api/admin/testimonials", "POST", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/testimonials'] });
+      toast({ title: "Success", description: "Testimonial created successfully" });
+      setIsAddDialogOpen(false);
+      setFormData({ name: "", title: "", content: "", rating: 5, isPublished: true });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to create testimonial", variant: "destructive" });
+    },
+  });
+
+  const updateTestimonialMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: { name: string; title?: string; content: string; rating: number; isPublished: boolean } }) => {
+      return await apiRequest(`/api/admin/testimonials/${id}`, "PUT", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/testimonials'] });
+      toast({ title: "Success", description: "Testimonial updated successfully" });
+      setIsEditDialogOpen(false);
+      setEditingTestimonial(null);
+      setFormData({ name: "", title: "", content: "", rating: 5, isPublished: true });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to update testimonial", variant: "destructive" });
+    },
+  });
+
   // Calculate statistics
   const publishedTestimonials = testimonials.filter(t => t.isPublished);
   const draftTestimonials = testimonials.filter(t => !t.isPublished);
@@ -66,6 +111,36 @@ const TestimonialsPage = () => {
   const handleViewTestimonial = (testimonial: Testimonial) => {
     setSelectedTestimonial(testimonial);
     setIsViewDialogOpen(true);
+  };
+
+  const handleAddTestimonial = () => {
+    setFormData({ name: "", title: "", content: "", rating: 5, isPublished: true });
+    setIsAddDialogOpen(true);
+  };
+
+  const handleEditTestimonial = (testimonial: Testimonial) => {
+    setEditingTestimonial(testimonial);
+    setFormData({
+      name: testimonial.name,
+      title: testimonial.title || "",
+      content: testimonial.content,
+      rating: testimonial.rating,
+      isPublished: testimonial.isPublished
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleSubmit = () => {
+    if (!formData.name || !formData.content) {
+      toast({ title: "Error", description: "Please fill in all required fields", variant: "destructive" });
+      return;
+    }
+
+    if (editingTestimonial) {
+      updateTestimonialMutation.mutate({ id: editingTestimonial.id, data: formData });
+    } else {
+      createTestimonialMutation.mutate(formData);
+    }
   };
 
   const handleDelete = (id: number) => {
@@ -179,7 +254,10 @@ const TestimonialsPage = () => {
                   className="w-full pl-12 pr-4 py-3 bg-gray-50 border-0 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-white transition-all duration-200 text-gray-700 placeholder-gray-400 shadow-inner"
                 />
               </div>
-              <button className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold rounded-2xl transition-all duration-200 transform hover:-translate-y-0.5 hover:shadow-lg">
+              <button 
+                onClick={handleAddTestimonial}
+                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold rounded-2xl transition-all duration-200 transform hover:-translate-y-0.5 hover:shadow-lg"
+              >
                 <Plus className="h-5 w-5 mr-2" />
                 Add Testimonial
               </button>
@@ -252,19 +330,26 @@ const TestimonialsPage = () => {
                           {formatDate(testimonial.createdAt)}
                         </td>
                         <td className="py-5 px-6">
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2">
                             <button
                               onClick={() => handleViewTestimonial(testimonial)}
-                              className="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-full transition-all duration-200 hover:shadow-md transform hover:-translate-y-0.5"
+                              className="inline-flex items-center px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-full transition-all duration-200 hover:shadow-md transform hover:-translate-y-0.5"
                             >
-                              <Eye className="h-3 w-3 mr-2" />
+                              <Eye className="h-3 w-3 mr-1" />
                               View
                             </button>
                             <button
-                              onClick={() => handleDelete(testimonial.id)}
-                              className="inline-flex items-center px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-medium rounded-full transition-all duration-200 hover:shadow-md transform hover:-translate-y-0.5"
+                              onClick={() => handleEditTestimonial(testimonial)}
+                              className="inline-flex items-center px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-medium rounded-full transition-all duration-200 hover:shadow-md transform hover:-translate-y-0.5"
                             >
-                              <Trash2 className="h-3 w-3 mr-2" />
+                              <Edit className="h-3 w-3 mr-1" />
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDelete(testimonial.id)}
+                              className="inline-flex items-center px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-medium rounded-full transition-all duration-200 hover:shadow-md transform hover:-translate-y-0.5"
+                            >
+                              <Trash2 className="h-3 w-3 mr-1" />
                               Delete
                             </button>
                           </div>
@@ -350,6 +435,105 @@ const TestimonialsPage = () => {
               >
                 Close Details
               </button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Add/Edit Testimonial Dialog */}
+        <Dialog open={isAddDialogOpen || isEditDialogOpen} onOpenChange={(open) => {
+          if (!open) {
+            setIsAddDialogOpen(false);
+            setIsEditDialogOpen(false);
+            setEditingTestimonial(null);
+            setFormData({ name: "", title: "", content: "", rating: 5, isPublished: true });
+          }
+        }}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>
+                {editingTestimonial ? 'Edit Testimonial' : 'Add Testimonial'}
+              </DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="name">Name *</Label>
+                <Input
+                  id="name"
+                  placeholder="Author name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="title">Title (Optional)</Label>
+                <Input
+                  id="title"
+                  placeholder="Author title or designation"
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="content">Content *</Label>
+                <Textarea
+                  id="content"
+                  placeholder="Write the testimonial content here..."
+                  value={formData.content}
+                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                  rows={4}
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="rating">Rating</Label>
+                <div className="flex items-center space-x-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, rating: star })}
+                      className={`p-1 ${star <= formData.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                    >
+                      <Star className="w-5 h-5 fill-current" />
+                    </button>
+                  ))}
+                  <span className="text-sm text-gray-600">({formData.rating}/5)</span>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="isPublished"
+                  checked={formData.isPublished}
+                  onCheckedChange={(checked) => setFormData({ ...formData, isPublished: checked })}
+                />
+                <Label htmlFor="isPublished">Published</Label>
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => {
+                  setIsAddDialogOpen(false);
+                  setIsEditDialogOpen(false);
+                  setEditingTestimonial(null);
+                  setFormData({ name: "", title: "", content: "", rating: 5, isPublished: true });
+                }}
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="button" 
+                onClick={handleSubmit}
+                disabled={createTestimonialMutation.isPending || updateTestimonialMutation.isPending}
+              >
+                {createTestimonialMutation.isPending || updateTestimonialMutation.isPending ? 'Saving...' : 'Save'}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

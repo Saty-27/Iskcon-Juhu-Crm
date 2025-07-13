@@ -2,6 +2,9 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AdminLayout from "@/components/admin/Layout";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { 
   Dialog, 
   DialogContent, 
@@ -9,7 +12,7 @@ import {
   DialogTitle, 
   DialogFooter 
 } from "@/components/ui/dialog";
-import { Link2, Eye, Trash2, Search, Globe, ExternalLink, Plus } from "lucide-react";
+import { Link2, Eye, Trash2, Search, Globe, ExternalLink, Plus, Edit } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -25,7 +28,15 @@ interface SocialLink {
 const SocialLinksPage = () => {
   const [selectedLink, setSelectedLink] = useState<SocialLink | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingLink, setEditingLink] = useState<SocialLink | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [formData, setFormData] = useState({
+    platform: "",
+    url: "",
+    isActive: true
+  });
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -47,6 +58,37 @@ const SocialLinksPage = () => {
     },
   });
 
+  const createLinkMutation = useMutation({
+    mutationFn: async (data: { platform: string; url: string; isActive: boolean }) => {
+      return await apiRequest("/api/social-links", "POST", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/social-links'] });
+      toast({ title: "Success", description: "Social link created successfully" });
+      setIsAddDialogOpen(false);
+      setFormData({ platform: "", url: "", isActive: true });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to create social link", variant: "destructive" });
+    },
+  });
+
+  const updateLinkMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: { platform: string; url: string; isActive: boolean } }) => {
+      return await apiRequest(`/api/social-links/${id}`, "PUT", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/social-links'] });
+      toast({ title: "Success", description: "Social link updated successfully" });
+      setIsEditDialogOpen(false);
+      setEditingLink(null);
+      setFormData({ platform: "", url: "", isActive: true });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to update social link", variant: "destructive" });
+    },
+  });
+
   // Calculate statistics
   const activeLinks = socialLinks.filter(link => link.isActive);
   const inactiveLinks = socialLinks.filter(link => !link.isActive);
@@ -62,6 +104,34 @@ const SocialLinksPage = () => {
   const handleViewLink = (link: SocialLink) => {
     setSelectedLink(link);
     setIsViewDialogOpen(true);
+  };
+
+  const handleAddLink = () => {
+    setFormData({ platform: "", url: "", isActive: true });
+    setIsAddDialogOpen(true);
+  };
+
+  const handleEditLink = (link: SocialLink) => {
+    setEditingLink(link);
+    setFormData({
+      platform: link.platform,
+      url: link.url,
+      isActive: link.isActive
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleSubmit = () => {
+    if (!formData.platform || !formData.url) {
+      toast({ title: "Error", description: "Please fill in all required fields", variant: "destructive" });
+      return;
+    }
+
+    if (editingLink) {
+      updateLinkMutation.mutate({ id: editingLink.id, data: formData });
+    } else {
+      createLinkMutation.mutate(formData);
+    }
   };
 
   const handleDelete = (id: number) => {
@@ -180,7 +250,10 @@ const SocialLinksPage = () => {
                   className="w-full pl-12 pr-4 py-3 bg-gray-50 border-0 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-white transition-all duration-200 text-gray-700 placeholder-gray-400 shadow-inner"
                 />
               </div>
-              <button className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold rounded-2xl transition-all duration-200 transform hover:-translate-y-0.5 hover:shadow-lg">
+              <button 
+                onClick={handleAddLink}
+                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold rounded-2xl transition-all duration-200 transform hover:-translate-y-0.5 hover:shadow-lg"
+              >
                 <Plus className="h-5 w-5 mr-2" />
                 Add Social Link
               </button>
@@ -247,19 +320,26 @@ const SocialLinksPage = () => {
                           {formatDate(link.createdAt)}
                         </td>
                         <td className="py-5 px-6">
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2">
                             <button
                               onClick={() => handleViewLink(link)}
-                              className="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-full transition-all duration-200 hover:shadow-md transform hover:-translate-y-0.5"
+                              className="inline-flex items-center px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-full transition-all duration-200 hover:shadow-md transform hover:-translate-y-0.5"
                             >
-                              <Eye className="h-3 w-3 mr-2" />
+                              <Eye className="h-3 w-3 mr-1" />
                               View
                             </button>
                             <button
-                              onClick={() => handleDelete(link.id)}
-                              className="inline-flex items-center px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-medium rounded-full transition-all duration-200 hover:shadow-md transform hover:-translate-y-0.5"
+                              onClick={() => handleEditLink(link)}
+                              className="inline-flex items-center px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-medium rounded-full transition-all duration-200 hover:shadow-md transform hover:-translate-y-0.5"
                             >
-                              <Trash2 className="h-3 w-3 mr-2" />
+                              <Edit className="h-3 w-3 mr-1" />
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDelete(link.id)}
+                              className="inline-flex items-center px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-medium rounded-full transition-all duration-200 hover:shadow-md transform hover:-translate-y-0.5"
+                            >
+                              <Trash2 className="h-3 w-3 mr-1" />
                               Delete
                             </button>
                           </div>
@@ -344,6 +424,78 @@ const SocialLinksPage = () => {
               >
                 Close Details
               </button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Add/Edit Social Link Dialog */}
+        <Dialog open={isAddDialogOpen || isEditDialogOpen} onOpenChange={(open) => {
+          if (!open) {
+            setIsAddDialogOpen(false);
+            setIsEditDialogOpen(false);
+            setEditingLink(null);
+            setFormData({ platform: "", url: "", isActive: true });
+          }
+        }}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>
+                {editingLink ? 'Edit Social Link' : 'Add Social Link'}
+              </DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="platform">Platform</Label>
+                <Input
+                  id="platform"
+                  placeholder="e.g., Facebook, Twitter, Instagram"
+                  value={formData.platform}
+                  onChange={(e) => setFormData({ ...formData, platform: e.target.value })}
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="url">URL</Label>
+                <Input
+                  id="url"
+                  type="url"
+                  placeholder="https://example.com"
+                  value={formData.url}
+                  onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                />
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="isActive"
+                  checked={formData.isActive}
+                  onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
+                />
+                <Label htmlFor="isActive">Active</Label>
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => {
+                  setIsAddDialogOpen(false);
+                  setIsEditDialogOpen(false);
+                  setEditingLink(null);
+                  setFormData({ platform: "", url: "", isActive: true });
+                }}
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="button" 
+                onClick={handleSubmit}
+                disabled={createLinkMutation.isPending || updateLinkMutation.isPending}
+              >
+                {createLinkMutation.isPending || updateLinkMutation.isPending ? 'Saving...' : 'Save'}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
