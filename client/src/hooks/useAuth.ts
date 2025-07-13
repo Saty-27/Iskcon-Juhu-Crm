@@ -33,9 +33,19 @@ const useAuth = () => {
     retry: false,
     refetchOnWindowFocus: false,
     queryFn: async () => {
+      const token = localStorage.getItem('authToken');
+      console.log('Auth query - token available:', !!token);
+      
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
       const res = await fetch('/api/auth/me', {
-        credentials: 'include'
+        credentials: 'include',
+        headers
       });
+      
       if (res.status === 401) {
         return null; // Return null for unauthenticated instead of throwing
       }
