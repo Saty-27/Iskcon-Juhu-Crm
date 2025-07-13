@@ -81,7 +81,7 @@ const Footer = () => {
               A.C. Bhaktivedanta Swami Prabhupada in 1966.
             </p>
             <div className="flex space-x-4">
-              {socialLinks.map((link) => (
+              {socialLinks.filter(link => link.isActive).map((link) => (
                 <a 
                   key={link.id}
                   href={link.url} 
@@ -90,7 +90,15 @@ const Footer = () => {
                   className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-opacity-80 transition-colors"
                   style={{ backgroundColor: '#4B0082', color: 'white' }}
                 >
-                  <i className={`${link.icon} text-lg`}></i>
+                  {link.icon && link.icon.startsWith('/uploads/') ? (
+                    <img 
+                      src={link.icon} 
+                      alt={`${link.platform} icon`} 
+                      className="w-6 h-6 object-contain"
+                    />
+                  ) : (
+                    <i className={`${link.icon || 'ri-link'} text-lg`}></i>
+                  )}
                 </a>
               ))}
             </div>

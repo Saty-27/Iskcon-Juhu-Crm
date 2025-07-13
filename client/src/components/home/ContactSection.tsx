@@ -4,6 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import { useQuery } from '@tanstack/react-query';
+import { SocialLink } from '@shared/schema';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -23,6 +25,10 @@ type ContactFormValues = z.infer<typeof contactFormSchema>;
 const ContactSection = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  
+  const { data: socialLinks = [] } = useQuery<SocialLink[]>({
+    queryKey: ['/api/social-links'],
+  });
   
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactFormSchema),
@@ -136,18 +142,26 @@ const ContactSection = () => {
             <div className="mt-8">
               <h4 className="font-poppins font-semibold text-lg mb-3 text-white">Connect With Us</h4>
               <div className="flex space-x-4">
-                <a href="https://facebook.com/iskconjuhu" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-opacity-80 transition-colors" style={{ backgroundColor: '#4B0082', color: 'white' }}>
-                  <i className="ri-facebook-fill"></i>
-                </a>
-                <a href="https://instagram.com/iskconjuhu" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-opacity-80 transition-colors" style={{ backgroundColor: '#4B0082', color: 'white' }}>
-                  <i className="ri-instagram-fill"></i>
-                </a>
-                <a href="https://youtube.com/iskconjuhu" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-opacity-80 transition-colors" style={{ backgroundColor: '#4B0082', color: 'white' }}>
-                  <i className="ri-youtube-fill"></i>
-                </a>
-                <a href="https://twitter.com/iskconjuhu" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-opacity-80 transition-colors" style={{ backgroundColor: '#4B0082', color: 'white' }}>
-                  <i className="ri-twitter-fill"></i>
-                </a>
+                {socialLinks.filter(link => link.isActive).map((link) => (
+                  <a 
+                    key={link.id}
+                    href={link.url} 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-opacity-80 transition-colors"
+                    style={{ backgroundColor: '#4B0082', color: 'white' }}
+                  >
+                    {link.icon && link.icon.startsWith('/uploads/') ? (
+                      <img 
+                        src={link.icon} 
+                        alt={`${link.platform} icon`} 
+                        className="w-6 h-6 object-contain"
+                      />
+                    ) : (
+                      <i className={`${link.icon || 'ri-link'} text-lg`}></i>
+                    )}
+                  </a>
+                ))}
               </div>
             </div>
           </div>
