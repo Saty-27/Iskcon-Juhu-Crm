@@ -52,9 +52,12 @@ const Login = () => {
     }
   }, [isAuthenticated, user, isPendingLogin]);
   
-  const onSubmit = async (data: LoginFormValues) => {
-    try {
-      const result = await login(data);
+  const onSubmit = (data: LoginFormValues) => {
+    // Handle redirect after successful login
+    const params = new URLSearchParams(window.location.search);
+    const redirectPath = params.get('redirect');
+    
+    login(data).then((result) => {
       console.log('Login result:', result);
       
       toast({
@@ -62,10 +65,6 @@ const Login = () => {
         description: "Welcome back!",
       });
 
-      // Handle redirect after successful login
-      const params = new URLSearchParams(window.location.search);
-      const redirectPath = params.get('redirect');
-      
       console.log('Redirect path:', redirectPath);
       console.log('User role:', result?.user?.role);
       
@@ -86,14 +85,14 @@ const Login = () => {
           }
         }
       }, 100);
-    } catch (error) {
+    }).catch((error) => {
       console.error('Login error:', error);
       toast({
         title: "Login Failed",
         description: "Invalid username or password. Please try again.",
         variant: "destructive",
       });
-    }
+    });
   };
   
   return (
