@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Menu, Download, User, HelpCircle, LogOut } from 'lucide-react';
+import { Menu, Download, User, HelpCircle, LogOut, Home } from 'lucide-react';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -15,9 +15,18 @@ import { useOnboarding } from '@/components/admin/OnboardingProvider';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const { user, logout } = useAuth();
   const { startTour } = useOnboarding();
+
+  const handleLogout = async () => {
+    await logout();
+    setLocation('/'); // Redirect to home page after logout
+  };
+
+  const handleBackToWebsite = () => {
+    setLocation('/'); // Navigate to home page
+  };
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -42,6 +51,18 @@ const Header = () => {
       </div>
 
       <div className="flex items-center space-x-4">
+        {/* Back to Website Button */}
+        <Button 
+          onClick={handleBackToWebsite}
+          variant="outline" 
+          size="sm"
+          className="flex items-center hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200"
+          title="Back to Website"
+        >
+          <Home className="h-4 w-4 md:mr-2" />
+          <span className="hidden md:inline">Back to Website</span>
+        </Button>
+
         {/* Tour Help Button */}
         <Button 
           onClick={startTour}
@@ -63,7 +84,7 @@ const Header = () => {
 
         {/* Logout Button */}
         <Button 
-          onClick={logout}
+          onClick={handleLogout}
           variant="outline" 
           size="sm"
           className="flex items-center hover:bg-red-50 hover:text-red-600 hover:border-red-200"
@@ -93,7 +114,7 @@ const Header = () => {
             <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
