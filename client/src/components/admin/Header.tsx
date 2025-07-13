@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Menu, Download, User, HelpCircle, LogOut } from 'lucide-react';
+import { Menu, Download, User, HelpCircle, LogOut, Home } from 'lucide-react';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -47,16 +47,16 @@ const Header = () => {
       </div>
 
       <div className="flex items-center space-x-4">
-        {/* Logout Button */}
+        {/* Back to Website Button (with logout functionality) */}
         <Button 
           onClick={handleLogout}
           variant="outline" 
           size="sm"
-          className="flex items-center hover:bg-red-50 hover:text-red-600 hover:border-red-200"
-          title="Logout"
+          className="flex items-center hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200"
+          title="Back to Website"
         >
-          <LogOut className="h-4 w-4 md:mr-2" />
-          <span className="hidden md:inline">Logout</span>
+          <Home className="h-4 w-4 md:mr-2" />
+          <span className="hidden md:inline">Back to Website</span>
         </Button>
 
         {/* Tour Help Button */}
