@@ -25,7 +25,6 @@ interface RegisterData {
 }
 
 const useAuth = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Get current authenticated user
   const { data: user, isLoading, error } = useQuery({
@@ -75,9 +74,8 @@ const useAuth = () => {
       if (data.token) {
         setAuthToken(data.token);
       }
-      // Set the user data immediately and mark as authenticated
+      // Set the user data immediately
       queryClient.setQueryData(['/api/auth/me'], data.user);
-      setIsAuthenticated(true);
       // Force immediate refetch to ensure auth state is synced
       await queryClient.refetchQueries({ queryKey: ['/api/auth/me'] });
     }
@@ -98,10 +96,9 @@ const useAuth = () => {
       return response.json();
     },
     onSuccess: async (data) => {
-      // Set the user data immediately and mark as authenticated
+      // Set the user data immediately
       if (data.user) {
         queryClient.setQueryData(['/api/auth/me'], data.user);
-        setIsAuthenticated(true);
       }
       // Also invalidate to ensure fresh data on next fetch
       queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
@@ -124,17 +121,15 @@ const useAuth = () => {
       // Remove JWT token
       removeAuthToken();
       queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
-      setIsAuthenticated(false);
     }
   });
 
+  // Calculate authentication state directly from user data
+  const isAuthenticated = !!user && !error && !isLoading;
+  
   useEffect(() => {
-    if (user && user !== null && !error) {
-      setIsAuthenticated(true);
-    } else {
-      setIsAuthenticated(false);
-    }
-  }, [user, error]);
+    console.log('Auth state update:', { user: !!user, error: !!error, isLoading, isAuthenticated });
+  }, [user, error, isLoading, isAuthenticated]);
 
   const login = (credentials: LoginCredentials) => {
     return loginMutation.mutateAsync(credentials);
