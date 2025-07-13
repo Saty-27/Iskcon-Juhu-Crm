@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
+import { Play } from 'lucide-react';
 import useAuth from '@/hooks/useAuth';
 import logoIskcon from '@/assets/logo-iskcon.png';
 
@@ -68,6 +69,15 @@ const Header = () => {
             <Link href="/contact" className="font-poppins font-medium text-dark hover:text-secondary transition-colors">
               Contact
             </Link>
+            <a 
+              href="https://www.youtube.com/@ISKCONJuhuTemple"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-poppins font-medium text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded-full transition-colors flex items-center gap-2 animate-pulse"
+            >
+              <Play className="w-4 h-4" />
+              Watch Live
+            </a>
             {isAuthenticated && user ? (
               <div className="flex items-center space-x-2">
                 <span className="font-poppins text-dark font-medium">{user.name}</span>
@@ -153,6 +163,16 @@ const Header = () => {
             >
               Contact
             </Link>
+            <a 
+              href="https://www.youtube.com/@ISKCONJuhuTemple"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={closeMobileMenu}
+              className="font-poppins font-medium text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded-full transition-colors flex items-center gap-2 animate-pulse justify-center"
+            >
+              <Play className="w-4 h-4" />
+              Watch Live
+            </a>
             {isAuthenticated && user ? (
               <div className="flex flex-col space-y-2">
                 <span className="font-poppins text-dark font-medium">Welcome, {user.name}</span>
