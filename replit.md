@@ -125,6 +125,7 @@ This is a comprehensive donation management system for ISKCON Juhu temple built 
 - June 26, 2025. Enhanced file upload system - Fixed QR code file persistence by implementing proper directory routing and file moving functionality
 - July 12, 2025. Fixed donation card duplication and deletion issues - Implemented comprehensive duplicate prevention system with server-side validation, improved modal state management, and proper card deletion logic. Added database-level duplicate detection and enhanced cache invalidation strategies.
 - July 13, 2025. Updated admin authentication system - Changed admin login credentials to username: isk_conjuhuadmin and password: isk_conjuhukrishnaconsiousness. Updated login form to use username instead of email, enabled proper admin route protection, and fixed redirect logic to send admin users to /admin dashboard after successful login.
+- July 13, 2025. Enhanced admin header with "Back to Website" logout button - Replaced standalone logout button with "Back to Website" button that performs logout functionality and redirects to home page. Button shows home icon with blue hover effects and is responsive (icon only on mobile, icon + text on desktop).
 
 ## User Preferences
 
