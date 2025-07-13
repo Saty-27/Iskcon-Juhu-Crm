@@ -100,6 +100,10 @@ This is a comprehensive donation management system for ISKCON Juhu temple built 
 - **Build Process**: Vite for frontend, esbuild for backend
 - **Asset Serving**: Express static file serving
 - **Session Security**: Secure session management with environment secrets
+- **VPS Deployment**: Complete deployment guide available in VPS_DEPLOYMENT_GUIDE.md
+- **Process Management**: PM2 for production process management
+- **Web Server**: Nginx with SSL termination and reverse proxy
+- **SSL**: Let's Encrypt certificates with auto-renewal
 
 ### Local Development
 - **Database**: PostgreSQL 14+ (local or cloud)
