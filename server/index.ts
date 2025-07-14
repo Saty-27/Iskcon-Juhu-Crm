@@ -110,7 +110,9 @@ app.use((req, res, next) => {
     });
   };
 
-  const port = process.env.PORT ? parseInt(process.env.PORT) : await findAvailablePort(3000);
+  const port = process.env.PORT ? parseInt(process.env.PORT) : await findAvailablePort(8080);
+  console.log(`Environment PORT: ${process.env.PORT}`);
+  console.log(`Using port: ${port}`);
   server.listen({
     port,
     host: "0.0.0.0",
