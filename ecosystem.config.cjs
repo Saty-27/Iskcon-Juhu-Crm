@@ -5,7 +5,7 @@ module.exports = {
     cwd: '/var/www/iskcon-juhu',
     env: {
       NODE_ENV: 'production',
-      PORT: 80
+      PORT: 5000
     },
     instances: 1,
     exec_mode: 'fork',
