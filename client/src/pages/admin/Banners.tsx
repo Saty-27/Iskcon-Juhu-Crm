@@ -205,7 +205,10 @@ const BannersPage = () => {
                     )}
                   />
                   <div className="space-y-4">
-                    <FormLabel>Banner Image</FormLabel>
+                    <div>
+                      <FormLabel>Banner Image (Desktop)</FormLabel>
+                      <p className="text-xs text-blue-600 font-semibold mt-1">📏 Recommended: 1920 x 1080 px | Max: 500KB</p>
+                    </div>
                     <div className="flex space-x-2 mb-3">
                       <Button
                         type="button"
@@ -287,8 +290,11 @@ const BannersPage = () => {
                   </div>
                   
                   <div className="space-y-4">
-                    <FormLabel>Mobile Banner Image (Optional)</FormLabel>
-                    <p className="text-sm text-gray-500">Upload a separate image optimized for mobile screens. If not provided, desktop image will be used.</p>
+                    <div>
+                      <FormLabel>Mobile Banner Image (Optional)</FormLabel>
+                      <p className="text-xs text-blue-600 font-semibold mt-1">📏 Recommended: 1080 x 1920 px | Max: 300KB</p>
+                      <p className="text-sm text-gray-500 mt-2">Upload a separate image optimized for mobile screens. If not provided, desktop image will be used.</p>
+                    </div>
                     <div className="flex space-x-2 mb-3">
                       <Button
                         type="button"

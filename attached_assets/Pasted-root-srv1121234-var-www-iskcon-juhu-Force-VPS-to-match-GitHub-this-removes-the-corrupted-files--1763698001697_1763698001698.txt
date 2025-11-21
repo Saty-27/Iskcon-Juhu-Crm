@@ -1,0 +1,69 @@
+root@srv1121234:/var/www/iskcon-juhu# # Force VPS to match GitHub (this removes the corrupted files)
+git reset --hard origin/main
+# Pull latest changes
+git pull origin main
+# Install packages
+npm install
+# Update database
+npm run db:push --force
+# Build
+npm run build
+# Restart server
+pm2 restart iskcon-juhu
+# Check if running
+pm2 status
+HEAD is now at 81d2448 Updated code
+From https://github.com/Saty-27/Iskcon-Juhu-Crm
+ * branch            main       -> FETCH_HEAD
+Already up to date.
+
+up to date, audited 631 packages in 3s
+
+74 packages are looking for funding
+  run `npm fund` for details
+
+15 vulnerabilities (3 low, 8 moderate, 3 high, 1 critical)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+npm warn using --force Recommended protections disabled.
+
+> rest-express@1.0.0 db:push
+> drizzle-kit push
+
+No config path provided, using default 'drizzle.config.ts'
+Reading config file '/var/www/iskcon-juhu/drizzle.config.ts'
+ Error  No schema files found for path config ['./shared/schema.ts']
+ Error  If path represents a file - please make sure to use .ts or other extension in the path
+
+> rest-express@1.0.0 build
+> vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+
+NODE_ENV=production is not supported in the .env file. Only NODE_ENV=development is supported to create a development build of your project. If you need to set process.env.NODE_ENV, you can set it in the Vite config instead.
+vite v5.4.14 building for production...
+✓ 0 modules transformed.
+x Build failed in 13ms
+error during build:
+Could not resolve entry module "index.html".
+    at getRollupError (file:///var/www/iskcon-juhu/node_modules/rollup/dist/es/shared/parseAst.js:396:41)
+    at error (file:///var/www/iskcon-juhu/node_modules/rollup/dist/es/shared/parseAst.js:392:42)
+    at ModuleLoader.loadEntryModule (file:///var/www/iskcon-juhu/node_modules/rollup/dist/es/shared/node-entry.js:20086:20)
+    at async Promise.all (index 0)
+Use --update-env to update environment variables
+[PM2] Applying action restartProcessId on app [iskcon-juhu](ids: [ 0 ])
+[PM2] [iskcon-juhu](0) ✓
+┌────┬────────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name           │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼────────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 0  │ iskcon-juhu    │ default     │ 1.0.0   │ fork    │ 164202   │ 0s     │ 27   │ online    │ 0%       │ 26.5mb   │ root     │ disabled │
+└────┴────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+┌────┬────────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name           │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼────────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 0  │ iskcon-juhu    │ default     │ 1.0.0   │ fork    │ 164202   │ 0s     │ 27   │ online    │ 0%       │ 63.1mb   │ root     │ disabled │
+└────┴────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘

@@ -177,7 +177,10 @@ const GalleryPage = () => {
                     name="imageUrl"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Image</FormLabel>
+                        <div>
+                          <FormLabel>Image</FormLabel>
+                          <p className="text-xs text-blue-600 font-semibold mt-1">📏 Recommended: 1200 x 800 px | Max: 400KB</p>
+                        </div>
                         <FormControl>
                           <Tabs defaultValue="url" className="w-full">
                             <TabsList className="grid w-full grid-cols-2">
