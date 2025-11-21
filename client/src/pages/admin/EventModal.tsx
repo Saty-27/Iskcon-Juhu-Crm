@@ -490,7 +490,10 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
                         name="imageUrl"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Banner Image</FormLabel>
+                            <div>
+                              <FormLabel>Banner Image</FormLabel>
+                              <p className="text-xs text-blue-600 font-semibold mt-1">📏 Recommended: 800 x 600 px | Max: 300KB</p>
+                            </div>
                             <div className="space-y-4">
                               {/* File Upload Option */}
                               <div>

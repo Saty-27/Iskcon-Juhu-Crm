@@ -403,6 +403,7 @@ export default function BlogManagement() {
                     <Image className="h-5 w-5" />
                     <Label className="text-base font-medium">Featured Image</Label>
                   </div>
+                  <p className="text-xs text-blue-600 font-semibold">📏 Recommended: 1200 x 630 px | Max: 350KB</p>
                   
                   <div className="grid grid-cols-2 gap-4">
                     <FormField

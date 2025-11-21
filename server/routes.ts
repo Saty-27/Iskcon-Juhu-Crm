@@ -878,13 +878,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/events/:id", isAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const success = await storage.deleteEvent(id);
-      if (!success) {
-        return res.status(404).json({ message: "Event not found" });
+      console.log('Attempting to delete event with ID:', id);
+      
+      const result = await storage.deleteEvent(id);
+      
+      if (!result.success) {
+        console.log('Delete operation failed:', result.message);
+        return res.status(400).json({ 
+          message: result.message || "Cannot delete event" 
+        });
       }
-      res.json({ message: "Event deleted" });
+      
+      console.log(`Successfully deleted event ${id}`);
+      res.json({ message: "Event deleted successfully" });
     } catch (error) {
-      res.status(500).json({ message: "Error deleting event" });
+      console.error('Error deleting event:', error);
+      res.status(500).json({ 
+        message: "Error deleting event", 
+        error: error instanceof Error ? error.message : String(error) 
+      });
     }
   });
 

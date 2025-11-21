@@ -306,15 +306,36 @@ export class DatabaseStorage implements IStorage {
     return event;
   }
 
-  async deleteEvent(id: number): Promise<boolean> {
+  async deleteEvent(id: number): Promise<{ success: boolean; message?: string }> {
     try {
-      // The database schema has ON DELETE CASCADE for related tables,
-      // so deleting the event should automatically delete related records
+      // First check if there are any donations referencing this event
+      const existingDonations = await db.select().from(donations).where(eq(donations.eventId, id));
+      
+      if (existingDonations.length > 0) {
+        return {
+          success: false,
+          message: `Cannot delete event with ${existingDonations.length} existing donation(s). Please contact administrator to handle existing donations first.`
+        };
+      }
+
+      // Delete related event donation cards first
+      await db.delete(eventDonationCards).where(eq(eventDonationCards.eventId, id));
+      
+      // Delete related bank details
+      await db.delete(eventBankDetails).where(eq(eventBankDetails.eventId, id));
+
+      // Then delete the event
       const result = await db.delete(events).where(eq(events.id, id));
-      return result.rowCount > 0;
+      
+      return {
+        success: result.rowCount > 0
+      };
     } catch (error) {
       console.error('Error deleting event:', error);
-      return false;
+      return {
+        success: false,
+        message: 'Database error occurred while deleting event'
+      };
     }
   }
 
