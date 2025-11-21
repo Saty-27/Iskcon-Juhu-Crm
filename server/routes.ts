@@ -371,20 +371,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const banners = await storage.getBanners();
       res.json(banners.filter(b => b.isActive));
     } catch (error) {
-      res.status(500).json({ message: "Error fetching banners" });
+      console.error('Error fetching banners:', error);
+      res.status(500).json({ 
+        message: "Error fetching banners",
+        error: error instanceof Error ? error.message : String(error)
+      });
     }
   });
 
   app.post("/api/banners", isAdmin, async (req, res) => {
     try {
+      console.log('Creating banner with data:', req.body);
       const data = insertBannerSchema.parse(req.body);
+      console.log('Parsed banner data:', data);
       const banner = await storage.createBanner(data);
       res.status(201).json(banner);
     } catch (error) {
+      console.error('Error creating banner:', error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid data", errors: error.errors });
       }
-      res.status(500).json({ message: "Error creating banner" });
+      res.status(500).json({ 
+        message: "Error creating banner",
+        error: error instanceof Error ? error.message : String(error)
+      });
     }
   });
 

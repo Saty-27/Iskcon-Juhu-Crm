@@ -1,0 +1,105 @@
+root@srv1121234:/var/www/iskcon-juhu# pm2 logs iskcon-juhu --lines 50
+[TAILING] Tailing last 50 lines for [iskcon-juhu] process (change the value with --lines option)
+/root/.pm2/logs/iskcon-juhu-error.log last 50 lines:
+0|iskcon-j |   file: 'ri_triggers.c',
+0|iskcon-j |   line: '2621',
+0|iskcon-j |   routine: 'ri_ReportViolation'
+0|iskcon-j | }
+0|iskcon-j | Error deleting event: error: update or delete on table "events" violates foreign key constraint "donations_event_id_events_id_fk" on table "donations"
+0|iskcon-j |     at /var/www/iskcon-juhu/node_modules/pg-pool/index.js:45:11
+0|iskcon-j |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|iskcon-j |     at async DatabaseStorage.deleteEvent (file:///var/www/iskcon-juhu/dist/index.js:924:22)
+0|iskcon-j |     at async file:///var/www/iskcon-juhu/dist/index.js:2818:23 {
+0|iskcon-j |   length: 300,
+0|iskcon-j |   severity: 'ERROR',
+0|iskcon-j |   code: '23503',
+0|iskcon-j |   detail: 'Key (id)=(5) is still referenced from table "donations".',
+0|iskcon-j |   hint: undefined,
+0|iskcon-j |   position: undefined,
+0|iskcon-j |   internalPosition: undefined,
+0|iskcon-j |   internalQuery: undefined,
+0|iskcon-j |   where: undefined,
+0|iskcon-j |   schema: 'public',
+0|iskcon-j |   table: 'donations',
+0|iskcon-j |   column: undefined,
+0|iskcon-j |   dataType: undefined,
+0|iskcon-j |   constraint: 'donations_event_id_events_id_fk',
+0|iskcon-j |   file: 'ri_triggers.c',
+0|iskcon-j |   line: '2621',
+0|iskcon-j |   routine: 'ri_ReportViolation'
+0|iskcon-j | }
+0|iskcon-j | Error deleting event: error: update or delete on table "events" violates foreign key constraint "donations_event_id_events_id_fk" on table "donations"
+0|iskcon-j |     at /var/www/iskcon-juhu/node_modules/pg-pool/index.js:45:11
+0|iskcon-j |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|iskcon-j |     at async DatabaseStorage.deleteEvent (file:///var/www/iskcon-juhu/dist/index.js:924:22)
+0|iskcon-j |     at async file:///var/www/iskcon-juhu/dist/index.js:2818:23 {
+0|iskcon-j |   length: 300,
+0|iskcon-j |   severity: 'ERROR',
+0|iskcon-j |   code: '23503',
+0|iskcon-j |   detail: 'Key (id)=(5) is still referenced from table "donations".',
+0|iskcon-j |   hint: undefined,
+0|iskcon-j |   position: undefined,
+0|iskcon-j |   internalPosition: undefined,
+0|iskcon-j |   internalQuery: undefined,
+0|iskcon-j |   where: undefined,
+0|iskcon-j |   schema: 'public',
+0|iskcon-j |   table: 'donations',
+0|iskcon-j |   column: undefined,
+0|iskcon-j |   dataType: undefined,
+0|iskcon-j |   constraint: 'donations_event_id_events_id_fk',
+0|iskcon-j |   file: 'ri_triggers.c',
+0|iskcon-j |   line: '2621',
+0|iskcon-j |   routine: 'ri_ReportViolation'
+0|iskcon-j | }
+
+/root/.pm2/logs/iskcon-juhu-out.log last 50 lines:
+0|iskcon-j |   id: 1,
+0|iskcon-j |   username: 'isk_conjuhuadmin',
+0|iskcon-j |   email: 'admin@iskconjuhu.org',
+0|iskcon-j |   name: 'ISKCON Juhu Admin',
+0|iskcon-j |   phone: null,
+0|iskcon-j |   address: null,
+0|iskcon-j |   role: 'admin',
+0|iskcon-j |   isActive: true
+0|iskcon-j | }
+0|iskcon-j | 11:51:16 AM [express] GET /api/auth/me 304 in 6ms :: {"id":1,"username":"isk_conjuhuadmin","email":"a…
+0|iskcon-j | Session middleware check: {
+0|iskcon-j |   sessionId: 'xj4tjpt9KYylykhYOlylXdBzNl-gXgVb',
+0|iskcon-j |   userId: undefined,
+0|iskcon-j |   sessionExists: true
+0|iskcon-j | }
+0|iskcon-j | 11:51:16 AM [express] GET /api/admin/donations 304 in 11ms :: [{"id":33,"amount":1,"name":"ISKCON Juh…
+0|iskcon-j | Session middleware check: {
+0|iskcon-j |   sessionId: 'zTAyVGUPBnvodTQ_I8sqrPU-Mxi51Brr',
+0|iskcon-j |   userId: undefined,
+0|iskcon-j |   sessionExists: true
+0|iskcon-j | }
+0|iskcon-j | 11:51:18 AM [express] GET /api/banners 500 in 4ms :: {"message":"Error fetching banners"}
+0|iskcon-j | Session middleware check: {
+0|iskcon-j |   sessionId: '44-5GiTA0npNWrZuik6Ghlf6Rp4H5oJU',
+0|iskcon-j |   userId: undefined,
+0|iskcon-j |   sessionExists: true
+0|iskcon-j | }
+0|iskcon-j | Upload destination for type banner : /var/www/iskcon-juhu/uploads/banners
+0|iskcon-j | Generated filename for type banner : banner-1763725893902-442527615.png
+0|iskcon-j | 11:51:33 AM [express] POST /api/upload/banner 200 in 5ms :: {"imageUrl":"/uploads/banners/banner-1763…
+0|iskcon-j | Session middleware check: {
+0|iskcon-j |   sessionId: 'PVaH8xu4Ry0xXDw35dADILWNgMPvyLHY',
+0|iskcon-j |   userId: undefined,
+0|iskcon-j |   sessionExists: true
+0|iskcon-j | }
+0|iskcon-j | 11:51:38 AM [express] POST /api/banners 500 in 12ms :: {"message":"Error creating banner"}
+0|iskcon-j | Session middleware check: {
+0|iskcon-j |   sessionId: 'IE2iNw7WLVxTCKj6eUuB6iXP9vRXFTst',
+0|iskcon-j |   userId: undefined,
+0|iskcon-j |   sessionExists: true
+0|iskcon-j | }
+0|iskcon-j | Upload destination for type banner : /var/www/iskcon-juhu/uploads/banners
+0|iskcon-j | Generated filename for type banner : banner-1763725908497-801676150.png
+0|iskcon-j | 11:51:48 AM [express] POST /api/upload/banner 200 in 6ms :: {"imageUrl":"/uploads/banners/banner-1763…
+0|iskcon-j | Session middleware check: {
+0|iskcon-j |   sessionId: 'E2NFEP6P0XPkQNWPbiU0BEYtdax_1Ddv',
+0|iskcon-j |   userId: undefined,
+0|iskcon-j |   sessionExists: true
+0|iskcon-j | }
+0|iskcon-j | 11:51:50 AM [express] POST /api/banners 500 in 12ms :: {"message":"Error creating banner"}

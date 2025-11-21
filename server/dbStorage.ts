@@ -55,7 +55,12 @@ export class DatabaseStorage implements IStorage {
 
   // Banner operations
   async getBanners(): Promise<Banner[]> {
-    return await db.select().from(banners);
+    try {
+      return await db.select().from(banners);
+    } catch (error) {
+      console.error('Error in getBanners:', error);
+      throw error;
+    }
   }
 
   async getBanner(id: number): Promise<Banner | undefined> {
@@ -64,8 +69,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createBanner(banner: InsertBanner): Promise<Banner> {
-    const [newBanner] = await db.insert(banners).values(banner).returning();
-    return newBanner;
+    try {
+      console.log('Inserting banner:', banner);
+      const [newBanner] = await db.insert(banners).values(banner).returning();
+      console.log('Banner created:', newBanner);
+      return newBanner;
+    } catch (error) {
+      console.error('Error in createBanner:', error);
+      throw error;
+    }
   }
 
   async updateBanner(id: number, bannerData: Partial<Banner>): Promise<Banner | undefined> {
