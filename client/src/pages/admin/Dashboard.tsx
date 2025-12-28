@@ -44,7 +44,7 @@ const AdminDashboard = () => {
         <title>Admin Dashboard - ISKCON Juhu</title>
       </Helmet>
       
-      <div className="bg-gray-50 min-h-screen">
+      <div className="bg-gray-50">
         <div className="p-6">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>

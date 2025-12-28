@@ -287,7 +287,7 @@ export default function BlogManagement() {
   if (isLoading) {
     return (
       <AdminLayout>
-        <div className="bg-gray-50 min-h-screen p-6">
+        <div className="bg-gray-50 p-6">
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h1 className="text-3xl font-bold text-gray-900">Blog Management</h1>
@@ -310,7 +310,7 @@ export default function BlogManagement() {
 
   return (
     <AdminLayout>
-      <div className="bg-gray-50 min-h-screen p-6">
+      <div className="bg-gray-50 p-6">
         <div className="space-y-6">
           <div className="flex justify-between items-center">
             <h1 className="text-3xl font-bold text-gray-900">Blog Management</h1>

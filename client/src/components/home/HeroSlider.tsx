@@ -1,9 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { Banner } from '@shared/schema';
 import { Skeleton } from '@/components/ui/skeleton';
 import iskconDeitiesImg from "@assets/Website FFC_20250531_190536_0000_1749327853462.png";
+
+// Preload next slide image for smooth transitions
+const useImagePreload = (url: string | undefined) => {
+  useEffect(() => {
+    if (!url) return;
+    const img = new Image();
+    img.src = url;
+  }, [url]);
+};
 
 const HeroSlider = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -32,6 +41,11 @@ const HeroSlider = () => {
   console.log('Banners:', banners, 'Length:', banners.length, 'Loading:', isLoading, 'Error:', error);
   console.log('Current slide:', currentSlide);
   
+  // Preload next image for smooth transitions
+  const nextSlideIndex = (currentSlide + 1) % banners.length;
+  const nextImageUrl = banners[nextSlideIndex]?.imageUrl;
+  useImagePreload(nextImageUrl);
+
   // Auto-advance slides
   useEffect(() => {
     if (banners.length <= 1) return; // Only auto-advance if there are multiple banners
@@ -59,12 +73,12 @@ const HeroSlider = () => {
   // Show fallback only if no banners exist and not loading
   if (banners.length === 0 && !isLoading) {
     return (
-      <section className="relative overflow-hidden h-[70vh] sm:h-[80vh] md:h-screen bg-gray-900">
-        <div className="h-full w-full absolute inset-0 flex items-center justify-center">
+      <section className="relative overflow-hidden h-[70vh] sm:h-[80vh] md:h-screen">
+        <div className="h-full w-full absolute inset-0">
           <img 
             src={iskconDeitiesImg} 
             alt="Sri Sri Radha Rasabihari" 
-            className="object-contain w-full h-full"
+            className="w-full h-full object-cover"
           />
         </div>
         <div className="absolute inset-0 z-20 flex items-end justify-center pb-8 sm:pb-12 md:pb-16">
@@ -90,13 +104,15 @@ const HeroSlider = () => {
   }
   
   return (
-    <section className="relative overflow-hidden h-[70vh] sm:h-[80vh] md:h-screen bg-gray-900">
+    <section className="relative overflow-hidden h-[70vh] sm:h-[80vh] md:h-screen">
       {banners.length > 0 && banners[currentSlide] && (
-        <div className="h-full w-full flex items-center justify-center">
+        <div className="h-full w-full absolute inset-0">
           <img 
             src={isMobile && banners[currentSlide].mobileImageUrl ? banners[currentSlide].mobileImageUrl : banners[currentSlide].imageUrl} 
             alt={banners[currentSlide].title} 
-            className="object-contain w-full h-full"
+            className="w-full h-full object-cover"
+            loading="eager"
+            decoding="async"
             onError={(e) => {
               console.error('Image failed to load:', isMobile && banners[currentSlide].mobileImageUrl ? banners[currentSlide].mobileImageUrl : banners[currentSlide].imageUrl);
             }}

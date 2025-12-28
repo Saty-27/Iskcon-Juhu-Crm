@@ -49,8 +49,13 @@ export default function EventDonation() {
     refetchOnWindowFocus: true,
   });
 
-  const { data: bankDetails = [] } = useQuery<BankDetails[]>({
-    queryKey: ["/api/bank-details"]
+  const { data: eventBankDetails = [] } = useQuery<BankDetails[]>({
+    queryKey: [`/api/events/${eventId}/bank-details`],
+    enabled: !!eventId,
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   const event = events.find(e => e.id === parseInt(eventId || "0"));
@@ -86,7 +91,7 @@ export default function EventDonation() {
     setPaymentModal({ isOpen: false });
   };
 
-  const currentBankDetail = bankDetails[0];
+  const activeBankDetail = eventBankDetails.find((bd: BankDetails) => bd.isActive) || eventBankDetails[0];
 
   if (!event) {
     return (
@@ -364,6 +369,68 @@ export default function EventDonation() {
               To get the receipt of donation, please share your details with our team.
             </p>
           </div>
+
+          {/* Bank Details & QR Code */}
+          {activeBankDetail && (
+            <div style={{ 
+              backgroundColor: '#fff', 
+              padding: '30px', 
+              borderRadius: '8px', 
+              marginTop: '20px', 
+              boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)' 
+            }}>
+              <h3 style={{ marginBottom: '20px', fontSize: '20px', fontWeight: 'bold' }}>Bank & Payment Details</h3>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', alignItems: 'start' }}>
+                {/* Bank Details */}
+                <div>
+                  <h4 style={{ marginBottom: '15px', fontWeight: 'bold', color: '#333' }}>Bank Account Information</h4>
+                  <div>
+                    <p style={{ marginBottom: '8px' }}>
+                      <strong>Account Holder:</strong> {activeBankDetail.accountName}
+                    </p>
+                    <p style={{ marginBottom: '8px' }}>
+                      <strong>Bank Name:</strong> {activeBankDetail.bankName}
+                    </p>
+                    <p style={{ marginBottom: '8px' }}>
+                      <strong>Account Number:</strong> {activeBankDetail.accountNumber}
+                    </p>
+                    <p style={{ marginBottom: '8px' }}>
+                      <strong>IFSC Code:</strong> {activeBankDetail.ifscCode}
+                    </p>
+                    {activeBankDetail.swiftCode && (
+                      <p style={{ marginBottom: '8px' }}>
+                        <strong>SWIFT Code:</strong> {activeBankDetail.swiftCode}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* QR Code */}
+                {activeBankDetail.qrCodeUrl && (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <h4 style={{ marginBottom: '15px', fontWeight: 'bold', color: '#333' }}>UPI QR Code</h4>
+                    <img 
+                      src={activeBankDetail.qrCodeUrl} 
+                      alt="UPI QR Code" 
+                      style={{ 
+                        maxWidth: '200px', 
+                        width: '100%', 
+                        height: 'auto', 
+                        border: '2px solid #ddd', 
+                        borderRadius: '8px', 
+                        padding: '10px',
+                        backgroundColor: '#f9f9f9'
+                      }}
+                    />
+                    <p style={{ marginTop: '10px', fontSize: '12px', color: '#666', textAlign: 'center' }}>
+                      Scan to donate via UPI
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Support */}
           <div style={{ marginTop: '20px', textAlign: 'center' }}>

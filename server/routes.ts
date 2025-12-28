@@ -22,7 +22,11 @@ import {
   insertSocialLinkSchema,
   insertDonationSchema,
   insertSubscriptionSchema,
-  insertBlogPostSchema
+  insertBlogPostSchema,
+  insertProcessSectionSchema,
+  insertFooterSettingsSchema,
+  insertPolicySchema,
+  insertPoliciesPageSchema
 } from "@shared/schema";
 
 import express from "express";
@@ -69,6 +73,13 @@ declare module "express-session" {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Cache control middleware for static assets
+  app.use('/uploads', (req, res, next) => {
+    // Cache images for 30 days
+    res.set('Cache-Control', 'public, max-age=2592000');
+    res.set('ETag', `"${Date.now()}"`);
+    next();
+  });
   // Simple in-memory session store for development
   const MemoryStore = require('memorystore')(session);
   
@@ -1472,6 +1483,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get donations by date range for Excel export
+  app.get("/api/donations/export", isAdmin, async (req, res) => {
+    try {
+      const { fromDate, toDate } = req.query;
+      
+      if (!fromDate || !toDate) {
+        return res.status(400).json({ message: "fromDate and toDate query parameters are required" });
+      }
+
+      const from = new Date(fromDate as string);
+      const to = new Date(toDate as string);
+
+      if (isNaN(from.getTime()) || isNaN(to.getTime())) {
+        return res.status(400).json({ message: "Invalid date format. Use ISO string format." });
+      }
+
+      const donations = await storage.getDonationsByDateRange(from, to);
+      res.json(donations);
+    } catch (error) {
+      console.error("Error fetching donations for export:", error);
+      res.status(500).json({ message: "Error fetching donations for export" });
+    }
+  });
+
   // Payment webhook (for PayU)
   app.post("/api/donations/payment-webhook", async (req, res) => {
     try {
@@ -2206,6 +2241,150 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error uploading social icon:', error);
       res.status(500).json({ message: "Error uploading social icon", error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
+  // Process Section API endpoints
+  app.get("/api/process-section", async (req, res) => {
+    try {
+      const section = await storage.getProcessSection();
+      res.json(section);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching process section" });
+    }
+  });
+
+  app.put("/api/process-section", isAdmin, async (req, res) => {
+    try {
+      const data = insertProcessSectionSchema.partial().parse(req.body);
+      const section = await storage.updateProcessSection(data);
+      res.json(section);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error updating process section" });
+    }
+  });
+
+  // Footer Settings API endpoints
+  app.get("/api/footer-settings", async (req, res) => {
+    try {
+      const settings = await storage.getFooterSettings();
+      res.json(settings);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching footer settings" });
+    }
+  });
+
+  app.put("/api/footer-settings", isAdmin, async (req, res) => {
+    try {
+      const data = insertFooterSettingsSchema.partial().parse(req.body);
+      const settings = await storage.updateFooterSettings(data);
+      res.json(settings);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error updating footer settings" });
+    }
+  });
+
+  // Policy API endpoints
+  app.get("/api/policies", async (req, res) => {
+    try {
+      const policies = await storage.getPolicies();
+      res.json(policies);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching policies" });
+    }
+  });
+
+  app.get("/api/policies/:slug", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const policy = await storage.getPolicyBySlug(slug);
+      if (!policy) {
+        return res.status(404).json({ message: "Policy not found" });
+      }
+      res.json(policy);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching policy" });
+    }
+  });
+
+  app.get("/api/admin/policies", isAdmin, async (req, res) => {
+    try {
+      const allPolicies = await storage.getAllPolicies();
+      res.json(allPolicies);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching policies" });
+    }
+  });
+
+  app.post("/api/admin/policies", isAdmin, async (req, res) => {
+    try {
+      const data = insertPolicySchema.parse(req.body);
+      const policy = await storage.createPolicy(data);
+      res.json(policy);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error creating policy" });
+    }
+  });
+
+  app.put("/api/admin/policies/:id", isAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const data = insertPolicySchema.partial().parse(req.body);
+      const policy = await storage.updatePolicy(parseInt(id), data);
+      if (!policy) {
+        return res.status(404).json({ message: "Policy not found" });
+      }
+      res.json(policy);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error updating policy" });
+    }
+  });
+
+  app.delete("/api/admin/policies/:id", isAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.deletePolicy(parseInt(id));
+      if (!success) {
+        return res.status(404).json({ message: "Policy not found" });
+      }
+      res.json({ message: "Policy deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting policy" });
+    }
+  });
+
+  // Policies Page Settings API endpoints
+  app.get("/api/policies-page", async (req, res) => {
+    try {
+      const page = await storage.getPoliciesPage();
+      res.json(page);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching policies page" });
+    }
+  });
+
+  app.put("/api/admin/policies-page", isAdmin, async (req, res) => {
+    try {
+      const data = insertPoliciesPageSchema.partial().parse(req.body);
+      const page = await storage.updatePoliciesPage(data);
+      res.json(page);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error updating policies page" });
     }
   });
 

@@ -18,7 +18,8 @@ import {
   Subscription, InsertSubscription, subscriptions,
   Stat, InsertStat, stats,
   Schedule, InsertSchedule, schedules,
-  BlogPost, InsertBlogPost, blogPosts
+  BlogPost, InsertBlogPost, blogPosts,
+  ProcessSection, InsertProcessSection, processSections
 } from "@shared/schema";
 
 export interface IStorage {
@@ -144,6 +145,7 @@ export interface IStorage {
   getDonation(id: number): Promise<Donation | undefined>;
   getDonationByPaymentId(paymentId: string): Promise<Donation | undefined>;
   getUserDonations(userId: number): Promise<Donation[]>;
+  getDonationsByDateRange(fromDate: Date, toDate: Date): Promise<any[]>;
   createDonation(donation: InsertDonation): Promise<Donation>;
   updateDonation(id: number, donationData: Partial<Donation>): Promise<Donation | undefined>;
   deleteDonation(id: number): Promise<boolean>;
@@ -177,6 +179,10 @@ export interface IStorage {
   createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
   updateBlogPost(id: number, postData: Partial<BlogPost>): Promise<BlogPost | undefined>;
   deleteBlogPost(id: number): Promise<boolean>;
+  
+  // Process section management
+  getProcessSection(): Promise<ProcessSection | undefined>;
+  updateProcessSection(sectionData: Partial<ProcessSection>): Promise<ProcessSection | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -199,9 +205,11 @@ export class MemStorage implements IStorage {
   private statsData: Map<number, Stat>;
   private schedulesData: Map<number, Schedule>;
   private blogPostsData: Map<number, BlogPost>;
+  private processSectionsData: Map<number, ProcessSection>;
   
   private userIdCounter: number;
   private bannerIdCounter: number;
+  private processSectionIdCounter: number = 1;
   private quoteIdCounter: number;
   private donationCategoryIdCounter: number;
   private donationCardIdCounter: number;
@@ -240,6 +248,7 @@ export class MemStorage implements IStorage {
     this.statsData = new Map();
     this.schedulesData = new Map();
     this.blogPostsData = new Map();
+    this.processSectionsData = new Map();
     
     this.userIdCounter = 1;
     this.bannerIdCounter = 1;
@@ -1321,6 +1330,37 @@ export class MemStorage implements IStorage {
 
   async deleteEventBankDetails(id: number): Promise<boolean> {
     return this.bankDetailsData.delete(id);
+  }
+  
+  async getProcessSection(): Promise<ProcessSection | undefined> {
+    // Return the first process section (there should only be one)
+    for (const section of this.processSectionsData.values()) {
+      return section;
+    }
+    return undefined;
+  }
+  
+  async updateProcessSection(sectionData: Partial<ProcessSection>): Promise<ProcessSection | undefined> {
+    const section = await this.getProcessSection();
+    if (!section) {
+      // Create if doesn't exist
+      const id = this.processSectionIdCounter++;
+      const newSection: ProcessSection = {
+        id,
+        title: "ISKCON FOOD FOR CHILD",
+        description: null,
+        desktopImageUrl: sectionData.desktopImageUrl || "",
+        mobileImageUrl: sectionData.mobileImageUrl || "",
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      this.processSectionsData.set(id, newSection);
+      return newSection;
+    }
+    const updated = { ...section, ...sectionData, updatedAt: new Date() };
+    this.processSectionsData.set(section.id, updated);
+    return updated;
   }
 }
 

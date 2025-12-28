@@ -459,3 +459,107 @@ export const insertBlogPostSchema = createInsertSchema(blogPosts, {
   createdAt: true,
   updatedAt: true,
 });
+
+// Process/Featured section table (for ISKCON Food for Child section)
+export const processSections = pgTable("process_sections", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull().default("ISKCON FOOD FOR CHILD"),
+  description: text("description"),
+  desktopImageUrl: text("desktop_image_url").notNull(),
+  mobileImageUrl: text("mobile_image_url").notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type ProcessSection = typeof processSections.$inferSelect;
+export type InsertProcessSection = typeof processSections.$inferInsert;
+
+export const insertProcessSectionSchema = createInsertSchema(processSections, {
+  title: z.string().min(1).max(255),
+  description: z.string().optional(),
+  desktopImageUrl: z.string().min(1),
+  mobileImageUrl: z.string().min(1),
+  isActive: z.boolean().optional(),
+}).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Footer settings table
+export const footerSettings = pgTable("footer_settings", {
+  id: serial("id").primaryKey(),
+  address: text("address").notNull().default("Hare Krishna Land, Juhu, Mumbai, Maharashtra 400049, India"),
+  phone: text("phone").notNull().default("+91 22 2620 0072"),
+  email: text("email").notNull().default("info@iskconjuhu.in"),
+  templeHours: text("temple_hours").notNull().default("Daily: 4:30 AM - 9:00 PM"),
+  templeHoursSpecial: text("temple_hours_special").notNull().default("Special timings during festivals"),
+  introDescription: text("intro_description").notNull().default("We'd love to hear from you. Reach out for inquiries, spiritual guidance, or to participate in our services."),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type FooterSettings = typeof footerSettings.$inferSelect;
+export type InsertFooterSettings = typeof footerSettings.$inferInsert;
+
+export const insertFooterSettingsSchema = createInsertSchema(footerSettings, {
+  address: z.string().min(1),
+  phone: z.string().min(1),
+  email: z.string().email(),
+  templeHours: z.string().min(1),
+  templeHoursSpecial: z.string().min(1),
+  introDescription: z.string().min(1),
+}).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Policies table
+export const policies = pgTable("policies", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  slug: text("slug").notNull().unique(),
+  content: text("content").notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  order: integer("order").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type Policy = typeof policies.$inferSelect;
+export type InsertPolicy = typeof policies.$inferInsert;
+
+export const insertPolicySchema = createInsertSchema(policies, {
+  title: z.string().min(1).max(255),
+  slug: z.string().min(1).max(255),
+  content: z.string().min(1),
+  isActive: z.boolean().optional(),
+  order: z.number().optional(),
+}).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Policies Page Settings table
+export const policiesPage = pgTable("policies_page", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull().default("Policies of Usage"),
+  description: text("description").notNull().default("Please review our policies to understand how we operate and your rights as a user."),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type PoliciesPage = typeof policiesPage.$inferSelect;
+export type InsertPoliciesPage = typeof policiesPage.$inferInsert;
+
+export const insertPoliciesPageSchema = createInsertSchema(policiesPage, {
+  title: z.string().min(1).max(255),
+  description: z.string().min(1),
+}).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});

@@ -29,10 +29,14 @@ import {
   CheckCircle,
   Clock,
   TrendingUp,
-  IndianRupee
+  IndianRupee,
+  Calendar,
+  Download,
+  Loader2
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import * as XLSX from "xlsx";
 
 interface Donation {
   id: number;
@@ -55,6 +59,9 @@ const DonationsPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [isExporting, setIsExporting] = useState(false);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -111,7 +118,23 @@ const DonationsPage = () => {
       (typeFilter === "category" && donation.categoryName) ||
       (typeFilter === "event" && donation.eventTitle);
     
-    return matchesSearch && matchesStatus && matchesType;
+    // Date range filter
+    let matchesDateRange = true;
+    if (fromDate || toDate) {
+      const donationDate = new Date(donation.createdAt).setHours(0, 0, 0, 0);
+      
+      if (fromDate) {
+        const fromDateTime = new Date(fromDate).setHours(0, 0, 0, 0);
+        if (donationDate < fromDateTime) matchesDateRange = false;
+      }
+      
+      if (toDate) {
+        const toDateTime = new Date(toDate).setHours(23, 59, 59, 999);
+        if (donationDate > toDateTime) matchesDateRange = false;
+      }
+    }
+    
+    return matchesSearch && matchesStatus && matchesType && matchesDateRange;
   });
 
   const handleViewDonation = (donation: Donation) => {
@@ -122,6 +145,72 @@ const DonationsPage = () => {
   const handleDelete = (id: number) => {
     if (confirm("Are you sure you want to delete this donation?")) {
       deleteDonationMutation.mutate(id);
+    }
+  };
+
+  const handleExportExcel = async () => {
+    if (!fromDate || !toDate) {
+      toast({ title: "Error", description: "Please select both from and to dates", variant: "destructive" });
+      return;
+    }
+
+    if (filteredDonations.length === 0) {
+      toast({ title: "Error", description: "No donations found for the selected date range", variant: "destructive" });
+      return;
+    }
+
+    try {
+      setIsExporting(true);
+      
+      // Prepare data for Excel
+      const excelData = filteredDonations.map((donation: any) => ({
+        "Donor Name": donation.name || "-",
+        "Email": donation.email || "-",
+        "Phone": donation.phone || "-",
+        "Amount": donation.amount || 0,
+        "Category": donation.categoryName || "N/A",
+        "Event": donation.eventTitle || "N/A",
+        "Status": donation.status || "-",
+        "Date": donation.createdAt
+          ? new Date(donation.createdAt).toLocaleDateString()
+          : "-",
+        "Payment ID": donation.paymentId || "-",
+      }));
+
+      // Create Excel workbook
+      const worksheet = XLSX.utils.json_to_sheet(excelData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Donations");
+
+      // Set column widths
+      worksheet["!cols"] = [
+        { wch: 20 },
+        { wch: 25 },
+        { wch: 15 },
+        { wch: 12 },
+        { wch: 20 },
+        { wch: 20 },
+        { wch: 12 },
+        { wch: 12 },
+        { wch: 15 },
+      ];
+
+      // Download file
+      const fileName = `donations-${fromDate}-to-${toDate}.xlsx`;
+      XLSX.writeFile(workbook, fileName);
+
+      toast({
+        title: "Success",
+        description: `Exported ${filteredDonations.length} donation(s) successfully`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to export donations",
+        variant: "destructive",
+      });
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -138,7 +227,7 @@ const DonationsPage = () => {
   if (isLoading) {
     return (
       <AdminLayout>
-        <div className="bg-gray-50 min-h-screen p-2.5">
+        <div className="bg-gray-50 p-2.5">
           <div className="animate-pulse space-y-6">
             <div className="h-8 bg-gray-200 rounded w-1/3"></div>
             <div className="grid grid-cols-4 gap-6">
@@ -155,7 +244,7 @@ const DonationsPage = () => {
 
   return (
     <AdminLayout>
-      <div className="bg-gray-50 min-h-screen">
+      <div className="bg-gray-50">
         <div className="p-2.5">
           {/* Summary Cards Grid - Modern Gradient Design */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -226,8 +315,8 @@ const DonationsPage = () => {
 
           {/* Search + Filters Bar - Modern Design */}
           <div className="bg-white rounded-2xl shadow-lg border-0 mb-8 p-6 backdrop-blur-sm">
-            <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
-              <div className="relative flex-1 max-w-md">
+            <div className="flex flex-col gap-6">
+              <div className="relative flex-1">
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <input
                   type="text"
@@ -238,10 +327,11 @@ const DonationsPage = () => {
                 />
               </div>
               
-              <div className="flex gap-4">
+              <div className="flex flex-col lg:flex-row gap-4">
+                {/* Status Filter */}
                 <div className="relative">
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-40 h-12 border-0 bg-gray-50 rounded-2xl focus:ring-2 focus:ring-purple-500 shadow-inner">
+                    <SelectTrigger className="w-full lg:w-40 h-12 border-0 bg-gray-50 rounded-2xl focus:ring-2 focus:ring-purple-500 shadow-inner">
                       <SelectValue placeholder="All Status" />
                     </SelectTrigger>
                     <SelectContent className="border-0 shadow-xl rounded-xl">
@@ -253,9 +343,10 @@ const DonationsPage = () => {
                   </Select>
                 </div>
 
+                {/* Type Filter */}
                 <div className="relative">
                   <Select value={typeFilter} onValueChange={setTypeFilter}>
-                    <SelectTrigger className="w-40 h-12 border-0 bg-gray-50 rounded-2xl focus:ring-2 focus:ring-purple-500 shadow-inner">
+                    <SelectTrigger className="w-full lg:w-40 h-12 border-0 bg-gray-50 rounded-2xl focus:ring-2 focus:ring-purple-500 shadow-inner">
                       <SelectValue placeholder="All Types" />
                     </SelectTrigger>
                     <SelectContent className="border-0 shadow-xl rounded-xl">
@@ -265,6 +356,66 @@ const DonationsPage = () => {
                     </SelectContent>
                   </Select>
                 </div>
+
+                {/* From Date Filter */}
+                <div className="relative">
+                  <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 border-0 rounded-2xl focus-within:ring-2 focus-within:ring-purple-500 shadow-inner">
+                    <Calendar className="h-5 w-5 text-gray-400" />
+                    <input
+                      type="date"
+                      value={fromDate}
+                      onChange={(e) => setFromDate(e.target.value)}
+                      className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-400"
+                      title="From Date"
+                    />
+                  </div>
+                </div>
+
+                {/* To Date Filter */}
+                <div className="relative">
+                  <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 border-0 rounded-2xl focus-within:ring-2 focus-within:ring-purple-500 shadow-inner">
+                    <Calendar className="h-5 w-5 text-gray-400" />
+                    <input
+                      type="date"
+                      value={toDate}
+                      onChange={(e) => setToDate(e.target.value)}
+                      className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-400"
+                      title="To Date"
+                    />
+                  </div>
+                </div>
+
+                {/* Clear Filters Button & Export Button */}
+                {(fromDate || toDate) && (
+                  <div className="flex gap-3 flex-wrap lg:flex-nowrap">
+                    <button
+                      onClick={() => {
+                        setFromDate("");
+                        setToDate("");
+                      }}
+                      className="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-2xl transition-colors duration-200"
+                    >
+                      Clear Dates
+                    </button>
+                    <Button
+                      onClick={handleExportExcel}
+                      disabled={isExporting || filteredDonations.length === 0}
+                      className="bg-green-600 hover:bg-green-700 gap-2"
+                    >
+                      {isExporting ? (
+                        <>
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                          Exporting...
+                        </>
+                      ) : (
+                        <>
+                          <Download className="h-5 w-5" />
+                          Export to Excel ({filteredDonations.length})
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -380,8 +531,8 @@ const DonationsPage = () => {
 
         {/* View Donation Dialog - Modern Design */}
         <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-          <DialogContent className="max-w-2xl border-0 rounded-3xl shadow-2xl bg-white backdrop-blur-sm">
-            <DialogHeader className="pb-6 border-b border-gray-100">
+          <DialogContent className="max-w-2xl border-0 rounded-3xl shadow-2xl bg-white backdrop-blur-sm flex flex-col max-h-[90vh]">
+            <DialogHeader className="pb-6 border-b border-gray-100 flex-shrink-0">
               <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-3">
                 <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center">
                   <Eye className="w-4 h-4 text-white" />
@@ -391,7 +542,7 @@ const DonationsPage = () => {
             </DialogHeader>
             
             {selectedDonation && (
-              <div className="space-y-6 py-6">
+              <div className="space-y-6 py-6 overflow-y-auto flex-1">
                 {/* Donor Info Section */}
                 <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-2xl p-6">
                   <div className="flex items-center gap-4 mb-4">
@@ -413,6 +564,40 @@ const DonationsPage = () => {
                       <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Donation Amount</label>
                       <p className="text-2xl font-bold text-emerald-600 mt-1">₹{selectedDonation.amount.toLocaleString()}</p>
                     </div>
+                  </div>
+                </div>
+                
+                {/* Category/Event Details */}
+                <div className="bg-blue-50 rounded-2xl p-6 border border-blue-200">
+                  <h4 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-4">Donation Type</h4>
+                  <div className="space-y-3">
+                    {selectedDonation.categoryName && (
+                      <div className="flex items-start gap-3">
+                        <div className="w-2 h-2 bg-blue-600 rounded-full mt-2.5"></div>
+                        <div>
+                          <p className="text-xs font-semibold text-gray-500 uppercase">Donation Category</p>
+                          <p className="text-lg font-bold text-gray-900 mt-1">{selectedDonation.categoryName}</p>
+                        </div>
+                      </div>
+                    )}
+                    {selectedDonation.eventTitle && (
+                      <div className="flex items-start gap-3">
+                        <div className="w-2 h-2 bg-blue-600 rounded-full mt-2.5"></div>
+                        <div>
+                          <p className="text-xs font-semibold text-gray-500 uppercase">Donation Event</p>
+                          <p className="text-lg font-bold text-gray-900 mt-1">{selectedDonation.eventTitle}</p>
+                        </div>
+                      </div>
+                    )}
+                    {!selectedDonation.categoryName && !selectedDonation.eventTitle && (
+                      <div className="flex items-start gap-3">
+                        <div className="w-2 h-2 bg-blue-600 rounded-full mt-2.5"></div>
+                        <div>
+                          <p className="text-xs font-semibold text-gray-500 uppercase">Donation Type</p>
+                          <p className="text-lg font-bold text-gray-900 mt-1">General Donation</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
                 
@@ -448,7 +633,7 @@ const DonationsPage = () => {
               </div>
             )}
             
-            <DialogFooter className="pt-6 border-t border-gray-100">
+            <DialogFooter className="pt-6 border-t border-gray-100 flex-shrink-0">
               <button
                 onClick={() => setIsViewDialogOpen(false)}
                 className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-2xl transition-all duration-200 transform hover:-translate-y-0.5 hover:shadow-lg"

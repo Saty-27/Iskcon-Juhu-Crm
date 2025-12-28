@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import useAuth from '@/hooks/useAuth';
 import { useOnboarding } from '@/components/admin/OnboardingProvider';
+import * as XLSX from 'xlsx';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -22,6 +23,67 @@ const Header = () => {
   const handleLogout = async () => {
     await logout();
     setLocation('/'); // Redirect to home page after logout
+  };
+
+  const handleExportDonations = async () => {
+    try {
+      // Fetch ALL donations from admin endpoint
+      const response = await fetch(
+        `/api/admin/donations`,
+        {
+          credentials: 'include',
+        }
+      );
+      
+      if (!response.ok) {
+        console.error('Failed to export donations');
+        return;
+      }
+      
+      const donations = await response.json();
+      
+      // Prepare data for Excel
+      const excelData = donations.map((donation: any) => ({
+        "ID": donation.id,
+        "Donor Name": donation.name || "-",
+        "Email": donation.email || "-",
+        "Phone": donation.phone || "-",
+        "Amount (₹)": donation.amount || 0,
+        "Category": donation.categoryName || "N/A",
+        "Event": donation.eventTitle || "N/A",
+        "Status": donation.status || "-",
+        "Date": donation.createdAt
+          ? new Date(donation.createdAt).toLocaleDateString('en-IN')
+          : "-",
+        "Payment ID": donation.paymentId || "-",
+      }));
+      
+      // Create Excel workbook
+      const worksheet = XLSX.utils.json_to_sheet(excelData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Donations");
+      
+      // Set column widths
+      worksheet["!cols"] = [
+        { wch: 8 },
+        { wch: 20 },
+        { wch: 25 },
+        { wch: 15 },
+        { wch: 12 },
+        { wch: 20 },
+        { wch: 20 },
+        { wch: 12 },
+        { wch: 15 },
+        { wch: 15 },
+      ];
+      
+      // Download file
+      const today = new Date().toISOString().split('T')[0];
+      const fileName = `all_donations_${today}.xlsx`;
+      XLSX.writeFile(workbook, fileName);
+    } catch (error) {
+      console.error('Export failed:', error);
+    }
   };
 
   const toggleMobileMenu = () => {
@@ -41,7 +103,7 @@ const Header = () => {
   const showExportButton = location === '/admin/donations';
 
   return (
-    <header className="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+    <header className="bg-white border-b border-gray-100 px-6 py-2 flex items-center justify-between">
       <div className="flex items-center">
         <h1 className="text-2xl font-bold text-gray-900">{getPageTitle()}</h1>
       </div>
@@ -72,7 +134,10 @@ const Header = () => {
         </Button>
         
         {showExportButton && (
-          <Button className="bg-purple-600 hover:bg-purple-700 text-white rounded-lg px-4 py-2 font-medium transition-all duration-200">
+          <Button 
+            onClick={handleExportDonations}
+            className="bg-purple-600 hover:bg-purple-700 text-white rounded-lg px-4 py-2 font-medium transition-all duration-200"
+          >
             <Download className="h-4 w-4 mr-2" />
             Export Donations
           </Button>

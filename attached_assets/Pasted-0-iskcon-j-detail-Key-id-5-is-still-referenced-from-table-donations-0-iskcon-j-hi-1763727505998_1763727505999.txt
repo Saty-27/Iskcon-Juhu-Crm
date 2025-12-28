@@ -1,0 +1,826 @@
+0|iskcon-j |   detail: 'Key (id)=(5) is still referenced from table "donations".',
+0|iskcon-j |   hint: undefined,
+0|iskcon-j |   position: undefined,
+0|iskcon-j |   internalPosition: undefined,
+0|iskcon-j |   internalQuery: undefined,
+0|iskcon-j |   where: undefined,
+0|iskcon-j |   schema: 'public',
+0|iskcon-j |   table: 'donations',
+0|iskcon-j |   column: undefined,
+0|iskcon-j |   dataType: undefined,
+0|iskcon-j |   constraint: 'donations_event_id_events_id_fk',
+0|iskcon-j |   file: 'ri_triggers.c',
+0|iskcon-j |   line: '2621',
+0|iskcon-j |   routine: 'ri_ReportViolation'
+0|iskcon-j | }
+
+/root/.pm2/logs/iskcon-juhu-out.log last 15 lines:
+0|iskcon-j |   sessionId: 'wVx9HVg0LEcz4T6ar_rEnF2PgksfH7OO',
+0|iskcon-j |   userId: undefined,
+0|iskcon-j |   sessionExists: true
+0|iskcon-j | }
+0|iskcon-j | 12:00:29 PM [express] GET /api/live-videos 304 in 65ms :: [{"id":1,"title":"Watch Live Darshan on You…
+0|iskcon-j | 12:00:29 PM [express] GET /api/testimonials 304 in 27ms :: []
+0|iskcon-j | 12:00:29 PM [express] GET /api/stats 304 in 74ms :: [{"id":1,"value":300,"suffix":"cr+","label":"Meal…
+0|iskcon-j | 12:00:29 PM [express] GET /api/donation-categories 304 in 73ms :: [{"id":1,"name":"Gau Seva","descrip…
+0|iskcon-j | 12:00:29 PM [express] GET /api/events 304 in 81ms :: [{"id":2,"title":"General Donation","description…
+0|iskcon-j | 12:00:29 PM [express] GET /api/quotes 304 in 78ms :: []
+0|iskcon-j | 12:00:29 PM [express] GET /api/social-links 304 in 83ms :: [{"id":1,"platform":"Facebook","url":"http…
+0|iskcon-j | 12:00:29 PM [express] GET /api/videos 304 in 79ms :: [{"id":1,"title":"Where wheels don't roll - An I…
+0|iskcon-j | 12:00:29 PM [express] GET /api/banners 500 in 71ms :: {"message":"Error fetching banners"}
+0|iskcon-j | 12:00:29 PM [express] GET /api/schedules 304 in 83ms :: [{"id":1,"time":"04:30 AM","title":"Mangala A…
+0|iskcon-j | 12:00:29 PM [express] GET /api/gallery 304 in 71ms :: [{"id":1,"title":"Small child happy to receive …
+
+0|iskcon-juhu  | ✓ Payment system configured for LIVE PRODUCTION MODE
+0|iskcon-juhu  | Default admin user already exists
+0|iskcon-juhu  | Blog posts already exist, skipping initialization
+0|iskcon-juhu  | Starting server on port 5000
+0|iskcon-juhu  | 12:09:29 PM [express] serving on port 5000
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'mECs_hIMpaT9AR0magYPTPjYGkQeKdBC',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Error in getBanners: error: column "mobile_image_url" does not exist
+0|iskcon-juhu  |     at /var/www/iskcon-juhu/node_modules/pg-pool/index.js:45:11
+0|iskcon-juhu  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/node_modules/drizzle-orm/node-postgres/session.js:83:22
+0|iskcon-juhu  |     at async DatabaseStorage.getBanners (file:///var/www/iskcon-juhu/dist/index.js:730:14)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/dist/index.js:2403:24 {
+0|iskcon-juhu  |   length: 116,
+0|iskcon-juhu  |   severity: 'ERROR',
+0|iskcon-juhu  |   code: '42703',
+0|iskcon-juhu  |   detail: undefined,
+0|iskcon-juhu  |   hint: undefined,
+0|iskcon-juhu  |   position: '51',
+0|iskcon-juhu  |   internalPosition: undefined,
+0|iskcon-juhu  |   internalQuery: undefined,
+0|iskcon-juhu  |   where: undefined,
+0|iskcon-juhu  |   schema: undefined,
+0|iskcon-juhu  |   table: undefined,
+0|iskcon-juhu  |   column: undefined,
+0|iskcon-juhu  |   dataType: undefined,
+0|iskcon-juhu  |   constraint: undefined,
+0|iskcon-juhu  |   file: 'parse_relation.c',
+0|iskcon-juhu  |   line: '3722',
+0|iskcon-juhu  |   routine: 'errorMissingColumn'
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Error fetching banners: error: column "mobile_image_url" does not exist
+0|iskcon-juhu  |     at /var/www/iskcon-juhu/node_modules/pg-pool/index.js:45:11
+0|iskcon-juhu  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/node_modules/drizzle-orm/node-postgres/session.js:83:22
+0|iskcon-juhu  |     at async DatabaseStorage.getBanners (file:///var/www/iskcon-juhu/dist/index.js:730:14)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/dist/index.js:2403:24 {
+0|iskcon-juhu  |   length: 116,
+0|iskcon-juhu  |   severity: 'ERROR',
+0|iskcon-juhu  |   code: '42703',
+0|iskcon-juhu  |   detail: undefined,
+0|iskcon-juhu  |   hint: undefined,
+0|iskcon-juhu  |   position: '51',
+0|iskcon-juhu  |   internalPosition: undefined,
+0|iskcon-juhu  |   internalQuery: undefined,
+0|iskcon-juhu  |   where: undefined,
+0|iskcon-juhu  |   schema: undefined,
+0|iskcon-juhu  |   table: undefined,
+0|iskcon-juhu  |   column: undefined,
+0|iskcon-juhu  |   dataType: undefined,
+0|iskcon-juhu  |   constraint: undefined,
+0|iskcon-juhu  |   file: 'parse_relation.c',
+0|iskcon-juhu  |   line: '3722',
+0|iskcon-juhu  |   routine: 'errorMissingColumn'
+0|iskcon-juhu  | }
+0|iskcon-juhu  | 12:15:51 PM [express] GET /api/banners 500 in 30ms :: {"message":"Error fetching banners","error":"co…
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'VcXXKvP5ZjzrpLKERXfq7hKGP9vNJce4',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'e-hIlPetc8tJFT3nfmM6G9Jlm1nRyglL',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Token decoded successfully, userId: 1
+0|iskcon-juhu  | Returning user: {
+0|iskcon-juhu  |   id: 1,
+0|iskcon-juhu  |   username: 'isk_conjuhuadmin',
+0|iskcon-juhu  |   email: 'admin@iskconjuhu.org',
+0|iskcon-juhu  |   name: 'ISKCON Juhu Admin',
+0|iskcon-juhu  |   phone: null,
+0|iskcon-juhu  |   address: null,
+0|iskcon-juhu  |   role: 'admin',
+0|iskcon-juhu  |   isActive: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | 12:15:53 PM [express] GET /api/auth/me 304 in 21ms :: {"id":1,"username":"isk_conjuhuadmin","email":"…
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'XqR203Ui7GWYdRFl3uiBV-HP8V53wS5c',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Error in getBanners: error: column "mobile_image_url" does not exist
+0|iskcon-juhu  |     at /var/www/iskcon-juhu/node_modules/pg-pool/index.js:45:11
+0|iskcon-juhu  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/node_modules/drizzle-orm/node-postgres/session.js:83:22
+0|iskcon-juhu  |     at async DatabaseStorage.getBanners (file:///var/www/iskcon-juhu/dist/index.js:730:14)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/dist/index.js:2403:24 {
+0|iskcon-juhu  |   length: 116,
+0|iskcon-juhu  |   severity: 'ERROR',
+0|iskcon-juhu  |   code: '42703',
+0|iskcon-juhu  |   detail: undefined,
+0|iskcon-juhu  |   hint: undefined,
+0|iskcon-juhu  |   position: '51',
+0|iskcon-juhu  |   internalPosition: undefined,
+0|iskcon-juhu  |   internalQuery: undefined,
+0|iskcon-juhu  |   where: undefined,
+0|iskcon-juhu  |   schema: undefined,
+0|iskcon-juhu  |   table: undefined,
+0|iskcon-juhu  |   column: undefined,
+0|iskcon-juhu  |   dataType: undefined,
+0|iskcon-juhu  |   constraint: undefined,
+0|iskcon-juhu  |   file: 'parse_relation.c',
+0|iskcon-juhu  |   line: '3722',
+0|iskcon-juhu  |   routine: 'errorMissingColumn'
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Error fetching banners: error: column "mobile_image_url" does not exist
+0|iskcon-juhu  |     at /var/www/iskcon-juhu/node_modules/pg-pool/index.js:45:11
+0|iskcon-juhu  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/node_modules/drizzle-orm/node-postgres/session.js:83:22
+0|iskcon-juhu  |     at async DatabaseStorage.getBanners (file:///var/www/iskcon-juhu/dist/index.js:730:14)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/dist/index.js:2403:24 {
+0|iskcon-juhu  |   length: 116,
+0|iskcon-juhu  |   severity: 'ERROR',
+0|iskcon-juhu  |   code: '42703',
+0|iskcon-juhu  |   detail: undefined,
+0|iskcon-juhu  |   hint: undefined,
+0|iskcon-juhu  |   position: '51',
+0|iskcon-juhu  |   internalPosition: undefined,
+0|iskcon-juhu  |   internalQuery: undefined,
+0|iskcon-juhu  |   where: undefined,
+0|iskcon-juhu  |   schema: undefined,
+0|iskcon-juhu  |   table: undefined,
+0|iskcon-juhu  |   column: undefined,
+0|iskcon-juhu  |   dataType: undefined,
+0|iskcon-juhu  |   constraint: undefined,
+0|iskcon-juhu  |   file: 'parse_relation.c',
+0|iskcon-juhu  |   line: '3722',
+0|iskcon-juhu  |   routine: 'errorMissingColumn'
+0|iskcon-juhu  | }
+0|iskcon-juhu  | 12:15:53 PM [express] GET /api/banners 500 in 4ms :: {"message":"Error fetching banners","error":"col…
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: '3Pxs6kmzlIQPnXLTIQA6ATXgkWobM39m',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'WsP2HRKOHipt5XiFtWdPYmWF2kgi3Ktf',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Token decoded successfully, userId: 1
+0|iskcon-juhu  | Returning user: {
+0|iskcon-juhu  |   id: 1,
+0|iskcon-juhu  |   username: 'isk_conjuhuadmin',
+0|iskcon-juhu  |   email: 'admin@iskconjuhu.org',
+0|iskcon-juhu  |   name: 'ISKCON Juhu Admin',
+0|iskcon-juhu  |   phone: null,
+0|iskcon-juhu  |   address: null,
+0|iskcon-juhu  |   role: 'admin',
+0|iskcon-juhu  |   isActive: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | 12:15:56 PM [express] GET /api/auth/me 304 in 14ms :: {"id":1,"username":"isk_conjuhuadmin","email":"…
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'G8pOCMPcjZZM_ZTW-K2wLL7NwzMpdRPY',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Error in getBanners: error: column "mobile_image_url" does not exist
+0|iskcon-juhu  |     at /var/www/iskcon-juhu/node_modules/pg-pool/index.js:45:11
+0|iskcon-juhu  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/node_modules/drizzle-orm/node-postgres/session.js:83:22
+0|iskcon-juhu  |     at async DatabaseStorage.getBanners (file:///var/www/iskcon-juhu/dist/index.js:730:14)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/dist/index.js:2403:24 {
+0|iskcon-juhu  |   length: 116,
+0|iskcon-juhu  |   severity: 'ERROR',
+0|iskcon-juhu  |   code: '42703',
+0|iskcon-juhu  |   detail: undefined,
+0|iskcon-juhu  |   hint: undefined,
+0|iskcon-juhu  |   position: '51',
+0|iskcon-juhu  |   internalPosition: undefined,
+0|iskcon-juhu  |   internalQuery: undefined,
+0|iskcon-juhu  |   where: undefined,
+0|iskcon-juhu  |   schema: undefined,
+0|iskcon-juhu  |   table: undefined,
+0|iskcon-juhu  |   column: undefined,
+0|iskcon-juhu  |   dataType: undefined,
+0|iskcon-juhu  |   constraint: undefined,
+0|iskcon-juhu  |   file: 'parse_relation.c',
+0|iskcon-juhu  |   line: '3722',
+0|iskcon-juhu  |   routine: 'errorMissingColumn'
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Error fetching banners: error: column "mobile_image_url" does not exist
+0|iskcon-juhu  |     at /var/www/iskcon-juhu/node_modules/pg-pool/index.js:45:11
+0|iskcon-juhu  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/node_modules/drizzle-orm/node-postgres/session.js:83:22
+0|iskcon-juhu  |     at async DatabaseStorage.getBanners (file:///var/www/iskcon-juhu/dist/index.js:730:14)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/dist/index.js:2403:24 {
+0|iskcon-juhu  |   length: 116,
+0|iskcon-juhu  |   severity: 'ERROR',
+0|iskcon-juhu  |   code: '42703',
+0|iskcon-juhu  |   detail: undefined,
+0|iskcon-juhu  |   hint: undefined,
+0|iskcon-juhu  |   position: '51',
+0|iskcon-juhu  |   internalPosition: undefined,
+0|iskcon-juhu  |   internalQuery: undefined,
+0|iskcon-juhu  |   where: undefined,
+0|iskcon-juhu  |   schema: undefined,
+0|iskcon-juhu  |   table: undefined,
+0|iskcon-juhu  |   column: undefined,
+0|iskcon-juhu  |   dataType: undefined,
+0|iskcon-juhu  |   constraint: undefined,
+0|iskcon-juhu  |   file: 'parse_relation.c',
+0|iskcon-juhu  |   line: '3722',
+0|iskcon-juhu  |   routine: 'errorMissingColumn'
+0|iskcon-juhu  | }
+0|iskcon-juhu  | 12:15:56 PM [express] GET /api/banners 500 in 4ms :: {"message":"Error fetching banners","error":"col…
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'lB0YHcmMSATGeSQMB8LBczfuCP3lRs0d',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | 12:16:02 PM [express] POST /api/auth/logout 200 in 3ms :: {"message":"Logout successful"}
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'o1jMdzZT6rU9J80DtgoM7Z1E5DIg5IeO',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'l6aE2oZR1QX6tyOgUeigd4zJqQ7XOmQ3',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | No authorization header or invalid format
+0|iskcon-juhu  | 12:16:02 PM [express] GET /api/auth/me 200 in 23ms
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'D8UK_npRDnfWO4jYkx6ViSiaB8ZFuwRU',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'dxld72duMLY2xgco_kph4oMG0JUT4EtC',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'DdmXN0I14sckW1ncJyFwDbgEeCOjDJBA',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'KHXDZnaXd-RXTwzS5UBZLgOJJZKsMdnr',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'UYFK5zymD5JaiWr3jFt9DQRmB8BmIkwE',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: '8LlvcTzNXl71Cd4_8c2hXn7fFNOgDdc2',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: '5UP_gwK-tV9kIL74ED0PWkF1PQFwzq7Y',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'iXRjxMK3v5hKiZG2dZNCM0qW1mFqVZR3',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'qhD5Eg79wn6bjeaULuhfH8_VlxNqv54C',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'gk9VYYnYgyUEGKsPzVm9rZTz6M9HqkW1',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Error in getBanners: error: column "mobile_image_url" does not exist
+0|iskcon-juhu  |     at /var/www/iskcon-juhu/node_modules/pg-pool/index.js:45:11
+0|iskcon-juhu  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/node_modules/drizzle-orm/node-postgres/session.js:83:22
+0|iskcon-juhu  |     at async DatabaseStorage.getBanners (file:///var/www/iskcon-juhu/dist/index.js:730:14)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/dist/index.js:2403:24 {
+0|iskcon-juhu  |   length: 116,
+0|iskcon-juhu  |   severity: 'ERROR',
+0|iskcon-juhu  |   code: '42703',
+0|iskcon-juhu  |   detail: undefined,
+0|iskcon-juhu  |   hint: undefined,
+0|iskcon-juhu  |   position: '51',
+0|iskcon-juhu  |   internalPosition: undefined,
+0|iskcon-juhu  |   internalQuery: undefined,
+0|iskcon-juhu  |   where: undefined,
+0|iskcon-juhu  |   schema: undefined,
+0|iskcon-juhu  |   table: undefined,
+0|iskcon-juhu  |   column: undefined,
+0|iskcon-juhu  |   dataType: undefined,
+0|iskcon-juhu  |   constraint: undefined,
+0|iskcon-juhu  |   file: 'parse_relation.c',
+0|iskcon-juhu  |   line: '3722',
+0|iskcon-juhu  |   routine: 'errorMissingColumn'
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Error fetching banners: error: column "mobile_image_url" does not exist
+0|iskcon-juhu  |     at /var/www/iskcon-juhu/node_modules/pg-pool/index.js:45:11
+0|iskcon-juhu  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/node_modules/drizzle-orm/node-postgres/session.js:83:22
+0|iskcon-juhu  |     at async DatabaseStorage.getBanners (file:///var/www/iskcon-juhu/dist/index.js:730:14)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/dist/index.js:2403:24 {
+0|iskcon-juhu  |   length: 116,
+0|iskcon-juhu  |   severity: 'ERROR',
+0|iskcon-juhu  |   code: '42703',
+0|iskcon-juhu  |   detail: undefined,
+0|iskcon-juhu  |   hint: undefined,
+0|iskcon-juhu  |   position: '51',
+0|iskcon-juhu  |   internalPosition: undefined,
+0|iskcon-juhu  |   internalQuery: undefined,
+0|iskcon-juhu  |   where: undefined,
+0|iskcon-juhu  |   schema: undefined,
+0|iskcon-juhu  |   table: undefined,
+0|iskcon-juhu  |   column: undefined,
+0|iskcon-juhu  |   dataType: undefined,
+0|iskcon-juhu  |   constraint: undefined,
+0|iskcon-juhu  |   file: 'parse_relation.c',
+0|iskcon-juhu  |   line: '3722',
+0|iskcon-juhu  |   routine: 'errorMissingColumn'
+0|iskcon-juhu  | }
+0|iskcon-juhu  | 12:16:02 PM [express] GET /api/banners 500 in 236ms :: {"message":"Error fetching banners","error":"c…
+0|iskcon-juhu  | 12:16:02 PM [express] GET /api/live-videos 304 in 207ms :: [{"id":1,"title":"Watch Live Darshan on Yo…
+0|iskcon-juhu  | 12:16:02 PM [express] GET /api/videos 304 in 193ms :: [{"id":1,"title":"Where wheels don't roll - An …
+0|iskcon-juhu  | 12:16:02 PM [express] GET /api/events 304 in 184ms :: [{"id":2,"title":"General Donation","descriptio…
+0|iskcon-juhu  | 12:16:02 PM [express] GET /api/social-links 304 in 157ms :: [{"id":1,"platform":"Facebook","url":"htt…
+0|iskcon-juhu  | 12:16:02 PM [express] GET /api/stats 304 in 144ms :: [{"id":1,"value":300,"suffix":"cr+","label":"Mea…
+0|iskcon-juhu  | 12:16:02 PM [express] GET /api/gallery 304 in 106ms :: [{"id":1,"title":"Small child happy to receive…
+0|iskcon-juhu  | 12:16:02 PM [express] GET /api/schedules 304 in 131ms :: [{"id":1,"time":"04:30 AM","title":"Mangala …
+0|iskcon-juhu  | 12:16:02 PM [express] GET /api/quotes 304 in 98ms :: []
+0|iskcon-juhu  | 12:16:02 PM [express] GET /api/donation-categories 304 in 90ms :: [{"id":1,"name":"Gau Seva","descrip…
+0|iskcon-juhu  | 12:16:02 PM [express] GET /api/testimonials 304 in 79ms :: []
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'W-QtxsqktsPhGa2LJmr_mHVrWtrIOXvr',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'FNytyqvtm7PSwcFuc25w4iyh0_kF1YXd',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'OFyRX448_SmBxnoNLyG_L-Vv1MiNloca',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | No authorization header or invalid format
+0|iskcon-juhu  | 12:16:04 PM [express] GET /api/auth/me 304 in 2ms
+0|iskcon-juhu  | 12:16:04 PM [express] GET /api/live-videos 304 in 10ms :: [{"id":1,"title":"Watch Live Darshan on You…
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: '-vDqPQ_KTdFVI_CazOZ9sNGvYuZOcrGb',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'U-7_krD8NQ_0U16ZHC4rJPkhZzSSftUN',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | 12:16:04 PM [express] GET /api/quotes 304 in 4ms :: []
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'qcbOVHgi3_-8yDm0f0JH5zREUzOPz-aI',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | 12:16:04 PM [express] GET /api/stats 304 in 6ms :: [{"id":1,"value":300,"suffix":"cr+","label":"Meals…
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'WT8-XjfjCebERR8t2UqHZWK3s5WLppCF',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | 12:16:04 PM [express] GET /api/testimonials 304 in 6ms :: []
+0|iskcon-juhu  | 12:16:04 PM [express] GET /api/videos 304 in 6ms :: [{"id":1,"title":"Where wheels don't roll - An IS…
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'A149tzdYp_xamOUKFMdwBdRWLZRKaDBE',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'w8K9KOw5lLJUN7__rSwyhECE3uSWoShQ',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | 12:16:04 PM [express] GET /api/donation-categories 304 in 5ms :: [{"id":1,"name":"Gau Seva","descript…
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: '7bDjrrYYkBd7N9yyItPgfh5ry_RUpyCn',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | 12:16:04 PM [express] GET /api/schedules 304 in 5ms :: [{"id":1,"time":"04:30 AM","title":"Mangala Aa…
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'OgxwFi-Tg5bWRhx96NlRCLcoXJhiiNTM',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | 12:16:04 PM [express] GET /api/social-links 304 in 4ms :: [{"id":1,"platform":"Facebook","url":"https…
+0|iskcon-juhu  | 12:16:04 PM [express] GET /api/events 304 in 3ms :: [{"id":2,"title":"General Donation","description"…
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: '_llprHNIXzslEVEDsY00tmlY00-4B0xC',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Error in getBanners: error: column "mobile_image_url" does not exist
+0|iskcon-juhu  |     at /var/www/iskcon-juhu/node_modules/pg-pool/index.js:45:11
+0|iskcon-juhu  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/node_modules/drizzle-orm/node-postgres/session.js:83:22
+0|iskcon-juhu  |     at async DatabaseStorage.getBanners (file:///var/www/iskcon-juhu/dist/index.js:730:14)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/dist/index.js:2403:24 {
+0|iskcon-juhu  |   length: 116,
+0|iskcon-juhu  |   severity: 'ERROR',
+0|iskcon-juhu  |   code: '42703',
+0|iskcon-juhu  |   detail: undefined,
+0|iskcon-juhu  |   hint: undefined,
+0|iskcon-juhu  |   position: '51',
+0|iskcon-juhu  |   internalPosition: undefined,
+0|iskcon-juhu  |   internalQuery: undefined,
+0|iskcon-juhu  |   where: undefined,
+0|iskcon-juhu  |   schema: undefined,
+0|iskcon-juhu  |   table: undefined,
+0|iskcon-juhu  |   column: undefined,
+0|iskcon-juhu  |   dataType: undefined,
+0|iskcon-juhu  |   constraint: undefined,
+0|iskcon-juhu  |   file: 'parse_relation.c',
+0|iskcon-juhu  |   line: '3722',
+0|iskcon-juhu  |   routine: 'errorMissingColumn'
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Error fetching banners: error: column "mobile_image_url" does not exist
+0|iskcon-juhu  |     at /var/www/iskcon-juhu/node_modules/pg-pool/index.js:45:11
+0|iskcon-juhu  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/node_modules/drizzle-orm/node-postgres/session.js:83:22
+0|iskcon-juhu  |     at async DatabaseStorage.getBanners (file:///var/www/iskcon-juhu/dist/index.js:730:14)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/dist/index.js:2403:24 {
+0|iskcon-juhu  |   length: 116,
+0|iskcon-juhu  |   severity: 'ERROR',
+0|iskcon-juhu  |   code: '42703',
+0|iskcon-juhu  |   detail: undefined,
+0|iskcon-juhu  |   hint: undefined,
+0|iskcon-juhu  |   position: '51',
+0|iskcon-juhu  |   internalPosition: undefined,
+0|iskcon-juhu  |   internalQuery: undefined,
+0|iskcon-juhu  |   where: undefined,
+0|iskcon-juhu  |   schema: undefined,
+0|iskcon-juhu  |   table: undefined,
+0|iskcon-juhu  |   column: undefined,
+0|iskcon-juhu  |   dataType: undefined,
+0|iskcon-juhu  |   constraint: undefined,
+0|iskcon-juhu  |   file: 'parse_relation.c',
+0|iskcon-juhu  |   line: '3722',
+0|iskcon-juhu  |   routine: 'errorMissingColumn'
+0|iskcon-juhu  | }
+0|iskcon-juhu  | 12:16:04 PM [express] GET /api/banners 500 in 2ms :: {"message":"Error fetching banners","error":"col…
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'tQfIROkbL2QtGMizoBmXlGSMIlh0tJb1',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | 12:16:04 PM [express] GET /api/gallery 304 in 5ms :: [{"id":1,"title":"Small child happy to receive h…
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: '1ZrtBTrTATmyn7WwkZSPVoly1yaggMVo',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: '6Q17f8-xjkmNSFe11Ge6BITkyonw4MKQ',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | No authorization header or invalid format
+0|iskcon-juhu  | 12:16:10 PM [express] GET /api/auth/me 304 in 2ms
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'UEO7NS-Dyzyeq92DWmyWdgfN5r3lorgd',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Login attempt: { email: undefined, username: 'isk_conjuhuadmin', password: '***' }
+0|iskcon-juhu  | User found: { id: 1, username: 'isk_conjuhuadmin', isActive: true }
+0|iskcon-juhu  | Password match: true
+0|iskcon-juhu  | Login successful, generating token for user: 1
+0|iskcon-juhu  | 12:16:45 PM [express] POST /api/auth/login 200 in 15ms :: {"message":"Login successful","user":{"id":…
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'Us-j-Qpwo_qIn4uj02H3aUNQ0fpooR_2',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Token decoded successfully, userId: 1
+0|iskcon-juhu  | Returning user: {
+0|iskcon-juhu  |   id: 1,
+0|iskcon-juhu  |   username: 'isk_conjuhuadmin',
+0|iskcon-juhu  |   email: 'admin@iskconjuhu.org',
+0|iskcon-juhu  |   name: 'ISKCON Juhu Admin',
+0|iskcon-juhu  |   phone: null,
+0|iskcon-juhu  |   address: null,
+0|iskcon-juhu  |   role: 'admin',
+0|iskcon-juhu  |   isActive: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | 12:16:45 PM [express] GET /api/auth/me 200 in 4ms :: {"id":1,"username":"isk_conjuhuadmin","email":"a…
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'a53LNJXrkCUaHUsP8iCJevD4VRGAzUOH',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'nEsVnWGQAKNgs41vTroRmXA8Ova61p5O',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Token decoded successfully, userId: 1
+0|iskcon-juhu  | Returning user: {
+0|iskcon-juhu  |   id: 1,
+0|iskcon-juhu  |   username: 'isk_conjuhuadmin',
+0|iskcon-juhu  |   email: 'admin@iskconjuhu.org',
+0|iskcon-juhu  |   name: 'ISKCON Juhu Admin',
+0|iskcon-juhu  |   phone: null,
+0|iskcon-juhu  |   address: null,
+0|iskcon-juhu  |   role: 'admin',
+0|iskcon-juhu  |   isActive: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | 12:16:45 PM [express] GET /api/auth/me 304 in 5ms :: {"id":1,"username":"isk_conjuhuadmin","email":"a…
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'AkfibQnJCnLWXF7lPFh50FPsLTYB5-oP',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | 12:16:45 PM [express] GET /api/admin/donations 304 in 8ms :: [{"id":33,"amount":1,"name":"ISKCON Juhu…
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: '2woINu4f7MtM8ItEKkzKQMHeD9PYMuqe',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | 12:16:50 PM [express] GET /api/admin/donations 304 in 8ms :: [{"id":33,"amount":1,"name":"ISKCON Juhu…
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'yE6xlQPyBeulqw69_hwf7nQI8XQVcIBL',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | 12:16:51 PM [express] GET /api/events 304 in 3ms :: [{"id":2,"title":"General Donation","description"…
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: '9W2wMqUfBqJqahXfoSXTnfiI1N3_eytd',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'zoLIvi9D85lF7f4qiZJ3n4gAuGn8d4d8',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | 12:16:56 PM [express] GET /api/events/5/bank-details 200 in 5ms :: [{"id":5,"eventId":5,"accountName"…
+0|iskcon-juhu  | 12:16:56 PM [express] GET /api/events/5/donation-cards 200 in 15ms :: [{"id":61,"eventId":5,"title":"…
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'ZYvu85QVDXjA5gCymxgCF5HZtYHpFgf9',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Error in getBanners: error: column "mobile_image_url" does not exist
+0|iskcon-juhu  |     at /var/www/iskcon-juhu/node_modules/pg-pool/index.js:45:11
+0|iskcon-juhu  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/node_modules/drizzle-orm/node-postgres/session.js:83:22
+0|iskcon-juhu  |     at async DatabaseStorage.getBanners (file:///var/www/iskcon-juhu/dist/index.js:730:14)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/dist/index.js:2403:24 {
+0|iskcon-juhu  |   length: 116,
+0|iskcon-juhu  |   severity: 'ERROR',
+0|iskcon-juhu  |   code: '42703',
+0|iskcon-juhu  |   detail: undefined,
+0|iskcon-juhu  |   hint: undefined,
+0|iskcon-juhu  |   position: '51',
+0|iskcon-juhu  |   internalPosition: undefined,
+0|iskcon-juhu  |   internalQuery: undefined,
+0|iskcon-juhu  |   where: undefined,
+0|iskcon-juhu  |   schema: undefined,
+0|iskcon-juhu  |   table: undefined,
+0|iskcon-juhu  |   column: undefined,
+0|iskcon-juhu  |   dataType: undefined,
+0|iskcon-juhu  |   constraint: undefined,
+0|iskcon-juhu  |   file: 'parse_relation.c',
+0|iskcon-juhu  |   line: '3722',
+0|iskcon-juhu  |   routine: 'errorMissingColumn'
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Error fetching banners: error: column "mobile_image_url" does not exist
+0|iskcon-juhu  |     at /var/www/iskcon-juhu/node_modules/pg-pool/index.js:45:11
+0|iskcon-juhu  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/node_modules/drizzle-orm/node-postgres/session.js:83:22
+0|iskcon-juhu  |     at async DatabaseStorage.getBanners (file:///var/www/iskcon-juhu/dist/index.js:730:14)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/dist/index.js:2403:24 {
+0|iskcon-juhu  |   length: 116,
+0|iskcon-juhu  |   severity: 'ERROR',
+0|iskcon-juhu  |   code: '42703',
+0|iskcon-juhu  |   detail: undefined,
+0|iskcon-juhu  |   hint: undefined,
+0|iskcon-juhu  |   position: '51',
+0|iskcon-juhu  |   internalPosition: undefined,
+0|iskcon-juhu  |   internalQuery: undefined,
+0|iskcon-juhu  |   where: undefined,
+0|iskcon-juhu  |   schema: undefined,
+0|iskcon-juhu  |   table: undefined,
+0|iskcon-juhu  |   column: undefined,
+0|iskcon-juhu  |   dataType: undefined,
+0|iskcon-juhu  |   constraint: undefined,
+0|iskcon-juhu  |   file: 'parse_relation.c',
+0|iskcon-juhu  |   line: '3722',
+0|iskcon-juhu  |   routine: 'errorMissingColumn'
+0|iskcon-juhu  | }
+0|iskcon-juhu  | 12:17:03 PM [express] GET /api/banners 500 in 9ms :: {"message":"Error fetching banners","error":"col…
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'Wprh19bbOsD9g7o2BwsFfgsiD5aGukLn',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Upload destination for type banner : /var/www/iskcon-juhu/uploads/banners
+0|iskcon-juhu  | Generated filename for type banner : banner-1763727446754-543107846.png
+0|iskcon-juhu  | 12:17:26 PM [express] POST /api/upload/banner 200 in 9ms :: {"imageUrl":"/uploads/banners/banner-1763…
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: '2zHmPmAML7uozo2THRdK42Ij_qNPBLAS',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Creating banner with data: {
+0|iskcon-juhu  |   title: '',
+0|iskcon-juhu  |   description: '',
+0|iskcon-juhu  |   imageUrl: '/uploads/banners/banner-1763727446754-543107846.png',
+0|iskcon-juhu  |   mobileImageUrl: '',
+0|iskcon-juhu  |   buttonText: '',
+0|iskcon-juhu  |   buttonLink: '',
+0|iskcon-juhu  |   isActive: true,
+0|iskcon-juhu  |   order: 0
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Parsed banner data: {
+0|iskcon-juhu  |   title: '',
+0|iskcon-juhu  |   description: '',
+0|iskcon-juhu  |   imageUrl: '/uploads/banners/banner-1763727446754-543107846.png',
+0|iskcon-juhu  |   mobileImageUrl: '',
+0|iskcon-juhu  |   buttonText: '',
+0|iskcon-juhu  |   buttonLink: '',
+0|iskcon-juhu  |   isActive: true,
+0|iskcon-juhu  |   order: 0
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Inserting banner: {
+0|iskcon-juhu  |   title: '',
+0|iskcon-juhu  |   description: '',
+0|iskcon-juhu  |   imageUrl: '/uploads/banners/banner-1763727446754-543107846.png',
+0|iskcon-juhu  |   mobileImageUrl: '',
+0|iskcon-juhu  |   buttonText: '',
+0|iskcon-juhu  |   buttonLink: '',
+0|iskcon-juhu  |   isActive: true,
+0|iskcon-juhu  |   order: 0
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Error in createBanner: error: column "mobile_image_url" of relation "banners" does not exist
+0|iskcon-juhu  |     at /var/www/iskcon-juhu/node_modules/pg-pool/index.js:45:11
+0|iskcon-juhu  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/node_modules/drizzle-orm/node-postgres/session.js:83:22
+0|iskcon-juhu  |     at async DatabaseStorage.createBanner (file:///var/www/iskcon-juhu/dist/index.js:743:27)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/dist/index.js:2418:22 {
+0|iskcon-juhu  |   length: 136,
+0|iskcon-juhu  |   severity: 'ERROR',
+0|iskcon-juhu  |   code: '42703',
+0|iskcon-juhu  |   detail: undefined,
+0|iskcon-juhu  |   hint: undefined,
+0|iskcon-juhu  |   position: '67',
+0|iskcon-juhu  |   internalPosition: undefined,
+0|iskcon-juhu  |   internalQuery: undefined,
+0|iskcon-juhu  |   where: undefined,
+0|iskcon-juhu  |   schema: undefined,
+0|iskcon-juhu  |   table: undefined,
+0|iskcon-juhu  |   column: undefined,
+0|iskcon-juhu  |   dataType: undefined,
+0|iskcon-juhu  |   constraint: undefined,
+0|iskcon-juhu  |   file: 'parse_target.c',
+0|iskcon-juhu  |   line: '1066',
+0|iskcon-juhu  |   routine: 'checkInsertTargets'
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Error creating banner: error: column "mobile_image_url" of relation "banners" does not exist
+0|iskcon-juhu  |     at /var/www/iskcon-juhu/node_modules/pg-pool/index.js:45:11
+0|iskcon-juhu  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/node_modules/drizzle-orm/node-postgres/session.js:83:22
+0|iskcon-juhu  |     at async DatabaseStorage.createBanner (file:///var/www/iskcon-juhu/dist/index.js:743:27)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/dist/index.js:2418:22 {
+0|iskcon-juhu  |   length: 136,
+0|iskcon-juhu  |   severity: 'ERROR',
+0|iskcon-juhu  |   code: '42703',
+0|iskcon-juhu  |   detail: undefined,
+0|iskcon-juhu  |   hint: undefined,
+0|iskcon-juhu  |   position: '67',
+0|iskcon-juhu  |   internalPosition: undefined,
+0|iskcon-juhu  |   internalQuery: undefined,
+0|iskcon-juhu  |   where: undefined,
+0|iskcon-juhu  |   schema: undefined,
+0|iskcon-juhu  |   table: undefined,
+0|iskcon-juhu  |   column: undefined,
+0|iskcon-juhu  |   dataType: undefined,
+0|iskcon-juhu  |   constraint: undefined,
+0|iskcon-juhu  |   file: 'parse_target.c',
+0|iskcon-juhu  |   line: '1066',
+0|iskcon-juhu  |   routine: 'checkInsertTargets'
+0|iskcon-juhu  | }
+0|iskcon-juhu  | 12:17:28 PM [express] POST /api/banners 500 in 16ms :: {"message":"Error creating banner","error":"co…
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'sKt59V6zE2whRq0n6qN75OV4rS0AW1q3',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Upload destination for type banner : /var/www/iskcon-juhu/uploads/banners
+0|iskcon-juhu  | Generated filename for type banner : banner-1763727453531-330850879.png
+0|iskcon-juhu  | 12:17:33 PM [express] POST /api/upload/banner 200 in 4ms :: {"imageUrl":"/uploads/banners/banner-1763…
+0|iskcon-juhu  | Session middleware check: {
+0|iskcon-juhu  |   sessionId: 'jJylOGi1UsI7gZIvrWkT5VKPWQA7PKXa',
+0|iskcon-juhu  |   userId: undefined,
+0|iskcon-juhu  |   sessionExists: true
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Creating banner with data: {
+0|iskcon-juhu  |   title: '',
+0|iskcon-juhu  |   description: '',
+0|iskcon-juhu  |   imageUrl: '/uploads/banners/banner-1763727453531-330850879.png',
+0|iskcon-juhu  |   mobileImageUrl: '',
+0|iskcon-juhu  |   buttonText: '',
+0|iskcon-juhu  |   buttonLink: '',
+0|iskcon-juhu  |   isActive: true,
+0|iskcon-juhu  |   order: 0
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Parsed banner data: {
+0|iskcon-juhu  |   title: '',
+0|iskcon-juhu  |   description: '',
+0|iskcon-juhu  |   imageUrl: '/uploads/banners/banner-1763727453531-330850879.png',
+0|iskcon-juhu  |   mobileImageUrl: '',
+0|iskcon-juhu  |   buttonText: '',
+0|iskcon-juhu  |   buttonLink: '',
+0|iskcon-juhu  |   isActive: true,
+0|iskcon-juhu  |   order: 0
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Inserting banner: {
+0|iskcon-juhu  |   title: '',
+0|iskcon-juhu  |   description: '',
+0|iskcon-juhu  |   imageUrl: '/uploads/banners/banner-1763727453531-330850879.png',
+0|iskcon-juhu  |   mobileImageUrl: '',
+0|iskcon-juhu  |   buttonText: '',
+0|iskcon-juhu  |   buttonLink: '',
+0|iskcon-juhu  |   isActive: true,
+0|iskcon-juhu  |   order: 0
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Error in createBanner: error: column "mobile_image_url" of relation "banners" does not exist
+0|iskcon-juhu  |     at /var/www/iskcon-juhu/node_modules/pg-pool/index.js:45:11
+0|iskcon-juhu  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/node_modules/drizzle-orm/node-postgres/session.js:83:22
+0|iskcon-juhu  |     at async DatabaseStorage.createBanner (file:///var/www/iskcon-juhu/dist/index.js:743:27)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/dist/index.js:2418:22 {
+0|iskcon-juhu  |   length: 136,
+0|iskcon-juhu  |   severity: 'ERROR',
+0|iskcon-juhu  |   code: '42703',
+0|iskcon-juhu  |   detail: undefined,
+0|iskcon-juhu  |   hint: undefined,
+0|iskcon-juhu  |   position: '67',
+0|iskcon-juhu  |   internalPosition: undefined,
+0|iskcon-juhu  |   internalQuery: undefined,
+0|iskcon-juhu  |   where: undefined,
+0|iskcon-juhu  |   schema: undefined,
+0|iskcon-juhu  |   table: undefined,
+0|iskcon-juhu  |   column: undefined,
+0|iskcon-juhu  |   dataType: undefined,
+0|iskcon-juhu  |   constraint: undefined,
+0|iskcon-juhu  |   file: 'parse_target.c',
+0|iskcon-juhu  |   line: '1066',
+0|iskcon-juhu  |   routine: 'checkInsertTargets'
+0|iskcon-juhu  | }
+0|iskcon-juhu  | Error creating banner: error: column "mobile_image_url" of relation "banners" does not exist
+0|iskcon-juhu  |     at /var/www/iskcon-juhu/node_modules/pg-pool/index.js:45:11
+0|iskcon-juhu  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/node_modules/drizzle-orm/node-postgres/session.js:83:22
+0|iskcon-juhu  |     at async DatabaseStorage.createBanner (file:///var/www/iskcon-juhu/dist/index.js:743:27)
+0|iskcon-juhu  |     at async file:///var/www/iskcon-juhu/dist/index.js:2418:22 {
+0|iskcon-juhu  |   length: 136,
+0|iskcon-juhu  |   severity: 'ERROR',
+0|iskcon-juhu  |   code: '42703',
+0|iskcon-juhu  |   detail: undefined,
+0|iskcon-juhu  |   hint: undefined,
+0|iskcon-juhu  |   position: '67',
+0|iskcon-juhu  |   internalPosition: undefined,
+0|iskcon-juhu  |   internalQuery: undefined,
+0|iskcon-juhu  |   where: undefined,
+0|iskcon-juhu  |   schema: undefined,
+0|iskcon-juhu  |   table: undefined,
+0|iskcon-juhu  |   column: undefined,
+0|iskcon-juhu  |   dataType: undefined,
+0|iskcon-juhu  |   constraint: undefined,
+0|iskcon-juhu  |   file: 'parse_target.c',
+0|iskcon-juhu  |   line: '1066',
+0|iskcon-juhu  |   routine: 'checkInsertTargets'
+0|iskcon-juhu  | }
+0|iskcon-juhu  | 12:17:34 PM [express] POST /api/banners 500 in 17ms :: {"message":"Error creating banner","error":"co…

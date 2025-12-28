@@ -3,7 +3,7 @@ import { db } from "./db";
 import { 
   users, banners, quotes, donationCategories, donationCards, eventDonationCards, bankDetails, eventBankDetails, categoryBankDetails, events, gallery, videos, liveVideos,
   testimonials, contactMessages, socialLinks, donations, subscriptions,
-  stats, schedules, blogPosts,
+  stats, schedules, blogPosts, processSections, footerSettings, policies, policiesPage,
   type User, type InsertUser, type Banner, type InsertBanner,
   type Quote, type InsertQuote, type DonationCategory, type InsertDonationCategory,
   type DonationCard, type InsertDonationCard, type EventDonationCard, type InsertEventDonationCard,
@@ -13,7 +13,7 @@ import {
   type ContactMessage, type InsertContactMessage, type SocialLink, type InsertSocialLink,
   type Donation, type InsertDonation, type Subscription, type InsertSubscription,
   type Stat, type InsertStat, type Schedule, type InsertSchedule,
-  type BlogPost, type InsertBlogPost
+  type BlogPost, type InsertBlogPost, type ProcessSection, type InsertProcessSection, type FooterSettings, type InsertFooterSettings, type Policy, type InsertPolicy, type PoliciesPage, type InsertPoliciesPage
 } from "@shared/schema";
 import type { IStorage } from "./storage";
 
@@ -594,6 +594,36 @@ export class DatabaseStorage implements IStorage {
     return result.rowCount > 0;
   }
 
+  async getDonationsByDateRange(fromDate: Date, toDate: Date): Promise<any[]> {
+    return await db
+      .select({
+        id: donations.id,
+        amount: donations.amount,
+        name: donations.name,
+        email: donations.email,
+        phone: donations.phone,
+        address: donations.address,
+        panCard: donations.panCard,
+        message: donations.message,
+        paymentId: donations.paymentId,
+        status: donations.status,
+        createdAt: donations.createdAt,
+        categoryName: donationCategories.name,
+        eventTitle: events.title,
+        invoiceNumber: donations.invoiceNumber,
+        receiptSent: donations.receiptSent,
+        notificationSent: donations.notificationSent
+      })
+      .from(donations)
+      .leftJoin(donationCategories, eq(donations.categoryId, donationCategories.id))
+      .leftJoin(events, eq(donations.eventId, events.id))
+      .where(and(
+        donations.createdAt >= fromDate,
+        donations.createdAt <= toDate
+      ))
+      .orderBy(desc(donations.createdAt));
+  }
+
   // Subscription operations
   async getSubscriptions(): Promise<Subscription[]> {
     return await db.select().from(subscriptions);
@@ -702,5 +732,93 @@ export class DatabaseStorage implements IStorage {
   async deleteBlogPost(id: number): Promise<boolean> {
     const result = await db.delete(blogPosts).where(eq(blogPosts.id, id));
     return result.rowCount > 0;
+  }
+
+  // Process section operations
+  async getProcessSection(): Promise<ProcessSection | undefined> {
+    const [section] = await db.select().from(processSections).limit(1);
+    return section;
+  }
+
+  async updateProcessSection(sectionData: Partial<ProcessSection>): Promise<ProcessSection | undefined> {
+    const existing = await this.getProcessSection();
+    if (!existing) {
+      // Create if doesn't exist
+      const [newSection] = await db.insert(processSections).values(sectionData as InsertProcessSection).returning();
+      return newSection;
+    }
+    // Update existing
+    const [updated] = await db.update(processSections).set(sectionData).where(eq(processSections.id, existing.id)).returning();
+    return updated;
+  }
+
+  // Footer settings operations
+  async getFooterSettings(): Promise<FooterSettings | undefined> {
+    const [settings] = await db.select().from(footerSettings).limit(1);
+    return settings;
+  }
+
+  async updateFooterSettings(settingsData: Partial<FooterSettings>): Promise<FooterSettings | undefined> {
+    const existing = await this.getFooterSettings();
+    if (!existing) {
+      // Create if doesn't exist
+      const [newSettings] = await db.insert(footerSettings).values(settingsData as InsertFooterSettings).returning();
+      return newSettings;
+    }
+    // Update existing
+    const [updated] = await db.update(footerSettings).set(settingsData).where(eq(footerSettings.id, existing.id)).returning();
+    return updated;
+  }
+
+  // Policy operations
+  async getPolicies(): Promise<Policy[]> {
+    return await db.select().from(policies).where(eq(policies.isActive, true)).orderBy(policies.order);
+  }
+
+  async getPolicy(id: number): Promise<Policy | undefined> {
+    const [policy] = await db.select().from(policies).where(eq(policies.id, id));
+    return policy;
+  }
+
+  async getPolicyBySlug(slug: string): Promise<Policy | undefined> {
+    const [policy] = await db.select().from(policies).where(eq(policies.slug, slug));
+    return policy;
+  }
+
+  async createPolicy(policy: InsertPolicy): Promise<Policy> {
+    const [newPolicy] = await db.insert(policies).values(policy).returning();
+    return newPolicy;
+  }
+
+  async updatePolicy(id: number, policyData: Partial<Policy>): Promise<Policy | undefined> {
+    const [policy] = await db.update(policies).set(policyData).where(eq(policies.id, id)).returning();
+    return policy;
+  }
+
+  async deletePolicy(id: number): Promise<boolean> {
+    const result = await db.delete(policies).where(eq(policies.id, id));
+    return result.rowCount > 0;
+  }
+
+  async getAllPolicies(): Promise<Policy[]> {
+    return await db.select().from(policies).orderBy(policies.order);
+  }
+
+  // Policies Page Settings operations
+  async getPoliciesPage(): Promise<PoliciesPage | undefined> {
+    const [page] = await db.select().from(policiesPage).limit(1);
+    return page;
+  }
+
+  async updatePoliciesPage(pageData: Partial<PoliciesPage>): Promise<PoliciesPage | undefined> {
+    const existing = await this.getPoliciesPage();
+    if (!existing) {
+      // Create if doesn't exist
+      const [newPage] = await db.insert(policiesPage).values(pageData as InsertPoliciesPage).returning();
+      return newPage;
+    }
+    // Update existing
+    const [updated] = await db.update(policiesPage).set(pageData).where(eq(policiesPage.id, existing.id)).returning();
+    return updated;
   }
 }

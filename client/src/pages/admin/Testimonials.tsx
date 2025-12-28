@@ -171,7 +171,7 @@ const TestimonialsPage = () => {
   if (isLoading) {
     return (
       <AdminLayout>
-        <div className="bg-gray-50 min-h-screen p-6">
+        <div className="bg-gray-50 p-6">
           <div className="animate-pulse space-y-6">
             <div className="h-8 bg-gray-200 rounded w-1/3"></div>
             <div className="grid grid-cols-3 gap-6">
@@ -188,7 +188,7 @@ const TestimonialsPage = () => {
 
   return (
     <AdminLayout>
-      <div className="bg-gray-50 min-h-screen">
+      <div className="bg-gray-50">
         <div className="p-6">
           {/* Statistics Cards - Modern Gradient Design */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

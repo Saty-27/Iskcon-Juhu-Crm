@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
-import { User, DonationCard, DonationCategory, Event } from '@shared/schema';
+import { User, DonationCard, DonationCategory, Event, BankDetails } from '@shared/schema';
 import { apiRequest } from '@/lib/queryClient';
 import useAuth from '@/hooks/useAuth';
 import { Loader2, CreditCard, IndianRupee } from 'lucide-react';
@@ -20,8 +20,8 @@ interface PaymentModalProps {
     eventId: number;
     title: string;
     amount: number;
-    description: string;
-    imageUrl: string;
+    description: string | null;
+    imageUrl: string | null;
   };
   customAmount?: number;
   donationCategory?: DonationCategory;
@@ -42,7 +42,7 @@ const PaymentModal = ({
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Fetch bank details for category or event
-  const { data: bankDetails = [] } = useQuery({
+  const { data: bankDetails = [] } = useQuery<BankDetails[]>({
     queryKey: donationCategory 
       ? [`/api/categories/${donationCategory.id}/bank-details`]
       : event 

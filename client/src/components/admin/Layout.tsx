@@ -10,18 +10,19 @@ interface LayoutProps {
 const Layout = ({ children }: LayoutProps) => {
   return (
     <OnboardingProvider>
-      <div className="min-h-screen bg-white md:bg-gray-50">
+      <div className="w-full md:grid md:grid-cols-[256px_1fr]">
+        {/* Sidebar - returns mobile header, overlay, and sidebar */}
         <Sidebar />
         
-        {/* Content wrapper - different positioning for mobile vs desktop */}
-        <div className="pt-16 md:pt-0 md:ml-64">
-          {/* Desktop Header - hidden on mobile since we use mobile header from Sidebar */}
+        {/* Content wrapper - takes remaining space on desktop */}
+        <div>
+          {/* Desktop Header */}
           <div className="hidden md:block bg-white border-b border-gray-200">
             <Header />
           </div>
           
-          {/* Main content - removed min-h-screen to allow scrolling */}
-          <main className="bg-white md:bg-gray-50 p-4 md:p-6">
+          {/* Main content */}
+          <main className="pt-16 md:pt-0 bg-white md:bg-gray-50 p-4 md:px-6 md:py-4">
             {children}
           </main>
         </div>

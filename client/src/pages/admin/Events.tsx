@@ -39,8 +39,9 @@ const EventsPage = () => {
       setIsAddDialogOpen(false);
       toast({ title: 'Success', description: 'Event created successfully' });
     },
-    onError: () => {
-      toast({ title: 'Error', description: 'Failed to create event', variant: 'destructive' });
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to create event';
+      toast({ title: 'Error', description: message, variant: 'destructive' });
     },
   });
 
@@ -55,8 +56,9 @@ const EventsPage = () => {
       setEditingEvent(null);
       toast({ title: 'Success', description: 'Event updated successfully' });
     },
-    onError: () => {
-      toast({ title: 'Error', description: 'Failed to update event', variant: 'destructive' });
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to update event';
+      toast({ title: 'Error', description: message, variant: 'destructive' });
     },
   });
 
@@ -66,8 +68,9 @@ const EventsPage = () => {
       queryClient.invalidateQueries({ queryKey: ['/api/events'] });
       toast({ title: 'Success', description: 'Event deleted successfully' });
     },
-    onError: () => {
-      toast({ title: 'Error', description: 'Failed to delete event', variant: 'destructive' });
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to delete event';
+      toast({ title: 'Error', description: message, variant: 'destructive' });
     },
   });
 

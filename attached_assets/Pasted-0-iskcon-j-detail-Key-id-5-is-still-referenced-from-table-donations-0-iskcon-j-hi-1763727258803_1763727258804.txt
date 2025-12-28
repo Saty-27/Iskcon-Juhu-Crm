@@ -1,0 +1,38 @@
+0|iskcon-j |   detail: 'Key (id)=(5) is still referenced from table "donations".',
+0|iskcon-j |   hint: undefined,
+0|iskcon-j |   position: undefined,
+0|iskcon-j |   internalPosition: undefined,
+0|iskcon-j |   internalQuery: undefined,
+0|iskcon-j |   where: undefined,
+0|iskcon-j |   schema: 'public',
+0|iskcon-j |   table: 'donations',
+0|iskcon-j |   column: undefined,
+0|iskcon-j |   dataType: undefined,
+0|iskcon-j |   constraint: 'donations_event_id_events_id_fk',
+0|iskcon-j |   file: 'ri_triggers.c',
+0|iskcon-j |   line: '2621',
+0|iskcon-j |   routine: 'ri_ReportViolation'
+0|iskcon-j | }
+
+/root/.pm2/logs/iskcon-juhu-out.log last 15 lines:
+0|iskcon-j |   sessionId: 'wVx9HVg0LEcz4T6ar_rEnF2PgksfH7OO',
+0|iskcon-j |   userId: undefined,
+0|iskcon-j |   sessionExists: true
+0|iskcon-j | }
+0|iskcon-j | 12:00:29 PM [express] GET /api/live-videos 304 in 65ms :: [{"id":1,"title":"Watch Live Darshan on You…
+0|iskcon-j | 12:00:29 PM [express] GET /api/testimonials 304 in 27ms :: []
+0|iskcon-j | 12:00:29 PM [express] GET /api/stats 304 in 74ms :: [{"id":1,"value":300,"suffix":"cr+","label":"Meal…
+0|iskcon-j | 12:00:29 PM [express] GET /api/donation-categories 304 in 73ms :: [{"id":1,"name":"Gau Seva","descrip…
+0|iskcon-j | 12:00:29 PM [express] GET /api/events 304 in 81ms :: [{"id":2,"title":"General Donation","description…
+0|iskcon-j | 12:00:29 PM [express] GET /api/quotes 304 in 78ms :: []
+0|iskcon-j | 12:00:29 PM [express] GET /api/social-links 304 in 83ms :: [{"id":1,"platform":"Facebook","url":"http…
+0|iskcon-j | 12:00:29 PM [express] GET /api/videos 304 in 79ms :: [{"id":1,"title":"Where wheels don't roll - An I…
+0|iskcon-j | 12:00:29 PM [express] GET /api/banners 500 in 71ms :: {"message":"Error fetching banners"}
+0|iskcon-j | 12:00:29 PM [express] GET /api/schedules 304 in 83ms :: [{"id":1,"time":"04:30 AM","title":"Mangala A…
+0|iskcon-j | 12:00:29 PM [express] GET /api/gallery 304 in 71ms :: [{"id":1,"title":"Small child happy to receive …
+
+0|iskcon-juhu  | ✓ Payment system configured for LIVE PRODUCTION MODE
+0|iskcon-juhu  | Default admin user already exists
+0|iskcon-juhu  | Blog posts already exist, skipping initialization
+0|iskcon-juhu  | Starting server on port 5000
+0|iskcon-juhu  | 12:09:29 PM [express] serving on port 5000

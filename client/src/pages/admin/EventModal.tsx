@@ -146,6 +146,7 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
   // Load event-specific bank details when available
   useEffect(() => {
     if (isOpen && event?.id) {
+      // Load existing event bank details
       if (existingEventBankDetails && existingEventBankDetails.length > 0) {
         const activeBankDetails = existingEventBankDetails.find((bd: any) => bd.isActive) || existingEventBankDetails[0];
         setBankDetails({
@@ -158,7 +159,7 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
           isActive: activeBankDetails.isActive,
         });
       } else {
-        // Initialize with default bank details for new event
+        // Initialize with default bank details when no existing details for event
         setBankDetails({
           accountName: "ISKCON Juhu",
           bankName: "HDFC",
@@ -169,6 +170,17 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
           isActive: true,
         });
       }
+    } else if (isOpen && !event?.id) {
+      // Initialize with default bank details for new event
+      setBankDetails({
+        accountName: "ISKCON Juhu",
+        bankName: "HDFC",
+        accountNumber: "",
+        ifscCode: "",
+        swiftCode: "",
+        qrCodeUrl: "",
+        isActive: true,
+      });
     } else if (!isOpen) {
       // Clear bank details when modal is closed
       setBankDetails(null);
@@ -193,9 +205,6 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
     },
     onSuccess: async (response) => {
       const savedEvent = await response.json();
-      // Force refresh of all event-related queries
-      queryClient.invalidateQueries({ queryKey: ['/api/events'] });
-      queryClient.removeQueries({ queryKey: ['/api/events'] });
       
       try {
         // Save donation cards if any (without showing individual toast)
@@ -205,8 +214,17 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
         
         // Save bank details if changed (without showing individual toast)
         if (bankDetails) {
-          await saveBankDetails(true);
+          await saveBankDetails(savedEvent.id, true);
         }
+        
+        // Force refresh of all event-related queries
+        queryClient.invalidateQueries({ 
+          queryKey: ['/api/events']
+        });
+        // Immediately refetch to show new events on frontend
+        await queryClient.refetchQueries({ 
+          queryKey: ['/api/events']
+        });
         
         // Show single success toast after all operations complete
         toast({ title: 'Success', description: `Event ${event ? 'updated' : 'created'} successfully` });
@@ -259,18 +277,20 @@ export default function EventModal({ isOpen, onClose, event }: EventModalProps) 
     }
   };
 
-  const saveBankDetails = async (silent = false) => {
-    if (!bankDetails || !event?.id) return;
+  const saveBankDetails = async (eventId?: number, silent = false) => {
+    if (!bankDetails || (!eventId && !event?.id)) return;
+    
+    const finalEventId = eventId || event?.id;
     
     try {
       if (existingEventBankDetails.length > 0) {
         const activeBankDetails = existingEventBankDetails.find((bd: any) => bd.isActive) || existingEventBankDetails[0];
-        await apiRequest(`/api/events/${event.id}/bank-details/${activeBankDetails.id}`, 'PUT', bankDetails);
+        await apiRequest(`/api/events/${finalEventId}/bank-details/${activeBankDetails.id}`, 'PUT', bankDetails);
       } else {
-        await apiRequest(`/api/events/${event.id}/bank-details`, 'POST', bankDetails);
+        await apiRequest(`/api/events/${finalEventId}/bank-details`, 'POST', bankDetails);
       }
       
-      queryClient.invalidateQueries({ queryKey: [`/api/events/${event.id}/bank-details`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/events/${finalEventId}/bank-details`] });
       
       if (!silent) {
         toast({ title: 'Success', description: 'Event payment details saved successfully' });

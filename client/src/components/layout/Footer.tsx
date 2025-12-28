@@ -3,7 +3,7 @@ import { Link } from 'wouter';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
-import { SocialLink } from '@shared/schema';
+import { SocialLink, type Policy } from '@shared/schema';
 
 const Footer = () => {
   const [email, setEmail] = useState('');
@@ -11,6 +11,10 @@ const Footer = () => {
   
   const { data: socialLinks = [] } = useQuery<SocialLink[]>({
     queryKey: ['/api/social-links'],
+  });
+
+  const { data: policies = [] } = useQuery<Policy[]>({
+    queryKey: ['/api/policies'],
   });
 
   const handleSubscribe = async (e: React.FormEvent) => {
@@ -141,30 +145,6 @@ const Footer = () => {
           </div>
           
           <div>
-            <h4 className="font-poppins font-semibold text-xl mb-4">Programs</h4>
-            <ul className="space-y-2">
-              <li>
-                <a href="#" className="font-opensans hover:text-yellow-300 transition-colors">Morning Aarti</a>
-              </li>
-              <li>
-                <a href="#" className="font-opensans hover:text-yellow-300 transition-colors">Bhagavad Gita Classes</a>
-              </li>
-              <li>
-                <a href="#" className="font-opensans hover:text-yellow-300 transition-colors">Sunday Feast</a>
-              </li>
-              <li>
-                <a href="#" className="font-opensans hover:text-yellow-300 transition-colors">Kirtan Events</a>
-              </li>
-              <li>
-                <a href="#" className="font-opensans hover:text-yellow-300 transition-colors">Youth Programs</a>
-              </li>
-              <li>
-                <a href="#" className="font-opensans hover:text-yellow-300 transition-colors">Food for Life</a>
-              </li>
-            </ul>
-          </div>
-          
-          <div>
             <h4 className="font-poppins font-semibold text-xl mb-4">Newsletter</h4>
             <p className="font-opensans mb-4">
               Subscribe to receive updates on events, festivals, and spiritual insights.
@@ -193,7 +173,10 @@ const Footer = () => {
         </div>
         
         <div className="border-t border-white border-opacity-20 pt-8 text-center">
-          <p className="font-opensans text-sm">&copy; {new Date().getFullYear()} ISKCON Juhu. All Rights Reserved.</p>
+          <p className="font-opensans text-sm mb-4">&copy; {new Date().getFullYear()} ISKCON Juhu. All Rights Reserved.</p>
+          <Link href="/policies" className="font-opensans text-sm hover:text-yellow-300 transition-colors">
+            Policies of Usage
+          </Link>
         </div>
       </div>
     </footer>

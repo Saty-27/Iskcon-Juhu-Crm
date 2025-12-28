@@ -43,6 +43,13 @@ import AdminMessages from "@/pages/admin/Messages";
 import AdminTestimonials from "@/pages/admin/Testimonials";
 import AdminSocialLinks from "@/pages/admin/SocialLinks";
 import BlogManagement from "@/pages/admin/BlogManagement";
+import ProcessSectionManagement from "@/pages/admin/ProcessSectionManagement";
+import DonationsExport from "@/pages/admin/DonationsExport";
+import FooterSettings from "@/pages/admin/FooterSettings";
+import PoliciesAdmin from "@/pages/admin/Policies";
+import PoliciesPageSettings from "@/pages/admin/PoliciesPageSettings";
+import PoliciesListPage from "@/pages/Policies";
+import PolicyPage from "@/pages/Policy";
 
 function Router() {
   return (
@@ -67,6 +74,8 @@ function Router() {
       <Route path="/blog" component={Blog} />
       <Route path="/blog/:slug" component={BlogPost} />
       <Route path="/contact" component={Contact} />
+      <Route path="/policies" component={PoliciesListPage} />
+      <Route path="/policies/:slug" component={PolicyPage} />
       
       {/* Authentication routes */}
       <Route path="/login" component={Login} />
@@ -144,6 +153,13 @@ function Router() {
           </AdminRoute>
         )}
       </Route>
+      <Route path="/admin/donations-export">
+        {() => (
+          <AdminRoute>
+            <DonationsExport />
+          </AdminRoute>
+        )}
+      </Route>
       <Route path="/admin/quotes">
         {() => (
           <AdminRoute>
@@ -183,6 +199,34 @@ function Router() {
         {() => (
           <AdminRoute>
             <BlogManagement />
+          </AdminRoute>
+        )}
+      </Route>
+      <Route path="/admin/process-section">
+        {() => (
+          <AdminRoute>
+            <ProcessSectionManagement />
+          </AdminRoute>
+        )}
+      </Route>
+      <Route path="/admin/footer-settings">
+        {() => (
+          <AdminRoute>
+            <FooterSettings />
+          </AdminRoute>
+        )}
+      </Route>
+      <Route path="/admin/policies">
+        {() => (
+          <AdminRoute>
+            <PoliciesAdmin />
+          </AdminRoute>
+        )}
+      </Route>
+      <Route path="/admin/policies-page">
+        {() => (
+          <AdminRoute>
+            <PoliciesPageSettings />
           </AdminRoute>
         )}
       </Route>

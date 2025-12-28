@@ -22,12 +22,26 @@ const contactFormSchema = z.object({
 
 type ContactFormValues = z.infer<typeof contactFormSchema>;
 
+interface FooterSettings {
+  id?: number;
+  address: string;
+  phone: string;
+  email: string;
+  templeHours: string;
+  templeHoursSpecial: string;
+  introDescription: string;
+}
+
 const ContactSection = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   
   const { data: socialLinks = [] } = useQuery<SocialLink[]>({
     queryKey: ['/api/social-links'],
+  });
+
+  const { data: footerSettings } = useQuery<FooterSettings>({
+    queryKey: ['/api/footer-settings'],
   });
   
   const form = useForm<ContactFormValues>({
@@ -91,8 +105,7 @@ const ContactSection = () => {
               Get in Touch
             </h2>
             <p className="font-opensans text-lg text-white mb-6">
-              We'd love to hear from you. Reach out for inquiries, spiritual guidance, 
-              or to participate in our services.
+              {footerSettings?.introDescription || "We'd love to hear from you. Reach out for inquiries, spiritual guidance, or to participate in our services."}
             </p>
             
             <div className="space-y-6">
@@ -103,7 +116,7 @@ const ContactSection = () => {
                 <div>
                   <h4 className="font-poppins font-semibold text-lg mb-1 text-white">Address</h4>
                   <p className="font-opensans text-white">
-                    Hare Krishna Land, Juhu, Mumbai, Maharashtra 400049, India
+                    {footerSettings?.address || "Hare Krishna Land, Juhu, Mumbai, Maharashtra 400049, India"}
                   </p>
                 </div>
               </div>
@@ -114,7 +127,7 @@ const ContactSection = () => {
                 </div>
                 <div>
                   <h4 className="font-poppins font-semibold text-lg mb-1 text-white">Phone</h4>
-                  <p className="font-opensans text-white">+91 22 2620 0072</p>
+                  <p className="font-opensans text-white">{footerSettings?.phone || "+91 22 2620 0072"}</p>
                 </div>
               </div>
               
@@ -124,7 +137,7 @@ const ContactSection = () => {
                 </div>
                 <div>
                   <h4 className="font-poppins font-semibold text-lg mb-1 text-white">Email</h4>
-                  <p className="font-opensans text-white">info@iskconjuhu.in</p>
+                  <p className="font-opensans text-white">{footerSettings?.email || "info@iskconjuhu.in"}</p>
                 </div>
               </div>
               
@@ -134,7 +147,7 @@ const ContactSection = () => {
                 </div>
                 <div>
                   <h4 className="font-poppins font-semibold text-lg mb-1 text-white">Temple Hours</h4>
-                  <p className="font-opensans text-white">Daily: 4:30 AM - 9:00 PM<br/>Special timings during festivals</p>
+                  <p className="font-opensans text-white">{footerSettings?.templeHours || "Daily: 4:30 AM - 9:00 PM"}<br/>{footerSettings?.templeHoursSpecial || "Special timings during festivals"}</p>
                 </div>
               </div>
             </div>
