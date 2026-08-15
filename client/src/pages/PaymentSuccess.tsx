@@ -41,27 +41,7 @@ const PaymentSuccess = () => {
   };
 
   const handleDownload = () => {
-    const printContent = document.getElementById('donation-receipt');
-    if (printContent) {
-      const newWindow = window.open('', '_blank');
-      newWindow?.document.write(`
-        <html>
-          <head>
-            <title>Donation Receipt - ISKCON Juhu</title>
-            <style>
-              body { font-family: Arial, sans-serif; margin: 20px; }
-              .receipt { max-width: 600px; margin: 0 auto; }
-              .header { text-align: center; border-bottom: 2px solid #f97316; padding-bottom: 20px; margin-bottom: 20px; }
-              .section { margin-bottom: 20px; }
-              .flex { display: flex; justify-content: space-between; margin-bottom: 8px; }
-              .amount { font-size: 24px; font-weight: bold; color: #f97316; }
-            </style>
-          </head>
-          <body>${printContent.innerHTML}</body>
-        </html>
-      `);
-      newWindow?.print();
-    }
+    handlePrint();
   };
 
   if (isLoading) {
