@@ -1689,9 +1689,9 @@ router.post("/initiate", async (req, res) => {
     }
     const txnid = `ISKCON_${nanoid2(8)}`;
     console.log(`Generated transaction ID: ${txnid}`);
-    const isLocalhost = req.headers.host?.includes("localhost") || req.headers.host?.includes("127.0.0.1");
-    const protocol = req.headers["x-forwarded-proto"] || (isLocalhost ? "http" : "https");
-    const host = req.headers.host || req.hostname;
+    const host = (req.headers.host || req.hostname || "").toLowerCase();
+    const isLocalhost = host.includes("localhost") || host.includes("127.0.0.1");
+    const protocol = isLocalhost ? "http" : "https";
     const baseUrl = `${protocol}://${host}`;
     const surl = `${baseUrl}/api/payments/success`;
     const furl = `${baseUrl}/api/payments/failure`;
@@ -3946,8 +3946,9 @@ async function registerRoutes(app2) {
         });
       }
       const txnid = `TXN_${nanoid4(12)}_${Date.now()}`;
-      const isLocalhost = req.get("host")?.includes("localhost") || req.get("host")?.includes("127.0.0.1");
-      const proto = req.headers["x-forwarded-proto"] || (isLocalhost ? "http" : "https");
+      const hostHeader = (req.get("host") || req.hostname || "").toLowerCase();
+      const isLocalhost = hostHeader.includes("localhost") || hostHeader.includes("127.0.0.1");
+      const proto = isLocalhost ? "http" : "https";
       const payuParams = {
         key: process.env.PAYU_MERCHANT_KEY,
         txnid,
@@ -4610,6 +4611,7 @@ The preparation of prasadam is also a meditative practice. Volunteers who join o
 
 // server/index.ts
 var app = express5();
+app.set("trust proxy", true);
 app.use(express5.json());
 app.use(express5.urlencoded({ extended: false }));
 app.use("/api/payments", payment_default);

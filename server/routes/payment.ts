@@ -36,9 +36,9 @@ router.post('/initiate', async (req, res) => {
     console.log(`Generated transaction ID: ${txnid}`);
     
     // Determine success and failure URLs
-    const isLocalhost = req.headers.host?.includes('localhost') || req.headers.host?.includes('127.0.0.1');
-    const protocol = req.headers['x-forwarded-proto'] || (isLocalhost ? 'http' : 'https');
-    const host = req.headers.host || req.hostname;
+    const host = (req.headers.host || req.hostname || '').toLowerCase();
+    const isLocalhost = host.includes('localhost') || host.includes('127.0.0.1');
+    const protocol = isLocalhost ? 'http' : 'https';
     const baseUrl = `${protocol}://${host}`;
     
     // PayU will redirect to these URLs after payment completion

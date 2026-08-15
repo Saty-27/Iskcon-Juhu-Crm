@@ -1994,8 +1994,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate unique transaction ID
       const txnid = `TXN_${nanoid(12)}_${Date.now()}`;
       
-      const isLocalhost = req.get('host')?.includes('localhost') || req.get('host')?.includes('127.0.0.1');
-      const proto = req.headers['x-forwarded-proto'] || (isLocalhost ? 'http' : 'https');
+      const hostHeader = (req.get('host') || req.hostname || '').toLowerCase();
+      const isLocalhost = hostHeader.includes('localhost') || hostHeader.includes('127.0.0.1');
+      const proto = isLocalhost ? 'http' : 'https';
 
       // PayU required parameters
       const payuParams = {
