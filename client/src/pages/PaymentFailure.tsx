@@ -125,8 +125,8 @@ const PaymentFailure = () => {
                     If you continue to experience issues, please contact our support team:
                   </p>
                   <div className="text-sm space-y-1">
-                    <p><strong>Email:</strong> donations@iskconjuhu.org</p>
-                    <p><strong>Phone:</strong> +91 22 2620 6860</p>
+                    <p><strong>Email:</strong> sukadeva.bvks@gmail.com</p>
+                    <p><strong>Phone:</strong> +91 88986 16150 (Sukadeva)</p>
                   </div>
                 </div>
               </CardContent>

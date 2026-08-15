@@ -131,11 +131,11 @@ const PaymentFailed = () => {
             <div className="flex flex-col sm:flex-row gap-3 text-sm">
               <div className="flex items-center text-orange-700">
                 <Phone className="w-4 h-4 mr-2" />
-                <span>+91-22-2620-6860</span>
+                <span>+91 88986 16150 (Sukadeva)</span>
               </div>
               <div className="flex items-center text-orange-700">
                 <Mail className="w-4 h-4 mr-2" />
-                <span>donations@iskconjuhu.org</span>
+                <span>sukadeva.bvks@gmail.com</span>
               </div>
             </div>
           </div>

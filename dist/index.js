@@ -1,7 +1,12 @@
 var __defProp = Object.defineProperty;
 var __getOwnPropNames = Object.getOwnPropertyNames;
-var __esm = (fn, res) => function __init() {
-  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+var __esm = (fn, res, err) => function __init() {
+  if (err) throw err[0];
+  try {
+    return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+  } catch (e) {
+    throw err = [e], e;
+  }
 };
 var __export = (target, all) => {
   for (var name in all)
@@ -19,6 +24,7 @@ import PDFDocument from "pdfkit";
 import { promises as fs } from "fs";
 import path from "path";
 import { nanoid } from "nanoid";
+import twilio from "twilio";
 async function generateDonationPDF(donation) {
   const doc = new PDFDocument({ margin: 50 });
   const buffers = [];
@@ -61,7 +67,7 @@ async function setupPDF(doc, donation) {
   doc.moveDown();
   doc.fontSize(8).text("This is an electronically generated receipt and does not require a signature.", { align: "center" });
   doc.moveDown(0.5);
-  doc.fontSize(8).text("For any queries related to your donation, please contact us at donations@iskconjuhu.in", { align: "center" });
+  doc.fontSize(8).text("For any queries related to your donation, please contact us at sukadeva.bvks@gmail.com or call +91 88986 16150 (Sukadeva)", { align: "center" });
 }
 async function sendWhatsAppReceipt(phoneNumber, donationData) {
   try {
@@ -115,9 +121,11 @@ function generateInvoiceNumber() {
   const random = Math.floor(Math.random() * 1e4).toString().padStart(4, "0");
   return `INV-${year}${month}-${random}`;
 }
+var twilioClient;
 var init_invoiceService = __esm({
   "server/services/invoiceService.ts"() {
     "use strict";
+    twilioClient = process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN) : null;
   }
 });
 
@@ -126,8 +134,8 @@ var notificationService_exports = {};
 __export(notificationService_exports, {
   sendFailedPaymentNotification: () => sendFailedPaymentNotification
 });
-import twilio from "twilio";
-async function sendFailedPaymentNotification(phoneNumber, donorName, amount2, purpose) {
+import twilio2 from "twilio";
+async function sendFailedPaymentNotification(phoneNumber, donorName, amount, purpose) {
   try {
     if (!twilioClient2) {
       console.warn("Twilio not configured - Failed payment notification not sent");
@@ -143,7 +151,7 @@ async function sendFailedPaymentNotification(phoneNumber, donorName, amount2, pu
       to: `whatsapp:${formattedPhoneNumber}`,
       body: `Hare Krishna, ${donorName}! \u{1F64F}
 
-We noticed there was an issue with your donation payment of \u20B9${amount2} towards ${purpose}.
+We noticed there was an issue with your donation payment of \u20B9${amount} towards ${purpose}.
 
 Please try again or contact our support team if you need assistance. You can visit our website at iskconjuhu.in or call us at +91 9876543210.
 
@@ -173,7 +181,7 @@ var twilioClient2;
 var init_notificationService = __esm({
   "server/services/notificationService.ts"() {
     "use strict";
-    twilioClient2 = process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN) : null;
+    twilioClient2 = process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN ? twilio2(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN) : null;
   }
 });
 
@@ -185,33 +193,33 @@ __export(upiService_exports, {
   verifyUpiTransaction: () => verifyUpiTransaction
 });
 function generateUpiIntent(params) {
-  const { upiId, txnid: txnid2, amount: amount2 } = params;
+  const { upiId, txnid, amount } = params;
   const encodedParams = new URLSearchParams({
     pa: upiId || "iskconjuhu@sbi",
     // Use provided UPI ID or default to ISKCON Juhu UPI
     pn: "ISKCON Juhu",
     // Name of the payee
-    tr: txnid2,
+    tr: txnid,
     // Transaction ID
-    am: amount2.toString(),
+    am: amount.toString(),
     // Amount
     cu: "INR",
     // Currency
-    tn: `Donation to ISKCON Juhu (${txnid2})`
+    tn: `Donation to ISKCON Juhu (${txnid})`
     // Transaction note
   }).toString();
   return `upi://pay?${encodedParams}`;
 }
 async function generateUpiQrData(params) {
-  const { txnid: txnid2, amount: amount2, upiId } = params;
+  const { txnid, amount, upiId } = params;
   const encodedParams = new URLSearchParams({
     pa: upiId || "iskconjuhu@sbi",
     // Use provided UPI ID or default to ISKCON Juhu UPI
     pn: "ISKCON Juhu",
-    tr: txnid2,
-    am: amount2.toString(),
+    tr: txnid,
+    am: amount.toString(),
     cu: "INR",
-    tn: `Donation to ISKCON Juhu (${txnid2})`
+    tn: `Donation to ISKCON Juhu (${txnid})`
   }).toString();
   const upiIntentUrl = `upi://pay?${encodedParams}`;
   try {
@@ -232,7 +240,7 @@ async function generateUpiQrData(params) {
     throw new Error("Failed to generate QR code for UPI payment");
   }
 }
-async function verifyUpiTransaction(txnid2) {
+async function verifyUpiTransaction(txnid) {
   try {
     await new Promise((resolve) => setTimeout(resolve, 1e3));
     const isSuccess = Math.random() < 0.8;
@@ -272,7 +280,7 @@ import express5 from "express";
 import { createServer } from "http";
 
 // server/dbStorage.ts
-import { eq, and } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 
 // server/db.ts
 import pkg from "pg";
@@ -292,6 +300,7 @@ __export(schema_exports, {
   eventBankDetails: () => eventBankDetails,
   eventDonationCards: () => eventDonationCards,
   events: () => events,
+  footerSettings: () => footerSettings,
   gallery: () => gallery,
   insertBankDetailsSchema: () => insertBankDetailsSchema,
   insertBannerSchema: () => insertBannerSchema,
@@ -304,8 +313,12 @@ __export(schema_exports, {
   insertEventBankDetailsSchema: () => insertEventBankDetailsSchema,
   insertEventDonationCardSchema: () => insertEventDonationCardSchema,
   insertEventSchema: () => insertEventSchema,
+  insertFooterSettingsSchema: () => insertFooterSettingsSchema,
   insertGallerySchema: () => insertGallerySchema,
   insertLiveVideoSchema: () => insertLiveVideoSchema,
+  insertPoliciesPageSchema: () => insertPoliciesPageSchema,
+  insertPolicySchema: () => insertPolicySchema,
+  insertProcessSectionSchema: () => insertProcessSectionSchema,
   insertQuoteSchema: () => insertQuoteSchema,
   insertScheduleSchema: () => insertScheduleSchema,
   insertSocialLinkSchema: () => insertSocialLinkSchema,
@@ -315,6 +328,9 @@ __export(schema_exports, {
   insertUserSchema: () => insertUserSchema,
   insertVideoSchema: () => insertVideoSchema,
   liveVideos: () => liveVideos,
+  policies: () => policies,
+  policiesPage: () => policiesPage,
+  processSections: () => processSections,
   quotes: () => quotes,
   schedules: () => schedules,
   socialLinks: () => socialLinks,
@@ -347,6 +363,7 @@ var banners = pgTable("banners", {
   title: text("title").notNull(),
   description: text("description"),
   imageUrl: text("image_url").notNull(),
+  mobileImageUrl: text("mobile_image_url"),
   imageAlt: text("image_alt"),
   // SEO alt text for banner image
   buttonText: text("button_text"),
@@ -682,6 +699,86 @@ var insertBlogPostSchema = createInsertSchema(blogPosts, {
   createdAt: true,
   updatedAt: true
 });
+var processSections = pgTable("process_sections", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull().default("ISKCON FOOD FOR CHILD"),
+  description: text("description"),
+  desktopImageUrl: text("desktop_image_url").notNull(),
+  mobileImageUrl: text("mobile_image_url").notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull()
+});
+var insertProcessSectionSchema = createInsertSchema(processSections, {
+  title: z.string().min(1).max(255),
+  description: z.string().optional(),
+  desktopImageUrl: z.string().min(1),
+  mobileImageUrl: z.string().min(1),
+  isActive: z.boolean().optional()
+}).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+var footerSettings = pgTable("footer_settings", {
+  id: serial("id").primaryKey(),
+  address: text("address").notNull().default("Hare Krishna Land, Juhu, Mumbai, Maharashtra 400049, India"),
+  phone: text("phone").notNull().default("+91 22 2620 0072"),
+  email: text("email").notNull().default("info@iskconjuhu.in"),
+  templeHours: text("temple_hours").notNull().default("Daily: 4:30 AM - 9:00 PM"),
+  templeHoursSpecial: text("temple_hours_special").notNull().default("Special timings during festivals"),
+  introDescription: text("intro_description").notNull().default("We'd love to hear from you. Reach out for inquiries, spiritual guidance, or to participate in our services."),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull()
+});
+var insertFooterSettingsSchema = createInsertSchema(footerSettings, {
+  address: z.string().min(1),
+  phone: z.string().min(1),
+  email: z.string().email(),
+  templeHours: z.string().min(1),
+  templeHoursSpecial: z.string().min(1),
+  introDescription: z.string().min(1)
+}).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+var policies = pgTable("policies", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  slug: text("slug").notNull().unique(),
+  content: text("content").notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  order: integer("order").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull()
+});
+var insertPolicySchema = createInsertSchema(policies, {
+  title: z.string().min(1).max(255),
+  slug: z.string().min(1).max(255),
+  content: z.string().min(1),
+  isActive: z.boolean().optional(),
+  order: z.number().optional()
+}).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+var policiesPage = pgTable("policies_page", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull().default("Policies of Usage"),
+  description: text("description").notNull().default("Please review our policies to understand how we operate and your rights as a user."),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull()
+});
+var insertPoliciesPageSchema = createInsertSchema(policiesPage, {
+  title: z.string().min(1).max(255),
+  description: z.string().min(1)
+}).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
 
 // server/db.ts
 var { Pool } = pkg;
@@ -725,15 +822,27 @@ var DatabaseStorage = class {
   }
   // Banner operations
   async getBanners() {
-    return await db.select().from(banners);
+    try {
+      return await db.select().from(banners);
+    } catch (error) {
+      console.error("Error in getBanners:", error);
+      throw error;
+    }
   }
   async getBanner(id) {
     const [banner] = await db.select().from(banners).where(eq(banners.id, id));
     return banner;
   }
   async createBanner(banner) {
-    const [newBanner] = await db.insert(banners).values(banner).returning();
-    return newBanner;
+    try {
+      console.log("Inserting banner:", banner);
+      const [newBanner] = await db.insert(banners).values(banner).returning();
+      console.log("Banner created:", newBanner);
+      return newBanner;
+    } catch (error) {
+      console.error("Error in createBanner:", error);
+      throw error;
+    }
   }
   async updateBanner(id, bannerData) {
     const [banner] = await db.update(banners).set(bannerData).where(eq(banners.id, id)).returning();
@@ -920,11 +1029,25 @@ var DatabaseStorage = class {
   }
   async deleteEvent(id) {
     try {
+      const existingDonations = await db.select().from(donations).where(eq(donations.eventId, id));
+      if (existingDonations.length > 0) {
+        return {
+          success: false,
+          message: `Cannot delete event with ${existingDonations.length} existing donation(s). Please contact administrator to handle existing donations first.`
+        };
+      }
+      await db.delete(eventDonationCards).where(eq(eventDonationCards.eventId, id));
+      await db.delete(eventBankDetails).where(eq(eventBankDetails.eventId, id));
       const result = await db.delete(events).where(eq(events.id, id));
-      return result.rowCount > 0;
+      return {
+        success: result.rowCount > 0
+      };
     } catch (error) {
       console.error("Error deleting event:", error);
-      return false;
+      return {
+        success: false,
+        message: "Database error occurred while deleting event"
+      };
     }
   }
   // Event donation card operations
@@ -1093,7 +1216,7 @@ var DatabaseStorage = class {
       invoiceNumber: donations.invoiceNumber,
       receiptSent: donations.receiptSent,
       notificationSent: donations.notificationSent
-    }).from(donations).leftJoin(donationCategories, eq(donations.categoryId, donationCategories.id)).leftJoin(events, eq(donations.eventId, events.id)).orderBy(donations.createdAt);
+    }).from(donations).leftJoin(donationCategories, eq(donations.categoryId, donationCategories.id)).leftJoin(events, eq(donations.eventId, events.id)).orderBy(desc(donations.createdAt));
   }
   async getDonation(id) {
     const [donation] = await db.select().from(donations).where(eq(donations.id, id));
@@ -1117,6 +1240,29 @@ var DatabaseStorage = class {
   async deleteDonation(id) {
     const result = await db.delete(donations).where(eq(donations.id, id));
     return result.rowCount > 0;
+  }
+  async getDonationsByDateRange(fromDate, toDate) {
+    return await db.select({
+      id: donations.id,
+      amount: donations.amount,
+      name: donations.name,
+      email: donations.email,
+      phone: donations.phone,
+      address: donations.address,
+      panCard: donations.panCard,
+      message: donations.message,
+      paymentId: donations.paymentId,
+      status: donations.status,
+      createdAt: donations.createdAt,
+      categoryName: donationCategories.name,
+      eventTitle: events.title,
+      invoiceNumber: donations.invoiceNumber,
+      receiptSent: donations.receiptSent,
+      notificationSent: donations.notificationSent
+    }).from(donations).leftJoin(donationCategories, eq(donations.categoryId, donationCategories.id)).leftJoin(events, eq(donations.eventId, events.id)).where(and(
+      donations.createdAt >= fromDate,
+      donations.createdAt <= toDate
+    )).orderBy(desc(donations.createdAt));
   }
   // Subscription operations
   async getSubscriptions() {
@@ -1206,6 +1352,75 @@ var DatabaseStorage = class {
     const result = await db.delete(blogPosts).where(eq(blogPosts.id, id));
     return result.rowCount > 0;
   }
+  // Process section operations
+  async getProcessSection() {
+    const [section] = await db.select().from(processSections).limit(1);
+    return section;
+  }
+  async updateProcessSection(sectionData) {
+    const existing = await this.getProcessSection();
+    if (!existing) {
+      const [newSection] = await db.insert(processSections).values(sectionData).returning();
+      return newSection;
+    }
+    const [updated] = await db.update(processSections).set(sectionData).where(eq(processSections.id, existing.id)).returning();
+    return updated;
+  }
+  // Footer settings operations
+  async getFooterSettings() {
+    const [settings] = await db.select().from(footerSettings).limit(1);
+    return settings;
+  }
+  async updateFooterSettings(settingsData) {
+    const existing = await this.getFooterSettings();
+    if (!existing) {
+      const [newSettings] = await db.insert(footerSettings).values(settingsData).returning();
+      return newSettings;
+    }
+    const [updated] = await db.update(footerSettings).set(settingsData).where(eq(footerSettings.id, existing.id)).returning();
+    return updated;
+  }
+  // Policy operations
+  async getPolicies() {
+    return await db.select().from(policies).where(eq(policies.isActive, true)).orderBy(policies.order);
+  }
+  async getPolicy(id) {
+    const [policy] = await db.select().from(policies).where(eq(policies.id, id));
+    return policy;
+  }
+  async getPolicyBySlug(slug) {
+    const [policy] = await db.select().from(policies).where(eq(policies.slug, slug));
+    return policy;
+  }
+  async createPolicy(policy) {
+    const [newPolicy] = await db.insert(policies).values(policy).returning();
+    return newPolicy;
+  }
+  async updatePolicy(id, policyData) {
+    const [policy] = await db.update(policies).set(policyData).where(eq(policies.id, id)).returning();
+    return policy;
+  }
+  async deletePolicy(id) {
+    const result = await db.delete(policies).where(eq(policies.id, id));
+    return result.rowCount > 0;
+  }
+  async getAllPolicies() {
+    return await db.select().from(policies).orderBy(policies.order);
+  }
+  // Policies Page Settings operations
+  async getPoliciesPage() {
+    const [page] = await db.select().from(policiesPage).limit(1);
+    return page;
+  }
+  async updatePoliciesPage(pageData) {
+    const existing = await this.getPoliciesPage();
+    if (!existing) {
+      const [newPage] = await db.insert(policiesPage).values(pageData).returning();
+      return newPage;
+    }
+    const [updated] = await db.update(policiesPage).set(pageData).where(eq(policiesPage.id, existing.id)).returning();
+    return updated;
+  }
 };
 
 // server/storage.ts
@@ -1265,15 +1480,6 @@ function validatePaymentConfig() {
   }
   if (!PAYMENT_CONFIG.PAYU.MERCHANT_SALT) {
     errors.push("PAYU_MERCHANT_SALT is required for live payments");
-  }
-  if (!process.env.TWILIO_ACCOUNT_SID) {
-    errors.push("TWILIO_ACCOUNT_SID is required for WhatsApp notifications");
-  }
-  if (!process.env.TWILIO_AUTH_TOKEN) {
-    errors.push("TWILIO_AUTH_TOKEN is required for WhatsApp notifications");
-  }
-  if (!process.env.TWILIO_PHONE_NUMBER) {
-    errors.push("TWILIO_PHONE_NUMBER is required for WhatsApp notifications");
   }
   return {
     isValid: errors.length === 0,
@@ -1347,7 +1553,7 @@ var createEmailTransporter = () => {
     service: "gmail",
     // or your email service
     auth: {
-      user: process.env.EMAIL_USER || "donations@iskconjuhu.org",
+      user: process.env.EMAIL_USER || "sukadeva.bvks@gmail.com",
       pass: process.env.EMAIL_PASSWORD || "your-app-password"
     }
   });
@@ -1360,7 +1566,7 @@ async function generatePDFReceipt(receiptData) {
       doc.on("data", (chunk) => chunks.push(chunk));
       doc.on("end", () => resolve(Buffer.concat(chunks)));
       doc.on("error", reject);
-      doc.fontSize(20).fillColor("#FF6B35").text("ISKCON JUHU", 50, 50, { align: "center" }).fontSize(14).fillColor("#000").text("International Society for Krishna Consciousness", 50, 80, { align: "center" }).text("Hare Krishna Land, Juhu, Mumbai - 400049", 50, 100, { align: "center" }).text("Phone: +91-22-2620-6860 | Email: donations@iskconjuhu.org", 50, 120, { align: "center" });
+      doc.fontSize(20).fillColor("#FF6B35").text("ISKCON JUHU", 50, 50, { align: "center" }).fontSize(14).fillColor("#000").text("International Society for Krishna Consciousness", 50, 80, { align: "center" }).text("Hare Krishna Land, Juhu, Mumbai - 400049", 50, 100, { align: "center" }).text("Phone: +91 88986 16150 (Sukadeva) | Email: sukadeva.bvks@gmail.com", 50, 120, { align: "center" });
       doc.fontSize(18).fillColor("#FF6B35").text("DONATION RECEIPT", 50, 160, { align: "center" }).fontSize(12).fillColor("#000").text("(Eligible for Tax Deduction under Section 80G)", 50, 185, { align: "center" });
       doc.rect(50, 210, 495, 200).stroke().fontSize(12);
       const startY = 230;
@@ -1396,7 +1602,7 @@ async function sendReceiptEmail(receiptData, pdfBuffer) {
   try {
     const transporter = createEmailTransporter();
     const mailOptions = {
-      from: "ISKCON Juhu <donations@iskconjuhu.org>",
+      from: "ISKCON Juhu <sukadeva.bvks@gmail.com>",
       to: receiptData.email,
       subject: `Donation Receipt - ${receiptData.invoiceNumber} | ISKCON Juhu`,
       html: `
@@ -1437,7 +1643,7 @@ async function sendReceiptEmail(receiptData, pdfBuffer) {
           
           <div style="background: #333; color: white; padding: 20px; text-align: center; font-size: 12px;">
             <p style="margin: 0;">ISKCON Juhu | Hare Krishna Land, Juhu, Mumbai - 400049</p>
-            <p style="margin: 5px 0 0;">Phone: +91-22-2620-6860 | Email: donations@iskconjuhu.org</p>
+            <p style="margin: 5px 0 0;">Phone: +91 88986 16150 (Sukadeva) | Email: sukadeva.bvks@gmail.com</p>
           </div>
         </div>
       `,
@@ -1461,8 +1667,9 @@ async function sendReceiptEmail(receiptData, pdfBuffer) {
 var router = express.Router();
 router.post("/initiate", async (req, res) => {
   try {
+    console.log("=== Payment Initiation Request ===");
     const {
-      amount: amount2,
+      amount,
       name,
       email,
       phone,
@@ -1473,14 +1680,17 @@ router.post("/initiate", async (req, res) => {
       paymentMethod = "netbanking"
       // Default payment method
     } = req.body;
-    if (!amount2 || !name || !email || !phone) {
+    console.log(`Initiating payment for: ${name} (${email}), Amount: \u20B9${amount}`);
+    if (!amount || !name || !email || !phone) {
       return res.status(400).json({
         success: false,
         message: "Missing required payment fields"
       });
     }
-    const txnid2 = `ISKCON_${nanoid2(8)}`;
-    const protocol = "http";
+    const txnid = `ISKCON_${nanoid2(8)}`;
+    console.log(`Generated transaction ID: ${txnid}`);
+    const isLocalhost = req.headers.host?.includes("localhost") || req.headers.host?.includes("127.0.0.1");
+    const protocol = req.headers["x-forwarded-proto"] || (isLocalhost ? "http" : "https");
     const host = req.headers.host || req.hostname;
     const baseUrl = `${protocol}://${host}`;
     const surl = `${baseUrl}/api/payments/success`;
@@ -1488,8 +1698,8 @@ router.post("/initiate", async (req, res) => {
     const categoryName = categoryId ? "Temple Donation" : "General Donation";
     const productinfo = `Donation for ISKCON Juhu - ${categoryName}`;
     const paymentRequest = {
-      txnid: txnid2,
-      amount: Number(amount2),
+      txnid,
+      amount: Number(amount),
       productinfo,
       firstname: name,
       email,
@@ -1505,22 +1715,28 @@ router.post("/initiate", async (req, res) => {
       }
     };
     const { formUrl, formData } = getPaymentFormData(paymentRequest);
-    await storage.createDonation({
+    console.log("Creating donation record in database with status: pending");
+    const donation = await storage.createDonation({
       email,
       name,
       phone,
-      amount: Number(amount2),
+      amount: Number(amount),
       message: message || null,
       status: "pending",
       categoryId: categoryId ? Number(categoryId) : null,
       eventId: eventId ? Number(eventId) : null,
       panCard: panCard || null,
       userId: req.user?.id || null,
-      paymentId: txnid2
+      paymentId: txnid
     });
+    console.log(`\u2713 Donation record created with ID: ${donation.id}`);
+    console.log(`Payment gateway URL: ${formUrl}`);
+    console.log(`Success callback URL: ${surl}`);
+    console.log(`Failure callback URL: ${furl}`);
+    console.log("=== Payment Initiation Complete ===\n");
     res.json({
       success: true,
-      txnid: txnid2,
+      txnid,
       payuUrl: formUrl,
       paymentData: formData,
       // Include UPI data if UPI is selected
@@ -1529,14 +1745,16 @@ router.post("/initiate", async (req, res) => {
           payeeVpa: "iskconjuhu@sbi",
           // ISKCON Juhu UPI ID
           payeeName: "ISKCON Juhu",
-          amount: Number(amount2),
-          transactionId: txnid2,
+          amount: Number(amount),
+          transactionId: txnid,
           transactionNote: productinfo
         }
       }
     });
   } catch (error) {
-    console.error("PayU payment initialization error:", error);
+    console.error("=== Payment Initiation ERROR ===");
+    console.error("Error details:", error);
+    console.error("=== END ERROR ===\n");
     res.status(500).json({
       success: false,
       message: "Payment initialization failed"
@@ -1546,17 +1764,24 @@ router.post("/initiate", async (req, res) => {
 router.post("/success", async (req, res) => {
   try {
     const paymentResponse = req.body;
+    console.log("=== PayU SUCCESS Callback Received ===");
+    console.log("Payment Response:", JSON.stringify(paymentResponse, null, 2));
     const { generateInvoiceNumber: generateInvoiceNumber2, sendWhatsAppReceipt: sendWhatsAppReceipt2 } = await Promise.resolve().then(() => (init_invoiceService(), invoiceService_exports));
     let purpose = "ISKCON Juhu Donation";
     if (paymentResponse && paymentResponse.txnid) {
+      console.log(`Looking up donation with payment ID: ${paymentResponse.txnid}`);
       const donation = await storage.getDonationByPaymentId(paymentResponse.txnid);
+      console.log("Found donation:", donation ? `ID=${donation.id}, Status=${donation.status}` : "NOT FOUND");
       if (donation) {
         const invoiceNumber = generateInvoiceNumber2();
+        console.log(`Generated invoice number: ${invoiceNumber}`);
+        console.log(`Updating donation ${donation.id} to 'completed' status...`);
         await storage.updateDonation(donation.id, {
           status: "completed",
-          paymentId: paymentResponse.mihpayid || paymentResponse.txnid,
+          // Keep original paymentId (txnid) - don't overwrite with mihpayid
           invoiceNumber
         });
+        console.log("\u2713 Donation status updated successfully");
         if (donation.categoryId) {
           const category = await storage.getDonationCategory(donation.categoryId);
           if (category) {
@@ -1621,10 +1846,18 @@ router.post("/success", async (req, res) => {
       purpose,
       categoryName: purpose
     });
-    res.redirect(`/payment/success?txnid=${txnid}&amount=${amount}`);
+    const redirectUrl = `/payment/success?${params.toString()}`;
+    console.log(`Redirecting to: ${redirectUrl}`);
+    console.log("=== PayU SUCCESS Callback Complete ===\n");
+    res.redirect(redirectUrl);
   } catch (error) {
-    console.error("PayU success callback error:", error);
-    res.redirect(`/payment/failure?txnid=${txnid}&error=payment_failed`);
+    console.error("=== PayU SUCCESS Callback ERROR ===");
+    console.error("Error details:", error);
+    console.error("=== END ERROR ===\n");
+    const errorParams = new URLSearchParams({
+      error: "payment_failed"
+    });
+    res.redirect(`/payment/failure?${errorParams.toString()}`);
   }
 });
 router.post("/failure", async (req, res) => {
@@ -1684,18 +1917,18 @@ router.post("/failure", async (req, res) => {
 router.post("/upi-intent", async (req, res) => {
   try {
     const upiId = "iskconjuhu@sbi";
-    const { txnid: txnid2, amount: amount2 } = req.body;
-    if (!txnid2 || !amount2) {
+    const { txnid, amount } = req.body;
+    if (!txnid || !amount) {
       return res.status(400).json({
         success: false,
         message: "Missing required UPI fields"
       });
     }
     const { generateUpiIntent: generateUpiIntent2, generateUpiQrData: generateUpiQrData2 } = await Promise.resolve().then(() => (init_upiService(), upiService_exports));
-    const upiParams = { upiId, txnid: txnid2, amount: amount2 };
+    const upiParams = { upiId, txnid, amount };
     const upiIntent = generateUpiIntent2(upiParams);
     const qrCodeData = await generateUpiQrData2(upiParams);
-    const donation = await storage.getDonationByPaymentId(txnid2);
+    const donation = await storage.getDonationByPaymentId(txnid);
     if (donation) {
       await storage.updateDonation(donation.id, {
         status: "pending_upi"
@@ -1706,7 +1939,7 @@ router.post("/upi-intent", async (req, res) => {
       success: true,
       upiIntent,
       qrCodeData,
-      txnid: txnid2,
+      txnid,
       payeeVpa: upiId,
       payeeName: "ISKCON Juhu"
     });
@@ -1720,8 +1953,8 @@ router.post("/upi-intent", async (req, res) => {
 });
 router.post("/verify-upi", async (req, res) => {
   try {
-    const { txnid: txnid2 } = req.body;
-    if (!txnid2) {
+    const { txnid } = req.body;
+    if (!txnid) {
       return res.status(400).json({
         success: false,
         message: "Transaction ID is required"
@@ -1730,7 +1963,7 @@ router.post("/verify-upi", async (req, res) => {
     const { verifyUpiTransaction: verifyUpiTransaction2 } = await Promise.resolve().then(() => (init_upiService(), upiService_exports));
     const { sendFailedPaymentNotification: sendFailedPaymentNotification2 } = await Promise.resolve().then(() => (init_notificationService(), notificationService_exports));
     const { generateInvoiceNumber: generateInvoiceNumber2, sendWhatsAppReceipt: sendWhatsAppReceipt2 } = await Promise.resolve().then(() => (init_invoiceService(), invoiceService_exports));
-    const donation = await storage.getDonationByPaymentId(txnid2);
+    const donation = await storage.getDonationByPaymentId(txnid);
     if (!donation) {
       return res.status(404).json({
         success: false,
@@ -1749,7 +1982,7 @@ router.post("/verify-upi", async (req, res) => {
         purpose = event.title;
       }
     }
-    const verificationResult = await verifyUpiTransaction2(txnid2);
+    const verificationResult = await verifyUpiTransaction2(txnid);
     if (verificationResult.success) {
       const invoiceNumber = generateInvoiceNumber2();
       await storage.updateDonation(donation.id, {
@@ -1759,7 +1992,7 @@ router.post("/verify-upi", async (req, res) => {
       if (donation.phone && !donation.receiptSent) {
         try {
           const receiptData = {
-            txnid: donation.paymentId || txnid2,
+            txnid: donation.paymentId || txnid,
             amount: donation.amount,
             name: donation.name,
             email: donation.email,
@@ -1826,8 +2059,8 @@ router.post("/verify-upi", async (req, res) => {
 });
 router.get("/receipt/:txnid", async (req, res) => {
   try {
-    const { txnid: txnid2 } = req.params;
-    const donation = await storage.getDonationByPaymentId(txnid2);
+    const { txnid } = req.params;
+    const donation = await storage.getDonationByPaymentId(txnid);
     if (!donation) {
       return res.status(404).json({ error: "Donation not found" });
     }
@@ -1844,13 +2077,13 @@ router.get("/receipt/:txnid", async (req, res) => {
       }
     }
     const receiptData = {
-      txnid: donation.paymentId || txnid2,
+      txnid: donation.paymentId || txnid,
       amount: donation.amount,
       name: donation.name,
       email: donation.email,
       phone: donation.phone,
       purpose,
-      invoiceNumber: donation.invoiceNumber || `INV-${txnid2}`,
+      invoiceNumber: donation.invoiceNumber || `INV-${txnid}`,
       date: donation.createdAt || /* @__PURE__ */ new Date(),
       panCard: donation.panCard || void 0
     };
@@ -1865,8 +2098,8 @@ router.get("/receipt/:txnid", async (req, res) => {
 });
 router.post("/send-receipt", async (req, res) => {
   try {
-    const { txnid: txnid2 } = req.body;
-    const donation = await storage.getDonationByPaymentId(txnid2);
+    const { txnid } = req.body;
+    const donation = await storage.getDonationByPaymentId(txnid);
     if (!donation) {
       return res.status(404).json({ error: "Donation not found" });
     }
@@ -1883,13 +2116,13 @@ router.post("/send-receipt", async (req, res) => {
       }
     }
     const receiptData = {
-      txnid: donation.paymentId || txnid2,
+      txnid: donation.paymentId || txnid,
       amount: donation.amount,
       name: donation.name,
       email: donation.email,
       phone: donation.phone,
       purpose,
-      invoiceNumber: donation.invoiceNumber || `INV-${txnid2}`,
+      invoiceNumber: donation.invoiceNumber || `INV-${txnid}`,
       date: donation.createdAt || /* @__PURE__ */ new Date(),
       panCard: donation.panCard || void 0
     };
@@ -2095,6 +2328,11 @@ var isAdmin = async (req, res, next) => {
   next();
 };
 async function registerRoutes(app2) {
+  app2.use("/uploads", (req, res, next) => {
+    res.set("Cache-Control", "public, max-age=2592000");
+    res.set("ETag", `"${Date.now()}"`);
+    next();
+  });
   const MemoryStore = require2("memorystore")(session);
   app2.use(
     session({
@@ -2359,19 +2597,29 @@ async function registerRoutes(app2) {
       const banners2 = await storage.getBanners();
       res.json(banners2.filter((b) => b.isActive));
     } catch (error) {
-      res.status(500).json({ message: "Error fetching banners" });
+      console.error("Error fetching banners:", error);
+      res.status(500).json({
+        message: "Error fetching banners",
+        error: error instanceof Error ? error.message : String(error)
+      });
     }
   });
   app2.post("/api/banners", isAdmin, async (req, res) => {
     try {
+      console.log("Creating banner with data:", req.body);
       const data = insertBannerSchema.parse(req.body);
+      console.log("Parsed banner data:", data);
       const banner = await storage.createBanner(data);
       res.status(201).json(banner);
     } catch (error) {
+      console.error("Error creating banner:", error);
       if (error instanceof z2.ZodError) {
         return res.status(400).json({ message: "Invalid data", errors: error.errors });
       }
-      res.status(500).json({ message: "Error creating banner" });
+      res.status(500).json({
+        message: "Error creating banner",
+        error: error instanceof Error ? error.message : String(error)
+      });
     }
   });
   app2.put("/api/banners/:id", isAdmin, async (req, res) => {
@@ -2797,13 +3045,22 @@ async function registerRoutes(app2) {
   app2.delete("/api/events/:id", isAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const success = await storage.deleteEvent(id);
-      if (!success) {
-        return res.status(404).json({ message: "Event not found" });
+      console.log("Attempting to delete event with ID:", id);
+      const result = await storage.deleteEvent(id);
+      if (!result.success) {
+        console.log("Delete operation failed:", result.message);
+        return res.status(400).json({
+          message: result.message || "Cannot delete event"
+        });
       }
-      res.json({ message: "Event deleted" });
+      console.log(`Successfully deleted event ${id}`);
+      res.json({ message: "Event deleted successfully" });
     } catch (error) {
-      res.status(500).json({ message: "Error deleting event" });
+      console.error("Error deleting event:", error);
+      res.status(500).json({
+        message: "Error deleting event",
+        error: error instanceof Error ? error.message : String(error)
+      });
     }
   });
   app2.get("/api/events/:eventId/donation-cards", async (req, res) => {
@@ -3305,6 +3562,24 @@ async function registerRoutes(app2) {
       res.status(500).json({ message: "Error fetching donation" });
     }
   });
+  app2.get("/api/donations/export", isAdmin, async (req, res) => {
+    try {
+      const { fromDate, toDate } = req.query;
+      if (!fromDate || !toDate) {
+        return res.status(400).json({ message: "fromDate and toDate query parameters are required" });
+      }
+      const from = new Date(fromDate);
+      const to = new Date(toDate);
+      if (isNaN(from.getTime()) || isNaN(to.getTime())) {
+        return res.status(400).json({ message: "Invalid date format. Use ISO string format." });
+      }
+      const donations2 = await storage.getDonationsByDateRange(from, to);
+      res.json(donations2);
+    } catch (error) {
+      console.error("Error fetching donations for export:", error);
+      res.status(500).json({ message: "Error fetching donations for export" });
+    }
+  });
   app2.post("/api/donations/payment-webhook", async (req, res) => {
     try {
       const { donationId, status, transactionId } = req.body;
@@ -3619,12 +3894,12 @@ async function registerRoutes(app2) {
       const unreadMessages = contactMessages2.filter((msg) => !msg.isRead).length;
       const donationsByCategory = donationCategories2.map((category) => {
         const count = donations2.filter((d) => d.categoryId === category.id && d.status === "success").length;
-        const amount2 = donations2.filter((d) => d.categoryId === category.id && d.status === "success").reduce((sum, d) => sum + d.amount, 0);
+        const amount = donations2.filter((d) => d.categoryId === category.id && d.status === "success").reduce((sum, d) => sum + d.amount, 0);
         return {
           id: category.id,
           name: category.name,
           count,
-          amount: amount2
+          amount
         };
       });
       res.json({
@@ -3648,7 +3923,7 @@ async function registerRoutes(app2) {
         email,
         phone,
         address,
-        amount: amount2,
+        amount,
         message,
         categoryId,
         cardId,
@@ -3656,7 +3931,7 @@ async function registerRoutes(app2) {
         eventCardId,
         isCustomAmount
       } = req.body;
-      if (!name || !email || !phone || !amount2 || amount2 <= 0) {
+      if (!name || !email || !phone || !amount || amount <= 0) {
         return res.status(400).json({
           success: false,
           message: "Missing required fields: name, email, phone, and amount are required"
@@ -3670,11 +3945,13 @@ async function registerRoutes(app2) {
           message: "Payment gateway not configured. Please contact administrator."
         });
       }
-      const txnid2 = `TXN_${nanoid4(12)}_${Date.now()}`;
+      const txnid = `TXN_${nanoid4(12)}_${Date.now()}`;
+      const isLocalhost = req.get("host")?.includes("localhost") || req.get("host")?.includes("127.0.0.1");
+      const proto = req.headers["x-forwarded-proto"] || (isLocalhost ? "http" : "https");
       const payuParams = {
         key: process.env.PAYU_MERCHANT_KEY,
-        txnid: txnid2,
-        amount: parseFloat(amount2).toFixed(2),
+        txnid,
+        amount: parseFloat(amount).toFixed(2),
         productinfo: isCustomAmount ? "Custom Donation" : cardId ? "Donation Card" : "Event Donation",
         firstname: name.split(" ")[0],
         lastname: name.split(" ").slice(1).join(" ") || "",
@@ -3690,8 +3967,8 @@ async function registerRoutes(app2) {
         udf3: eventId?.toString() || "",
         udf4: eventCardId?.toString() || "",
         udf5: isCustomAmount ? "true" : "false",
-        surl: `https://${req.get("host")}/api/payments/success`,
-        furl: `https://${req.get("host")}/api/payments/failure`,
+        surl: `${proto}://${req.get("host")}/api/payments/success`,
+        furl: `${proto}://${req.get("host")}/api/payments/failure`,
         hash: ""
       };
       const hashString = `${payuParams.key}|${payuParams.txnid}|${parseFloat(payuParams.amount).toFixed(2)}|${payuParams.productinfo}|${payuParams.firstname}|${payuParams.email}|${payuParams.udf1 || ""}|${payuParams.udf2 || ""}|${payuParams.udf3 || ""}|${payuParams.udf4 || ""}|${payuParams.udf5 || ""}||||||${process.env.PAYU_MERCHANT_SALT}`;
@@ -3710,9 +3987,9 @@ async function registerRoutes(app2) {
         email,
         phone,
         address: address || "",
-        amount: parseInt(amount2),
+        amount: parseInt(amount),
         message: message || "",
-        paymentId: txnid2,
+        paymentId: txnid,
         status: "pending",
         categoryId: categoryId || null,
         eventId: eventId || null,
@@ -3723,7 +4000,7 @@ async function registerRoutes(app2) {
         success: true,
         paymentUrl: "https://secure.payu.in/_payment",
         params: payuParams,
-        txnid: txnid2
+        txnid
       });
     } catch (error) {
       console.error("PayU order creation error:", error);
@@ -3736,8 +4013,8 @@ async function registerRoutes(app2) {
   app2.post("/payment/success", async (req, res) => {
     try {
       const {
-        txnid: txnid2,
-        amount: amount2,
+        txnid,
+        amount,
         productinfo,
         firstname,
         email,
@@ -3746,9 +4023,9 @@ async function registerRoutes(app2) {
         payuMoneyId,
         mihpayid
       } = req.body;
-      console.log("PayU Success Callback:", { txnid: txnid2, amount: amount2, status, firstname, email, hash });
+      console.log("PayU Success Callback:", { txnid, amount, status, firstname, email, hash });
       const crypto2 = require2("crypto");
-      const reverseHashString = `${process.env.PAYU_MERCHANT_SALT}|${status}|||||||||||${email}|${firstname}|${productinfo}|${amount2}|${txnid2}|${process.env.PAYU_MERCHANT_KEY}`;
+      const reverseHashString = `${process.env.PAYU_MERCHANT_SALT}|${status}|||||||||||${email}|${firstname}|${productinfo}|${amount}|${txnid}|${process.env.PAYU_MERCHANT_KEY}`;
       const reverseHash = crypto2.createHash("sha512").update(reverseHashString).digest("hex");
       console.log("Hash verification:", {
         received: hash,
@@ -3760,7 +4037,7 @@ async function registerRoutes(app2) {
         console.error("Hash verification failed");
         return res.redirect("/payment/failure?error=verification_failed");
       }
-      const donation = await storage.getDonationByPaymentId(txnid2);
+      const donation = await storage.getDonationByPaymentId(txnid);
       if (donation) {
         await storage.updateDonation(donation.id, {
           status: status === "success" ? "success" : "failed",
@@ -3769,9 +4046,9 @@ async function registerRoutes(app2) {
         });
       }
       if (status === "success") {
-        res.redirect(`/payment/success?txnid=${txnid2}&amount=${amount2}`);
+        res.redirect(`/payment/success?txnid=${txnid}&amount=${amount}`);
       } else {
-        res.redirect(`/payment/failure?txnid=${txnid2}&error=payment_failed`);
+        res.redirect(`/payment/failure?txnid=${txnid}&error=payment_failed`);
       }
     } catch (error) {
       console.error("Payment success handler error:", error);
@@ -3780,8 +4057,8 @@ async function registerRoutes(app2) {
   });
   app2.get("/api/donation/:txnid", async (req, res) => {
     try {
-      const { txnid: txnid2 } = req.params;
-      const donation = await storage.getDonationByPaymentId(txnid2);
+      const { txnid } = req.params;
+      const donation = await storage.getDonationByPaymentId(txnid);
       if (!donation) {
         return res.status(404).json({ message: "Donation not found" });
       }
@@ -3835,9 +4112,9 @@ async function registerRoutes(app2) {
   });
   app2.post("/payment/failure", async (req, res) => {
     try {
-      const { txnid: txnid2, status } = req.body;
-      console.log("PayU Failure Callback:", { txnid: txnid2, status });
-      const donation = await storage.getDonationByPaymentId(txnid2);
+      const { txnid, status } = req.body;
+      console.log("PayU Failure Callback:", { txnid, status });
+      const donation = await storage.getDonationByPaymentId(txnid);
       if (donation) {
         await storage.updateDonation(donation.id, {
           status: "failed",
@@ -3845,7 +4122,7 @@ async function registerRoutes(app2) {
           updatedAt: /* @__PURE__ */ new Date()
         });
       }
-      res.redirect(`/payment/failure?txnid=${txnid2}&error=payment_cancelled`);
+      res.redirect(`/payment/failure?txnid=${txnid}&error=payment_cancelled`);
     } catch (error) {
       console.error("Payment failure handler error:", error);
       res.redirect("/payment/failure?error=processing_error");
@@ -3865,6 +4142,134 @@ async function registerRoutes(app2) {
     } catch (error) {
       console.error("Error uploading social icon:", error);
       res.status(500).json({ message: "Error uploading social icon", error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+  app2.get("/api/process-section", async (req, res) => {
+    try {
+      const section = await storage.getProcessSection();
+      res.json(section);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching process section" });
+    }
+  });
+  app2.put("/api/process-section", isAdmin, async (req, res) => {
+    try {
+      const data = insertProcessSectionSchema.partial().parse(req.body);
+      const section = await storage.updateProcessSection(data);
+      res.json(section);
+    } catch (error) {
+      if (error instanceof z2.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error updating process section" });
+    }
+  });
+  app2.get("/api/footer-settings", async (req, res) => {
+    try {
+      const settings = await storage.getFooterSettings();
+      res.json(settings);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching footer settings" });
+    }
+  });
+  app2.put("/api/footer-settings", isAdmin, async (req, res) => {
+    try {
+      const data = insertFooterSettingsSchema.partial().parse(req.body);
+      const settings = await storage.updateFooterSettings(data);
+      res.json(settings);
+    } catch (error) {
+      if (error instanceof z2.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error updating footer settings" });
+    }
+  });
+  app2.get("/api/policies", async (req, res) => {
+    try {
+      const policies2 = await storage.getPolicies();
+      res.json(policies2);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching policies" });
+    }
+  });
+  app2.get("/api/policies/:slug", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const policy = await storage.getPolicyBySlug(slug);
+      if (!policy) {
+        return res.status(404).json({ message: "Policy not found" });
+      }
+      res.json(policy);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching policy" });
+    }
+  });
+  app2.get("/api/admin/policies", isAdmin, async (req, res) => {
+    try {
+      const allPolicies = await storage.getAllPolicies();
+      res.json(allPolicies);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching policies" });
+    }
+  });
+  app2.post("/api/admin/policies", isAdmin, async (req, res) => {
+    try {
+      const data = insertPolicySchema.parse(req.body);
+      const policy = await storage.createPolicy(data);
+      res.json(policy);
+    } catch (error) {
+      if (error instanceof z2.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error creating policy" });
+    }
+  });
+  app2.put("/api/admin/policies/:id", isAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const data = insertPolicySchema.partial().parse(req.body);
+      const policy = await storage.updatePolicy(parseInt(id), data);
+      if (!policy) {
+        return res.status(404).json({ message: "Policy not found" });
+      }
+      res.json(policy);
+    } catch (error) {
+      if (error instanceof z2.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error updating policy" });
+    }
+  });
+  app2.delete("/api/admin/policies/:id", isAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.deletePolicy(parseInt(id));
+      if (!success) {
+        return res.status(404).json({ message: "Policy not found" });
+      }
+      res.json({ message: "Policy deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting policy" });
+    }
+  });
+  app2.get("/api/policies-page", async (req, res) => {
+    try {
+      const page = await storage.getPoliciesPage();
+      res.json(page);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching policies page" });
+    }
+  });
+  app2.put("/api/admin/policies-page", isAdmin, async (req, res) => {
+    try {
+      const data = insertPoliciesPageSchema.partial().parse(req.body);
+      const page = await storage.updatePoliciesPage(data);
+      res.json(page);
+    } catch (error) {
+      if (error instanceof z2.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error updating policies page" });
     }
   });
   const httpServer = createServer(app2);
@@ -3902,7 +4307,20 @@ var vite_config_default = defineConfig({
   root: path4.resolve(import.meta.dirname, "client"),
   build: {
     outDir: path4.resolve(import.meta.dirname, "dist/public"),
-    emptyOutDir: true
+    emptyOutDir: true,
+    // Production optimization settings
+    minify: "esbuild",
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "vendor": ["react", "react-dom"],
+          "ui": ["@radix-ui/react-dialog", "@radix-ui/react-select"],
+          "query": ["@tanstack/react-query"]
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1e3,
+    reportCompressedSize: false
   }
 });
 
@@ -3931,7 +4349,6 @@ async function setupVite(app2, server) {
       ...viteLogger,
       error: (msg, options) => {
         viteLogger.error(msg, options);
-        process.exit(1);
       }
     },
     server: serverOptions,
@@ -4237,36 +4654,18 @@ app.use((req, res, next) => {
   app.use((err, _req, res, _next) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
-    res.status(status).json({ message });
-    throw err;
+    console.error("Server Error:", err);
+    if (!res.headersSent) {
+      res.status(status).json({ message });
+    }
   });
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
     serveStatic(app);
   }
-  const findAvailablePort = async (startPort) => {
-    const { createServer: createServer2 } = await import("net");
-    return new Promise((resolve, reject) => {
-      const testServer = createServer2();
-      testServer.listen(startPort, "0.0.0.0", () => {
-        const address = testServer.address();
-        const port2 = typeof address === "object" && address !== null ? address.port : startPort;
-        testServer.close(() => resolve(port2));
-      });
-      testServer.on("error", async () => {
-        try {
-          const nextPort = await findAvailablePort(startPort + 1);
-          resolve(nextPort);
-        } catch (err) {
-          reject(err);
-        }
-      });
-    });
-  };
-  const port = process.env.PORT ? parseInt(process.env.PORT) : await findAvailablePort(8080);
-  console.log(`Environment PORT: ${process.env.PORT}`);
-  console.log(`Using port: ${port}`);
+  const port = process.env.PORT ? parseInt(process.env.PORT) : 5e3;
+  console.log(`Starting server on port ${port}`);
   server.listen({
     port,
     host: "0.0.0.0"

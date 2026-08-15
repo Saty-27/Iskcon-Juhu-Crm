@@ -21,7 +21,7 @@ const createEmailTransporter = () => {
   return nodemailer.createTransport({
     service: 'gmail', // or your email service
     auth: {
-      user: process.env.EMAIL_USER || 'donations@iskconjuhu.org',
+      user: process.env.EMAIL_USER || 'sukadeva.bvks@gmail.com',
       pass: process.env.EMAIL_PASSWORD || 'your-app-password'
     }
   });
@@ -45,7 +45,7 @@ export async function generatePDFReceipt(receiptData: ReceiptData): Promise<Buff
          .fillColor('#000')
          .text('International Society for Krishna Consciousness', 50, 80, { align: 'center' })
          .text('Hare Krishna Land, Juhu, Mumbai - 400049', 50, 100, { align: 'center' })
-         .text('Phone: +91-22-2620-6860 | Email: donations@iskconjuhu.org', 50, 120, { align: 'center' });
+         .text('Phone: +91 88986 16150 (Sukadeva) | Email: sukadeva.bvks@gmail.com', 50, 120, { align: 'center' });
 
       // Title
       doc.fontSize(18)
@@ -127,7 +127,7 @@ export async function sendReceiptEmail(receiptData: ReceiptData, pdfBuffer: Buff
     const transporter = createEmailTransporter();
 
     const mailOptions = {
-      from: 'ISKCON Juhu <donations@iskconjuhu.org>',
+      from: 'ISKCON Juhu <sukadeva.bvks@gmail.com>',
       to: receiptData.email,
       subject: `Donation Receipt - ${receiptData.invoiceNumber} | ISKCON Juhu`,
       html: `
@@ -168,7 +168,7 @@ export async function sendReceiptEmail(receiptData: ReceiptData, pdfBuffer: Buff
           
           <div style="background: #333; color: white; padding: 20px; text-align: center; font-size: 12px;">
             <p style="margin: 0;">ISKCON Juhu | Hare Krishna Land, Juhu, Mumbai - 400049</p>
-            <p style="margin: 5px 0 0;">Phone: +91-22-2620-6860 | Email: donations@iskconjuhu.org</p>
+            <p style="margin: 5px 0 0;">Phone: +91 88986 16150 (Sukadeva) | Email: sukadeva.bvks@gmail.com</p>
           </div>
         </div>
       `,

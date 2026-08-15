@@ -288,7 +288,8 @@ const PaymentSuccess = () => {
                   <div className="text-sm text-gray-600">
                     <p className="mb-1">• You will receive an email confirmation shortly</p>
                     <p className="mb-1">• Your donation receipt is available for download/print</p>
-                    <p>• For queries, contact: donations@iskconjuhu.org</p>
+                    <p className="mb-1">• For queries, contact: sukadeva.bvks@gmail.com</p>
+                    <p>• For contact, you can call: +91 88986 16150 (Sukadeva)</p>
                   </div>
                 </div>
               </CardContent>

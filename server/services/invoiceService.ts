@@ -9,6 +9,12 @@ import { Readable } from 'stream';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { nanoid } from 'nanoid';
+import twilio from 'twilio';
+
+// Initialize Twilio client with environment variables if credentials exist
+const twilioClient = process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN 
+  ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
+  : null;
 
 interface DonationReceipt {
   txnid: string;
@@ -131,7 +137,7 @@ async function setupPDF(doc: PDFKit.PDFDocument, donation: DonationReceipt) {
   doc.moveDown(0.5);
   
   doc.fontSize(8)
-     .text('For any queries related to your donation, please contact us at donations@iskconjuhu.in', { align: 'center' });
+     .text('For any queries related to your donation, please contact us at sukadeva.bvks@gmail.com or call +91 88986 16150 (Sukadeva)', { align: 'center' });
 }
 
 /**

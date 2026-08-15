@@ -1994,6 +1994,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate unique transaction ID
       const txnid = `TXN_${nanoid(12)}_${Date.now()}`;
       
+      const isLocalhost = req.get('host')?.includes('localhost') || req.get('host')?.includes('127.0.0.1');
+      const proto = req.headers['x-forwarded-proto'] || (isLocalhost ? 'http' : 'https');
+
       // PayU required parameters
       const payuParams = {
         key: process.env.PAYU_MERCHANT_KEY,
@@ -2014,8 +2017,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         udf3: eventId?.toString() || '',
         udf4: eventCardId?.toString() || '',
         udf5: isCustomAmount ? 'true' : 'false',
-        surl: `https://${req.get('host')}/api/payments/success`,
-        furl: `https://${req.get('host')}/api/payments/failure`,
+        surl: `${proto}://${req.get('host')}/api/payments/success`,
+        furl: `${proto}://${req.get('host')}/api/payments/failure`,
         hash: ''
       };
 

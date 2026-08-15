@@ -36,7 +36,8 @@ router.post('/initiate', async (req, res) => {
     console.log(`Generated transaction ID: ${txnid}`);
     
     // Determine success and failure URLs
-    const protocol = 'https';  // Use HTTPS for secure PayU callbacks
+    const isLocalhost = req.headers.host?.includes('localhost') || req.headers.host?.includes('127.0.0.1');
+    const protocol = req.headers['x-forwarded-proto'] || (isLocalhost ? 'http' : 'https');
     const host = req.headers.host || req.hostname;
     const baseUrl = `${protocol}://${host}`;
     

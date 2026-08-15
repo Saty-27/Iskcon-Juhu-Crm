@@ -277,7 +277,7 @@ const ThankYou = () => {
           {/* Contact Information */}
           <div className="text-center text-sm text-gray-600 pt-4 border-t">
             <p>For any queries regarding your donation, please contact:</p>
-            <p className="font-medium">Email: donations@iskconjuhu.org | Phone: +91-22-2620-6860</p>
+            <p className="font-medium">Email: sukadeva.bvks@gmail.com | Phone: +91 88986 16150 (Sukadeva)</p>
           </div>
         </CardContent>
       </Card>
